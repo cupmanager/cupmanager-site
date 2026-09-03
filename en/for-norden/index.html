@@ -1,0 +1,516 @@
+<!DOCTYPE html><html lang="en"> <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>For the nerds - Cup Manager</title><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400..800&family=Roboto:wght@300..700&display=swap"><link rel="icon" href="/media/shared/favicon.png" sizes="32x32"><link rel="icon" href="/media/shared/favicon.png" sizes="192x192"><link rel="apple-touch-icon" href="/media/shared/favicon.png"><meta name="msapplication-TileImage" content="/media/shared/favicon.png"><link rel="alternate" hreflang="sv" href="https://cupmanager.net/sv/for-norden/"><link rel="alternate" hreflang="no" href="https://cupmanager.net/no/for-norden/"><link rel="alternate" hreflang="en" href="https://cupmanager.net/en/for-norden/"><link rel="alternate" hreflang="x-default" href="https://cupmanager.net/sv/for-norden/"><link rel="stylesheet" href="/_astro/registry.4cHICgBS.css"></head> <body> <header class="plinto-header"> <a href="/en" style="display:inline-flex;align-items:center"><img src="/media/shared/cupmanager_light.svg" alt="Cup Manager" style="height:48px;width:auto;display:block"/></a>
+<nav class="cm-nav"><style>
+  .plinto-header {
+    --plinto-header-max-width: 1300px;
+    --plinto-header-padding-inline: 30px;
+    --plinto-header-padding-block: 0px;
+    --plinto-header-min-height: 100px;
+    --plinto-header-border-width: 0px;
+    --plinto-header-shadow: 0 0 20px rgba(0,0,0,0.1);
+  }
+</style><style>
+        .cm-nav { display: flex; align-items: center; gap: 30px; font-family: var(--font-body, Roboto, sans-serif); }
+        .cm-nav-toggle { display: none; }
+        .cm-nav-hamburger { display: none; cursor: pointer; padding: 8px; background: none; border: none; color: #333; }
+        .cm-nav-hamburger svg { display: block; }
+        .cm-nav-links { display: contents; }
+        .cm-nav a.cm-nav-link, .cm-nav span.cm-nav-link { color: #5C6B79; font-weight: 400; font-size: 17px; text-decoration: none; transition: color 0.15s; }
+        /* Chevron inherits the link colour, so it greens on hover too */
+        .cm-nav .cm-caret { margin-left: 5px; flex: none; }
+        @media (min-width: 1024px) {
+          /* Nav items span the full header height (as on cupmanager.net), for
+             two reasons: the mega panel is positioned at top:100% of its item,
+             so anything shorter drops it *inside* the header; and it gives the
+             hover target the whole bar rather than just the text. Going
+             inline-flex also stops the chevron inflating the trigger's line
+             box, which would knock it off the centre line of its neighbours. */
+          /* The nav must fill the header before its items can; otherwise
+             stretching them only reaches the nav's own content height. */
+          .cm-nav { align-self: stretch; }
+          .cm-nav > .cm-nav-links > a.cm-nav-link,
+          .cm-nav > .cm-nav-links > .cm-mi-wrap { align-self: stretch; display: inline-flex; align-items: center; }
+          .cm-nav .cm-mi-wrap > a.cm-nav-link,
+          .cm-nav .cm-mi-wrap > span.cm-nav-link { display: inline-flex; align-items: center; height: 100%; }
+        }
+        .cm-nav a.cm-nav-link:hover, .cm-nav .cm-mi-wrap:hover > a.cm-nav-link, .cm-nav .cm-mi-wrap:hover > span.cm-nav-link { color: var(--brand); }
+        .cm-nav span.cm-nav-link { cursor: default; }
+        @media (max-width: 1024px) {
+          .cm-nav .cm-caret { display: none; }
+          .cm-nav-hamburger { display: block; }
+          .cm-nav-links { display: none; flex-direction: column; width: 100%; position: absolute; top: 100%; left: 0; right: 0; background: #fff; border-bottom: 1px solid #eee; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); z-index: 50; padding: 0 24px 12px; }
+          .cm-nav-links > a, .cm-nav-links .cm-mi-wrap { display: block; padding: 12px 0; border-top: 1px solid #f0f0f0; }
+          .cm-nav-toggle:checked ~ .cm-nav-links { display: flex; }
+        }
+      </style><input type="checkbox" id="cm-nav-toggle" class="cm-nav-toggle" hidden=""/><label for="cm-nav-toggle" class="cm-nav-hamburger" aria-label="Menu"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg></label><div class="cm-nav-links"><a href="/en" class="cm-nav-link">Home</a><div class="cm-mi-wrap"><style>
+          /* Deliberately NOT positioned: the panel spans the viewport, so its
+             containing block has to be the header (.plinto-header is relative,
+             from the library's globals) rather than the item. Items stretch to
+             the full header height, so top:100% lands in the same place either
+             way. */
+          .cm-mi-panel { display: none; position: absolute; top: 100%; left: 0; right: 0; background: #fff; border-top: 1px solid var(--brand); border-bottom: 1px solid var(--brand); z-index: 60; }
+          .cm-mi-wrap:hover > .cm-mi-panel, .cm-mi-wrap:focus-within > .cm-mi-panel { display: block; }
+          /* The two halves meet at the centre of the viewport. Contained keeps
+             them inside the header's content width (cupmanager.net); full lets
+             the colour bleed to the edges (superinvite.com). */
+          .cm-mi-panel-inner { display: flex; max-width: var(--cm-panel-max-width, 1300px); margin: 0 auto; }
+          .cm-mi-panel-highlights { background: var(--brand); flex: 0 0 50%; min-width: 0; box-sizing: border-box; display: flex; flex-direction: column; gap: 20px; justify-content: center; padding: 44px 20px 44px 27%; }
+          .cm-nav .cm-mi-panel-highlights a.cm-nav-link { color: #fff; font-weight: 400; font-size: 18px; display: inline-flex; align-items: center; gap: 14px; }
+          .cm-mi-panel-highlights svg { width: 20px; height: 20px; flex: none; }
+          .cm-nav .cm-mi-panel-highlights a.cm-nav-link:hover { color: rgba(255,255,255,0.8); }
+          .cm-mi-panel-main { background: #f5f5f5; flex: 0 0 50%; min-width: 0; box-sizing: border-box; padding: 44px 6% 44px 5%; }
+          .cm-mi-panel-heading { font-family: var(--font-heading, Montserrat, sans-serif); font-weight: 600; font-size: 22px; color: #162B40; margin: 0 0 6px; padding-bottom: 14px; border-bottom: 2px solid var(--brand); }
+          /* Multi-column, not grid: the live panels fill the first column
+             before starting the second, and column-count does that for any
+             number of links without the markup naming a row count. */
+          .cm-mi-panel-links { columns: 2; column-gap: 32px; margin-top: 20px; }
+          .cm-nav .cm-mi-panel-links a.cm-nav-link { display: block; break-inside: avoid; margin-bottom: 18px; color: #5C6B79; font-weight: 400; font-size: 15px; }
+          .cm-nav .cm-mi-panel-links a.cm-nav-link:hover { color: var(--brand); }
+          @media (max-width: 1024px) {
+            .cm-mi-panel { display: block; position: static; border: 0; background: transparent; }
+            .cm-mi-panel-inner { display: block; max-width: none; }
+            .cm-mi-panel-highlights { display: none; }
+            .cm-mi-panel-main { background: transparent; padding: 8px 0 0 12px; }
+            .cm-mi-panel-heading { display: none; }
+            .cm-mi-panel-links { columns: 1; margin-top: 4px; }
+            .cm-nav .cm-mi-panel-links a.cm-nav-link { margin-bottom: 10px; }
+          }
+        </style><span class="cm-nav-link" tabindex="0" role="button" aria-haspopup="true">About Cup Manager<svg class="cm-caret" aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg></span><div class="cm-mi-panel"><div class="cm-mi-panel-inner"><div class="cm-mi-panel-highlights"><a href="/en/kort-och-klarna" class="cm-nav-link"><svg width="16" height="16" viewBox="0 0 512 512" fill="currentColor" aria-hidden="true"><path d="M448 96c17.7 0 32 14.3 32 32l0 64-448 0 0-64c0-17.7 14.3-32 32-32l384 0zm32 128l0 160c0 17.7-14.3 32-32 32L64 416c-17.7 0-32-14.3-32-32l0-160 448 0zM64 64C28.7 64 0 92.7 0 128L0 384c0 35.3 28.7 64 64 64l384 0c35.3 0 64-28.7 64-64l0-256c0-35.3-28.7-64-64-64L64 64zM96 336c0 8.8 7.2 16 16 16l32 0c8.8 0 16-7.2 16-16s-7.2-16-16-16l-32 0c-8.8 0-16 7.2-16 16zm96 0c0 8.8 7.2 16 16 16l32 0c8.8 0 16-7.2 16-16s-7.2-16-16-16l-32 0c-8.8 0-16 7.2-16 16z"></path></svg>Cards and Klarna</a><a href="/en/app" class="cm-nav-link"><svg width="16" height="16" viewBox="0 0 384 512" fill="currentColor" aria-hidden="true"><path d="M48 448c0 17.7 14.3 32 32 32l224 0c17.7 0 32-14.3 32-32l0-96-288 0 0 96zm0-128l288 0 0-256c0-17.7-14.3-32-32-32L80 32C62.3 32 48 46.3 48 64l0 256zM16 64C16 28.7 44.7 0 80 0L304 0c35.3 0 64 28.7 64 64l0 384c0 35.3-28.7 64-64 64L80 512c-35.3 0-64-28.7-64-64L16 64zM160 400l64 0c8.8 0 16 7.2 16 16s-7.2 16-16 16l-64 0c-8.8 0-16-7.2-16-16s7.2-16 16-16z"></path></svg>Your own tournament app</a><a href="/en/hemsida" class="cm-nav-link"><svg width="16" height="16" viewBox="0 0 512 512" fill="currentColor" aria-hidden="true"><path d="M288 64l0 64-64 0 0-64 64 0zm-64 96l16 0 0 64-128 0c-35.3 0-64 28.7-64 64l0 64-16 0c-17.7 0-32 14.3-32 32l0 64c0 17.7 14.3 32 32 32l64 0c17.7 0 32-14.3 32-32l0-64c0-17.7-14.3-32-32-32l-16 0 0-64c0-17.7 14.3-32 32-32l128 0 0 96-16 0c-17.7 0-32 14.3-32 32l0 64c0 17.7 14.3 32 32 32l64 0c17.7 0 32-14.3 32-32l0-64c0-17.7-14.3-32-32-32l-16 0 0-96 128 0c17.7 0 32 14.3 32 32l0 64-16 0c-17.7 0-32 14.3-32 32l0 64c0 17.7 14.3 32 32 32l64 0c17.7 0 32-14.3 32-32l0-64c0-17.7-14.3-32-32-32l-16 0 0-64c0-35.3-28.7-64-64-64l-128 0 0-64 16 0c17.7 0 32-14.3 32-32l0-64c0-17.7-14.3-32-32-32l-64 0c-17.7 0-32 14.3-32 32l0 64c0 17.7 14.3 32 32 32zM32 384l64 0 0 64-64 0 0-64zm192 0l64 0 0 64-64 0 0-64zm192 0l64 0 0 64-64 0 0-64z"></path></svg>Website included</a><a href="/en/streaming" class="cm-nav-link"><svg width="16" height="16" viewBox="0 0 512 512" fill="currentColor" aria-hidden="true"><path d="M256 32a224 224 0 1 1 0 448 224 224 0 1 1 0-448zm0 480a256 256 0 1 0 0-512 256 256 0 1 0 0 512zm72.7-256L208 329.7 208 182.3 328.7 256zM188.3 147.1c-7.6 4.2-12.3 12.3-12.3 20.9l0 176c0 8.7 4.7 16.7 12.3 20.9s16.8 4.1 24.3-.5l144-88c7.1-4.4 11.5-12.1 11.5-20.5s-4.4-16.1-11.5-20.5l-144-88c-7.4-4.5-16.7-4.7-24.3-.5z"></path></svg>Livestreaming</a><a href="/en/priser" class="cm-nav-link"><svg width="16" height="16" viewBox="0 0 512 512" fill="currentColor" aria-hidden="true"><path d="M64.1 96c0-17.7 14.3-32 32-32l156.1 0c8.5 0 16.6 3.4 22.6 9.4l192 192c12.5 12.5 12.5 32.8 0 45.2L310.7 466.7c-12.5 12.5-32.8 12.5-45.3 0l-192-192c-6-6-9.4-14.1-9.4-22.6L64.1 96zm32-64c-35.3 0-64 28.7-64 64l0 156.1c0 17 6.7 33.2 18.7 45.3l192 192c25 25 65.5 25 90.5 0L489.5 333.3c25-25 25-65.5 0-90.5l-192-192c-12-12-28.3-18.7-45.3-18.7L96.1 32zm48 136a24 24 0 1 0 0-48 24 24 0 1 0 0 48z"></path></svg>Pricing</a></div><div class="cm-mi-panel-main"><p class="cm-mi-panel-heading">Learn more about our features</p><div class="cm-mi-panel-links"><a href="/en/hemsida" class="cm-nav-link">Your own website for the tournament</a><a href="/en/anmalningar" class="cm-nav-link">Registration system for teams &amp; referees</a><a href="/en/kort-och-klarna" class="cm-nav-link">Integrated payment solutions</a><a href="/en/lagkonto-boende" class="cm-nav-link">Team accounts and accommodation management</a><a href="/en/lottning-schema" class="cm-nav-link">Draw and scheduling</a><a href="/en/resultat" class="cm-nav-link">Results and more during the tournament</a></div></div></div></div></div><a href="/en/support" class="cm-nav-link">Support</a><a href="/en/laddaner" class="cm-nav-link">Download</a><a href="/en/om-cupmanager" class="cm-nav-link">About us</a><a href="https://calendly.com/superinvite-cupmanager-en/demo" style="display:inline-flex;align-items:center;gap:8px;background-color:var(--brand);color:#fff;border-radius:3px;font-family:var(--font-body, Roboto, sans-serif);font-weight:300;text-decoration:none;white-space:nowrap;font-size:16px;padding:10px 30px">Book a demo</a></div><script>(function(){
+        var path = location.pathname.replace(/\/$/, '');
+        var links = document.querySelectorAll('.cm-nav > .cm-nav-links > a.cm-nav-link, .cm-nav > .cm-nav-links > .cm-mi-wrap > a.cm-nav-link');
+        links.forEach(function(a){
+          var href = a.getAttribute('href');
+          if (!href) return;
+          var norm = href.replace(/\/$/, '');
+          if (norm === path || (norm !== '/sv' && path.indexOf(norm + '/') === 0)) a.style.color = 'var(--brand)';
+        });
+      })();</script></nav> </header> <main> <section style="background-color:#fff;padding:48px 7%"><style>
+        /* Side by side only while the copy still fits the fixed-ratio row.
+           Measured on the longest row of the start page: against the 460px box
+           the roomy padding leaves just 3px of slack from 1441px to 1560px and
+           overflows below that, so the tighter padding covers everything up to
+           1599px and buys back the ~60px that makes the copy fit down to 960px.
+           From 1600px up the roomy padding has 28px to spare on its own. */
+        @media (min-width: 961px) and (max-width: 1599px) {
+          .cm-frow:not(.cm-frow-contained):not(.cm-frow-split) > div:last-child > div {
+            padding: 40px 5% !important;
+          }
+        }
+        @media (max-width: 960px) {
+          /* Stacked: the row is content-height, and the image keeps a fixed
+             ratio of its own so every stacked row still matches the others. */
+          .cm-frow { flex-direction: column !important; min-height: 0 !important; }
+          /* flex-basis becomes HEIGHT in column direction — reset it */
+          .cm-frow > div { flex-basis: auto !important; }
+          .cm-frow:not(.cm-frow-contained) > div:first-child {
+            aspect-ratio: 16 / 9;
+            min-height: 0 !important;
+          }
+        }
+      </style><div class="cm-frow cm-frow-contained" style="display:flex;flex-direction:row-reverse;min-height:0;max-width:1140px;margin:0 auto;gap:48px;align-items:start;flex-wrap:wrap"><div style="flex:1 1 380px;min-width:0;position:relative;overflow:hidden;min-height:0"><img src="/media/for-norden/feature-006.png" alt="Tactics board" style="width:100%;height:auto;display:block;border-radius:4px"/></div><div style="flex:1 1 380px;min-width:0;display:flex;align-items:center;background-color:#fff"><div style="padding:0;max-width:1000px"><div><h2 style="font-size:clamp(1.4rem, 2.5vw, 2rem);font-weight:700;color:var(--brand);margin-bottom:16px;line-height:1.2;font-family:var(--font-heading, Montserrat, sans-serif)">How Cup Manager works under the hood</h2><div style="width:60px;height:2px;background-color:var(--brand);margin-bottom:20px"></div><div style="color:#555;font-size:15px;line-height:1.7;margin-bottom:28px;font-family:var(--font-body, Roboto, sans-serif)"><style>
+.cm-rich > *:first-child { margin-top: 0; }
+.cm-rich > *:last-child { margin-bottom: 0; }
+.cm-rich p { margin: 0 0 0.9em; }
+.cm-rich ul { list-style: disc; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich ol { list-style: decimal; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich li { margin: 0.3em 0; }
+.cm-rich a { color: var(--brand); text-decoration: none; }
+.cm-rich a:hover { text-decoration: underline; }
+.cm-rich strong { font-weight: 700; }
+.cm-rich blockquote { border-left: 3px solid var(--brand); padding-left: 1em; margin: 1em 0; font-style: italic; opacity: 0.85; }
+.cm-rich h3, .cm-rich h4 { font-weight: 700; margin: 1.2em 0 0.5em; font-family: var(--font-heading, Montserrat, sans-serif); }
+.cm-rich h3 { font-size: 1.25em; }
+.cm-rich h4 { font-size: 1.1em; }
+.cm-rich table { border-collapse: collapse; margin: 1em 0; }
+.cm-rich th, .cm-rich td { border: 1px solid #d5d5d5; padding: 5px 10px; text-align: center; }
+.cm-rich th { background: rgba(0,0,0,0.045); font-weight: 700; }
+.cm-rich img { max-width: 100%; height: auto; }
+.cm-rich hr { border: none; border-top: 1px solid rgba(0,0,0,0.12); margin: 1.4em 0; }
+</style><div class="cm-rich"><p><strong>We&#39;ve spent years refining the algorithms behind Cup Manager&#39;s many automatic features.</strong></p><p>Every new tournament has taught us something new about how complicated it is to design the perfect schedule.</p><p>Here&#39;s a look at some of our unique features, built on the knowledge we&#39;ve gathered over the years.</p></div></div></div></div></div></div></section>
+<section style="padding:40px 7%;background-color:transparent"><style>
+        .cm-cols-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 48px; max-width: 1140px; margin: 0 auto; text-align: left; }
+        /* In the editor Puck wraps the columns in a DropZone. display:contents
+           would make them cells of the grid above, but it also discards the
+           DropZone's own box — 0x0 while empty, so Puck's own min-height cannot
+           apply and a freshly dropped CmColumns cannot be filled at all: the
+           dragged block just relocates elsewhere on the page. The DropZone is
+           the grid instead, spanning the outer tracks and repeating them
+           inside. The rendered page has no DropZone, so there the rule above
+           does the work. */
+        .cm-cols-2 > [class*="DropZone"] {
+          grid-column: 1 / -1;
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
+          gap: 48px;
+        }
+        @media (max-width: 640px) {
+          .cm-cols-2 { grid-template-columns: 1fr; max-width: 100%; }
+          .cm-cols-2 > [class*="DropZone"] { grid-template-columns: 1fr; }
+        }
+      </style><div class="cm-cols-2"><div><style>.cm-col-heading:has(> [data-puck-overlay-portal]:empty) { display: none; }</style><h2 class="cm-col-heading" style="color:#1a1a1a;font-size:1.5rem;font-weight:700;margin-bottom:24px;font-family:var(--font-heading, Montserrat, sans-serif)">Geographic grouping of teams</h2><div class="py-4 max-w-2xl mx-auto text-left"><div class="text-gray-700 leading-relaxed"><style>
+.cm-rich > *:first-child { margin-top: 0; }
+.cm-rich > *:last-child { margin-bottom: 0; }
+.cm-rich p { margin: 0 0 0.9em; }
+.cm-rich ul { list-style: disc; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich ol { list-style: decimal; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich li { margin: 0.3em 0; }
+.cm-rich a { color: var(--brand); text-decoration: none; }
+.cm-rich a:hover { text-decoration: underline; }
+.cm-rich strong { font-weight: 700; }
+.cm-rich blockquote { border-left: 3px solid var(--brand); padding-left: 1em; margin: 1em 0; font-style: italic; opacity: 0.85; }
+.cm-rich h3, .cm-rich h4 { font-weight: 700; margin: 1.2em 0 0.5em; font-family: var(--font-heading, Montserrat, sans-serif); }
+.cm-rich h3 { font-size: 1.25em; }
+.cm-rich h4 { font-size: 1.1em; }
+.cm-rich table { border-collapse: collapse; margin: 1em 0; }
+.cm-rich th, .cm-rich td { border: 1px solid #d5d5d5; padding: 5px 10px; text-align: center; }
+.cm-rich th { background: rgba(0,0,0,0.045); font-weight: 700; }
+.cm-rich img { max-width: 100%; height: auto; }
+.cm-rich hr { border: none; border-top: 1px solid rgba(0,0,0,0.12); margin: 1.4em 0; }
+</style><div class="cm-rich"><p>To build an automatic function you can actually rely on for splitting teams into groups (the same algorithm is also used for playoff brackets), you can&#39;t stop halfway and only consider which club each team belongs to. That kind of algorithm leaves a lot of manual work behind, since teams from the same city (or country, in international tournaments) can still end up in the same group.</p><p>That&#39;s why Cup Manager takes the following conflicts into account (a conflict is when two teams sharing one of these properties end up in the same group):</p><ol>
+<li>Club</li>
+<li>Postal code</li>
+<li>City</li>
+<li>Municipality</li>
+<li>Sports district</li>
+<li>County</li>
+<li>Postal code area</li>
+<li>Country</li>
+<li>Country region</li>
+<li>Admin email address</li>
+<li>Jersey color</li>
+</ol></div></div></div></div><div><style>.cm-col-heading:has(> [data-puck-overlay-portal]:empty) { display: none; }</style><div class="py-4 max-w-2xl mx-auto text-left"><div class="text-gray-700 leading-relaxed"><style>
+.cm-rich > *:first-child { margin-top: 0; }
+.cm-rich > *:last-child { margin-bottom: 0; }
+.cm-rich p { margin: 0 0 0.9em; }
+.cm-rich ul { list-style: disc; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich ol { list-style: decimal; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich li { margin: 0.3em 0; }
+.cm-rich a { color: var(--brand); text-decoration: none; }
+.cm-rich a:hover { text-decoration: underline; }
+.cm-rich strong { font-weight: 700; }
+.cm-rich blockquote { border-left: 3px solid var(--brand); padding-left: 1em; margin: 1em 0; font-style: italic; opacity: 0.85; }
+.cm-rich h3, .cm-rich h4 { font-weight: 700; margin: 1.2em 0 0.5em; font-family: var(--font-heading, Montserrat, sans-serif); }
+.cm-rich h3 { font-size: 1.25em; }
+.cm-rich h4 { font-size: 1.1em; }
+.cm-rich table { border-collapse: collapse; margin: 1em 0; }
+.cm-rich th, .cm-rich td { border: 1px solid #d5d5d5; padding: 5px 10px; text-align: center; }
+.cm-rich th { background: rgba(0,0,0,0.045); font-weight: 700; }
+.cm-rich img { max-width: 100%; height: auto; }
+.cm-rich hr { border: none; border-top: 1px solid rgba(0,0,0,0.12); margin: 1.4em 0; }
+</style><div class="cm-rich"><p>Conflicts are handled in the order of the list above. It&#39;s worse, for example, if two teams from the same club end up in the same group than if two teams simply share a jersey color. The goal is to minimize the total number of conflicts across all groups.</p><p>Cup Manager has three different features that use these same conflicts to build the best possible schedule:</p><ul>
+<li>Grouping teams</li>
+<li>Playoffs (where an extra conflict is added: teams that advanced from the same group)</li>
+<li>Match assignment in non-ranked classes</li>
+</ul></div></div></div></div></div></section>
+<section style="padding:40px 7%;background-color:transparent"><style>
+        .cm-cols-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 48px; max-width: 1140px; margin: 0 auto; text-align: left; }
+        /* In the editor Puck wraps the columns in a DropZone. display:contents
+           would make them cells of the grid above, but it also discards the
+           DropZone's own box — 0x0 while empty, so Puck's own min-height cannot
+           apply and a freshly dropped CmColumns cannot be filled at all: the
+           dragged block just relocates elsewhere on the page. The DropZone is
+           the grid instead, spanning the outer tracks and repeating them
+           inside. The rendered page has no DropZone, so there the rule above
+           does the work. */
+        .cm-cols-2 > [class*="DropZone"] {
+          grid-column: 1 / -1;
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
+          gap: 48px;
+        }
+        @media (max-width: 640px) {
+          .cm-cols-2 { grid-template-columns: 1fr; max-width: 100%; }
+          .cm-cols-2 > [class*="DropZone"] { grid-template-columns: 1fr; }
+        }
+      </style><div class="cm-cols-2"><div><style>.cm-col-heading:has(> [data-puck-overlay-portal]:empty) { display: none; }</style><div class="py-4 max-w-2xl mx-auto text-left"><div class="text-gray-700 leading-relaxed"><style>
+.cm-rich > *:first-child { margin-top: 0; }
+.cm-rich > *:last-child { margin-bottom: 0; }
+.cm-rich p { margin: 0 0 0.9em; }
+.cm-rich ul { list-style: disc; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich ol { list-style: decimal; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich li { margin: 0.3em 0; }
+.cm-rich a { color: var(--brand); text-decoration: none; }
+.cm-rich a:hover { text-decoration: underline; }
+.cm-rich strong { font-weight: 700; }
+.cm-rich blockquote { border-left: 3px solid var(--brand); padding-left: 1em; margin: 1em 0; font-style: italic; opacity: 0.85; }
+.cm-rich h3, .cm-rich h4 { font-weight: 700; margin: 1.2em 0 0.5em; font-family: var(--font-heading, Montserrat, sans-serif); }
+.cm-rich h3 { font-size: 1.25em; }
+.cm-rich h4 { font-size: 1.1em; }
+.cm-rich table { border-collapse: collapse; margin: 1em 0; }
+.cm-rich th, .cm-rich td { border: 1px solid #d5d5d5; padding: 5px 10px; text-align: center; }
+.cm-rich th { background: rgba(0,0,0,0.045); font-weight: 700; }
+.cm-rich img { max-width: 100%; height: auto; }
+.cm-rich hr { border: none; border-top: 1px solid rgba(0,0,0,0.12); margin: 1.4em 0; }
+</style><div class="cm-rich"><p><strong>Grouping teams</strong></p><p>Cup Manager has a built-in &quot;conflict solver&quot; that&#39;s guaranteed to split teams between groups in an optimal way. That means Cup Manager always distributes teams so the number of conflicts is minimized. Combined with the option to seed certain teams before running the automatic function, this makes Cup Manager&#39;s team-grouping feature complete. The conflict solver is actually one of the first things ever built for Cup Manager, and it&#39;s been part of every version since around 2008 (12 years, at the time of writing!).</p><p><strong>Optimal playoff brackets</strong></p><p>If you want the details, read the next section, which covers playoffs specifically — but we can already reveal that the conflict solver plays a central role there too.</p><p><strong>Match assignment in non-ranked classes</strong></p><p>Since teams in non-ranked classes don&#39;t need to be ranked by result, not every team in a group has to play every other team. That opens up the possibility of selecting a subset of matches from a large group while still avoiding conflicts between the teams playing in the matches chosen.</p><p>This can look like just as simple a problem as splitting teams into groups, but the truth is it&#39;s far harder. Unlike the earlier case, where a guaranteed optimal solution can always be found, here — at least for somewhat larger groups — you have to settle for the best split you can find. One way to illustrate the difficulty is to describe a sub-problem:</p><blockquote>
+<p>How many matches must teams from the same club play against each other if they&#39;re in a group of a certain size, where every team must play at least a certain number of matches?</p>
+</blockquote></div></div></div></div><div><style>.cm-col-heading:has(> [data-puck-overlay-portal]:empty) { display: none; }</style><div class="py-4 max-w-2xl mx-auto text-left"><div class="text-gray-700 leading-relaxed"><style>
+.cm-rich > *:first-child { margin-top: 0; }
+.cm-rich > *:last-child { margin-bottom: 0; }
+.cm-rich p { margin: 0 0 0.9em; }
+.cm-rich ul { list-style: disc; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich ol { list-style: decimal; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich li { margin: 0.3em 0; }
+.cm-rich a { color: var(--brand); text-decoration: none; }
+.cm-rich a:hover { text-decoration: underline; }
+.cm-rich strong { font-weight: 700; }
+.cm-rich blockquote { border-left: 3px solid var(--brand); padding-left: 1em; margin: 1em 0; font-style: italic; opacity: 0.85; }
+.cm-rich h3, .cm-rich h4 { font-weight: 700; margin: 1.2em 0 0.5em; font-family: var(--font-heading, Montserrat, sans-serif); }
+.cm-rich h3 { font-size: 1.25em; }
+.cm-rich h4 { font-size: 1.1em; }
+.cm-rich table { border-collapse: collapse; margin: 1em 0; }
+.cm-rich th, .cm-rich td { border: 1px solid #d5d5d5; padding: 5px 10px; text-align: center; }
+.cm-rich th { background: rgba(0,0,0,0.045); font-weight: 700; }
+.cm-rich img { max-width: 100%; height: auto; }
+.cm-rich hr { border: none; border-top: 1px solid rgba(0,0,0,0.12); margin: 1.4em 0; }
+</style><div class="cm-rich"><p>For a 7-team group, here&#39;s what the answer looks like as you vary the number of teams from the same club (rows) and the number of matches per team (columns):</p><p>|  | 1 | 2 | 3 | 4 | 5 | 6 |
+| --- | --- | --- | --- | --- | --- | --- |
+| <strong>1</strong> | 0 | 0 | 0 | 0 | 0 | 0 |
+| <strong>2</strong> | 0 | 0 | 0 | 0 | 0 | 1 |
+| <strong>3</strong> | 0 | 0 | 0 | 0 | 2 | 3 |
+| <strong>4</strong> | 0 | 1 | 1 | 2 | 4 | 6 |
+| <strong>5</strong> | 1 | 3 | 4 | 6 | 8 | 10 |
+| <strong>6</strong> | 2 | 5 | 7 | 10 | 12 | 15 |
+| <strong>7</strong> | 4 | 7 | 11 | 14 | 18 | 21 |</p><p>There are clear patterns in the table above, but the relationship is complicated enough that we&#39;ve had to simulate the results for different group sizes in advance inside Cup Manager. That precomputed data then helps the system determine whether it has found an optimal match assignment.</p><p>Since there&#39;s no simple way to find the best matches, Cup Manager tries its way forward — much like a human would. The advantage Cup Manager has is speed, and the ability to constantly keep track of whether every team has the right number of matches. Cup Manager also handles all 11 conflicts from the list above, which isn&#39;t easy to keep in your head on your own! This trial-and-error process is what can take a few minutes when you draw a non-ranked class in Cup Manager.</p></div></div></div></div></div></section>
+<section style="padding:40px 7%;background-color:transparent"><style>
+        .cm-cols-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 48px; max-width: 1140px; margin: 0 auto; text-align: left; }
+        /* In the editor Puck wraps the columns in a DropZone. display:contents
+           would make them cells of the grid above, but it also discards the
+           DropZone's own box — 0x0 while empty, so Puck's own min-height cannot
+           apply and a freshly dropped CmColumns cannot be filled at all: the
+           dragged block just relocates elsewhere on the page. The DropZone is
+           the grid instead, spanning the outer tracks and repeating them
+           inside. The rendered page has no DropZone, so there the rule above
+           does the work. */
+        .cm-cols-2 > [class*="DropZone"] {
+          grid-column: 1 / -1;
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
+          gap: 48px;
+        }
+        @media (max-width: 640px) {
+          .cm-cols-2 { grid-template-columns: 1fr; max-width: 100%; }
+          .cm-cols-2 > [class*="DropZone"] { grid-template-columns: 1fr; }
+        }
+      </style><div class="cm-cols-2"><div><style>.cm-col-heading:has(> [data-puck-overlay-portal]:empty) { display: none; }</style><h2 class="cm-col-heading" style="color:#1a1a1a;font-size:1.5rem;font-weight:700;margin-bottom:24px;font-family:var(--font-heading, Montserrat, sans-serif)">Playoff brackets</h2><div class="py-4 max-w-2xl mx-auto text-left"><div class="text-gray-700 leading-relaxed"><style>
+.cm-rich > *:first-child { margin-top: 0; }
+.cm-rich > *:last-child { margin-bottom: 0; }
+.cm-rich p { margin: 0 0 0.9em; }
+.cm-rich ul { list-style: disc; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich ol { list-style: decimal; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich li { margin: 0.3em 0; }
+.cm-rich a { color: var(--brand); text-decoration: none; }
+.cm-rich a:hover { text-decoration: underline; }
+.cm-rich strong { font-weight: 700; }
+.cm-rich blockquote { border-left: 3px solid var(--brand); padding-left: 1em; margin: 1em 0; font-style: italic; opacity: 0.85; }
+.cm-rich h3, .cm-rich h4 { font-weight: 700; margin: 1.2em 0 0.5em; font-family: var(--font-heading, Montserrat, sans-serif); }
+.cm-rich h3 { font-size: 1.25em; }
+.cm-rich h4 { font-size: 1.1em; }
+.cm-rich table { border-collapse: collapse; margin: 1em 0; }
+.cm-rich th, .cm-rich td { border: 1px solid #d5d5d5; padding: 5px 10px; text-align: center; }
+.cm-rich th { background: rgba(0,0,0,0.045); font-weight: 700; }
+.cm-rich img { max-width: 100%; height: auto; }
+.cm-rich hr { border: none; border-top: 1px solid rgba(0,0,0,0.12); margin: 1.4em 0; }
+</style><div class="cm-rich"><p>A good playoff bracket needs to satisfy two requirements.</p><p><strong>1. The higher a team is ranked, the easier its path to the final should be</strong></p><p><strong>2. Teams that have already met earlier in the tournament should meet as late as possible in the playoffs</strong></p><p>The first requirement means the top-ranked team should face the lowest-ranked team, the second-best team should face the second-lowest, and so on. In reality, several teams often share the same ranking (for example, all the group winners — with the exception noted in rule 4).</p></div></div></div><figure class="py-4"><div class="relative w-full overflow-hidden rounded-lg"><img src="/media/for-norden/small01-2.png" alt="Playoff bracket in Cup Manager" class="w-full h-auto"/></div></figure><div class="py-4 max-w-2xl mx-auto text-left"><div class="text-gray-700 leading-relaxed"><style>
+.cm-rich > *:first-child { margin-top: 0; }
+.cm-rich > *:last-child { margin-bottom: 0; }
+.cm-rich p { margin: 0 0 0.9em; }
+.cm-rich ul { list-style: disc; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich ol { list-style: decimal; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich li { margin: 0.3em 0; }
+.cm-rich a { color: var(--brand); text-decoration: none; }
+.cm-rich a:hover { text-decoration: underline; }
+.cm-rich strong { font-weight: 700; }
+.cm-rich blockquote { border-left: 3px solid var(--brand); padding-left: 1em; margin: 1em 0; font-style: italic; opacity: 0.85; }
+.cm-rich h3, .cm-rich h4 { font-weight: 700; margin: 1.2em 0 0.5em; font-family: var(--font-heading, Montserrat, sans-serif); }
+.cm-rich h3 { font-size: 1.25em; }
+.cm-rich h4 { font-size: 1.1em; }
+.cm-rich table { border-collapse: collapse; margin: 1em 0; }
+.cm-rich th, .cm-rich td { border: 1px solid #d5d5d5; padding: 5px 10px; text-align: center; }
+.cm-rich th { background: rgba(0,0,0,0.045); font-weight: 700; }
+.cm-rich img { max-width: 100%; height: auto; }
+.cm-rich hr { border: none; border-top: 1px solid rgba(0,0,0,0.12); margin: 1.4em 0; }
+</style><div class="cm-rich"><p>Rule 2 is often easy to follow. If, for example, the 1st and 2nd place teams from every group advance to playoff bracket A, you can place all the 1st-place teams on one side of the bracket and the 2nd-place teams on the other. It gets more complicated when three teams from the same group land in the same playoff bracket. Then the bracket has to be split into 4 parts (at each semifinal), with one team placed in 3 of the 4 parts — meaning two of those teams could end up meeting as early as the semifinal, if luck isn&#39;t on their side.</p></div></div></div></div><div><style>.cm-col-heading:has(> [data-puck-overlay-portal]:empty) { display: none; }</style><div class="py-4 max-w-2xl mx-auto text-left"><div class="text-gray-700 leading-relaxed"><style>
+.cm-rich > *:first-child { margin-top: 0; }
+.cm-rich > *:last-child { margin-bottom: 0; }
+.cm-rich p { margin: 0 0 0.9em; }
+.cm-rich ul { list-style: disc; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich ol { list-style: decimal; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich li { margin: 0.3em 0; }
+.cm-rich a { color: var(--brand); text-decoration: none; }
+.cm-rich a:hover { text-decoration: underline; }
+.cm-rich strong { font-weight: 700; }
+.cm-rich blockquote { border-left: 3px solid var(--brand); padding-left: 1em; margin: 1em 0; font-style: italic; opacity: 0.85; }
+.cm-rich h3, .cm-rich h4 { font-weight: 700; margin: 1.2em 0 0.5em; font-family: var(--font-heading, Montserrat, sans-serif); }
+.cm-rich h3 { font-size: 1.25em; }
+.cm-rich h4 { font-size: 1.1em; }
+.cm-rich table { border-collapse: collapse; margin: 1em 0; }
+.cm-rich th, .cm-rich td { border: 1px solid #d5d5d5; padding: 5px 10px; text-align: center; }
+.cm-rich th { background: rgba(0,0,0,0.045); font-weight: 700; }
+.cm-rich img { max-width: 100%; height: auto; }
+.cm-rich hr { border: none; border-top: 1px solid rgba(0,0,0,0.12); margin: 1.4em 0; }
+</style><div class="cm-rich"><p>It&#39;s easy to see how this can turn into a genuinely tricky situation if you have several groups with an odd number of teams, and possibly even an uneven playoff bracket on top of that. It&#39;s clear that not every case can be solved with ready-made templates — you need an algorithm. Unfortunately, it can get even trickier, because there&#39;s often a third requirement to follow, similar to requirement 2:</p><p><strong>3. Teams that regularly meet in league play, or that come from the same club, should meet as late as possible in the playoffs.</strong></p><p>This is where things reach the limit of what&#39;s practically possible. In Cup Manager, rule 3 is handled by checking, after groups and playoffs have been created and teams placed, whether any teams from the same club are set to meet. If that happens, the system helps you move one of the teams to a new group to avoid the problem.</p><p>Finally, a playoff bracket can be uneven (unless you use a feature like Best 3rd-Place Teams). An uneven bracket means, for example, that you have 14 teams and would therefore need a round of 16, but only have 6 matches worth of teams for it. That means two of the teams have to go straight through to the quarterfinal. If you have an uneven bracket, there&#39;s one more rule:</p><p><strong>4. In an uneven playoff bracket, the teams that have played the most matches should get priority to skip the opening round.</strong></p><p>That means if it comes down to a choice between the 1st-place team in a 4-team group and the 1st-place team in a 5-team group, the team from the 5-team group — having already played one extra match — should be the one to skip the opening round of the playoffs.</p></div></div></div></div></div></section>
+<section style="background-color:#fff;padding:0"><style>
+        /* Side by side only while the copy still fits the fixed-ratio row.
+           Measured on the longest row of the start page: against the 460px box
+           the roomy padding leaves just 3px of slack from 1441px to 1560px and
+           overflows below that, so the tighter padding covers everything up to
+           1599px and buys back the ~60px that makes the copy fit down to 960px.
+           From 1600px up the roomy padding has 28px to spare on its own. */
+        @media (min-width: 961px) and (max-width: 1599px) {
+          .cm-frow:not(.cm-frow-contained):not(.cm-frow-split) > div:last-child > div {
+            padding: 40px 5% !important;
+          }
+        }
+        @media (max-width: 960px) {
+          /* Stacked: the row is content-height, and the image keeps a fixed
+             ratio of its own so every stacked row still matches the others. */
+          .cm-frow { flex-direction: column !important; min-height: 0 !important; }
+          /* flex-basis becomes HEIGHT in column direction — reset it */
+          .cm-frow > div { flex-basis: auto !important; }
+          .cm-frow:not(.cm-frow-contained) > div:first-child {
+            aspect-ratio: 16 / 9;
+            min-height: 0 !important;
+          }
+        }
+      </style><div class="cm-frow" style="display:flex;flex-direction:row;min-height:460px;max-width:100%;gap:0;align-items:stretch"><div style="flex:1;min-width:0;position:relative;overflow:hidden;min-height:300px"><img src="/media/for-norden/rawpixel-557123-unsplash.jpg" alt="A hand holding a mobile phone" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;display:block"/></div><div style="flex:1;min-width:0;display:flex;align-items:center;background-color:#fff"><div style="padding:60px 7%;max-width:1000px"><div><h2 style="font-size:clamp(1.4rem, 2.5vw, 2rem);font-weight:700;color:#1a1a1a;margin-bottom:16px;line-height:1.2;font-family:var(--font-heading, Montserrat, sans-serif)">Automatic scheduling</h2><div style="width:60px;height:2px;background-color:#1a1a1a;margin-bottom:20px"></div><div style="color:#555;font-size:15px;line-height:1.7;margin-bottom:28px;font-family:var(--font-body, Roboto, sans-serif)"><style>
+.cm-rich > *:first-child { margin-top: 0; }
+.cm-rich > *:last-child { margin-bottom: 0; }
+.cm-rich p { margin: 0 0 0.9em; }
+.cm-rich ul { list-style: disc; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich ol { list-style: decimal; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich li { margin: 0.3em 0; }
+.cm-rich a { color: var(--brand); text-decoration: none; }
+.cm-rich a:hover { text-decoration: underline; }
+.cm-rich strong { font-weight: 700; }
+.cm-rich blockquote { border-left: 3px solid var(--brand); padding-left: 1em; margin: 1em 0; font-style: italic; opacity: 0.85; }
+.cm-rich h3, .cm-rich h4 { font-weight: 700; margin: 1.2em 0 0.5em; font-family: var(--font-heading, Montserrat, sans-serif); }
+.cm-rich h3 { font-size: 1.25em; }
+.cm-rich h4 { font-size: 1.1em; }
+.cm-rich table { border-collapse: collapse; margin: 1em 0; }
+.cm-rich th, .cm-rich td { border: 1px solid #d5d5d5; padding: 5px 10px; text-align: center; }
+.cm-rich th { background: rgba(0,0,0,0.045); font-weight: 700; }
+.cm-rich img { max-width: 100%; height: auto; }
+.cm-rich hr { border: none; border-top: 1px solid rgba(0,0,0,0.12); margin: 1.4em 0; }
+</style><div class="cm-rich"><p>Scheduling is a problem that can look simple on the surface, but is actually one of the hardest things for a computer to handle. Even so, tournament organizers have managed to build match schedules without double-bookings and with enough rest time between games for as long as tournaments have existed. That&#39;s what inspired us when we built Cup Manager&#39;s automatic scheduling algorithm.</p><p>Just like a human would, Cup Manager places one match at a time into the schedule until every match has a slot. If it hits a dead end, it simply removes the most recently placed matches and tries again, until everything fits.</p><p>So what&#39;s the actual problem? A simple calculation answers that quickly. Say we want to schedule 100 matches across 10 different fields. If we had to try all 10 fields for all 100 matches while building the schedule, we&#39;d be testing 100,000,000,000,000,000,000 (100^10) different match placements. Not even every supercomputer on Earth combined could schedule a tournament that way — and that&#39;s before even factoring in kickoff times. The obvious trick (easier said than done) is to avoid making mistakes when placing matches in the first place. Suddenly you only need to test 1 schedule. Instead of correcting errors after the fact, you have to be forward-looking and make sure you make no mistakes at all — or at least very few.</p><p>Scheduling can then be broken down into two problems that need solving, or two questions to answer at every step of building the schedule:</p><ol>
+<li>Which match should I place next?</li>
+<li>What field and time should the chosen match get?</li>
+</ol><p>If you answer those two questions &quot;correctly&quot; throughout the entire scheduling process, you&#39;re done! Unfortunately, the methods for answering them correctly make up an entire field of science. The foundation of Cup Manager&#39;s approach comes from a computer science master&#39;s thesis you can <a href="/media/for-norden/scheduling_cm.pdf">download here</a>. Using the method described there for ranking matches and time slots, you&#39;ll always end up with a balanced schedule with an equal number of matches on every field.</p><p>Answering those questions also has to account for every rule governing what a tournament&#39;s schedule is allowed to look like — things like rest periods and which days a match can be played, but also more advanced rules like requiring every team to play at least one match on the main field or on artificial turf. Every rule you add affects the answers to those two questions, since it&#39;s through those two questions that the system avoids breaking any of the rules.</p><p>Under the hood of Cup Manager&#39;s scheduler is therefore an advanced scheduling engine capable of handling tournaments with several thousand matches, even with complicated rules in play. By taking every rule you&#39;ve added into account when answering the two key questions, Cup Manager can schedule almost any tournament quickly.</p></div></div></div></div></div></div></section>
+<section style="padding:56px 7%;background-color:#fff"><div style="display:flex;flex-wrap:wrap;gap:40px;align-items:center;max-width:1140px;margin:0 auto"><div style="flex:1 1 280px;font-family:var(--font-body, Roboto, sans-serif);color:#555;font-size:15px;line-height:1.7;border-left:3px solid var(--brand);padding-left:24px"><style>
+.cm-rich > *:first-child { margin-top: 0; }
+.cm-rich > *:last-child { margin-bottom: 0; }
+.cm-rich p { margin: 0 0 0.9em; }
+.cm-rich ul { list-style: disc; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich ol { list-style: decimal; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich li { margin: 0.3em 0; }
+.cm-rich a { color: var(--brand); text-decoration: none; }
+.cm-rich a:hover { text-decoration: underline; }
+.cm-rich strong { font-weight: 700; }
+.cm-rich blockquote { border-left: 3px solid var(--brand); padding-left: 1em; margin: 1em 0; font-style: italic; opacity: 0.85; }
+.cm-rich h3, .cm-rich h4 { font-weight: 700; margin: 1.2em 0 0.5em; font-family: var(--font-heading, Montserrat, sans-serif); }
+.cm-rich h3 { font-size: 1.25em; }
+.cm-rich h4 { font-size: 1.1em; }
+.cm-rich table { border-collapse: collapse; margin: 1em 0; }
+.cm-rich th, .cm-rich td { border: 1px solid #d5d5d5; padding: 5px 10px; text-align: center; }
+.cm-rich th { background: rgba(0,0,0,0.045); font-weight: 700; }
+.cm-rich img { max-width: 100%; height: auto; }
+.cm-rich hr { border: none; border-top: 1px solid rgba(0,0,0,0.12); margin: 1.4em 0; }
+</style><div class="cm-rich"><p>We love thinking about schedules. Feel free to challenge us!</p>
+<p><strong>Cup Manager support</strong></p></div><p style="margin-top:12px"><span style="display:block"><strong style="color:#1a1a1a">Telefon:</strong> <!-- -->046-52580</span><span style="display:block"><strong style="color:#1a1a1a">E-post:</strong> <a href="mailto:support@cupmanager.net" style="color:var(--brand);text-decoration:none">support@cupmanager.net</a></span></p></div></div><div style="background-color:#EBEBEB;border-radius:10px;padding:32px 28px;max-width:1140px;margin:30px auto 0"><h3 style="font-family:var(--font-heading, Montserrat, sans-serif);font-weight:700;font-size:22px;color:#1a1a1a;margin:0 0 10px">Ready for an easier life?</h3><p style="font-family:var(--font-body, Roboto, sans-serif);font-size:15px;color:#555;line-height:1.6;margin:0 0 20px">Get in touch with us, or pick a time to book a demo of Cup Manager. We look forward to showing you our system.</p><a href="https://calendly.com/superinvite-cupmanager-en/demo" style="display:inline-flex;align-items:center;gap:8px;background-color:var(--brand);color:#fff;border-radius:3px;font-family:var(--font-body, Roboto, sans-serif);font-weight:300;text-decoration:none;font-size:15px;padding:8px 20px">Pick a time for a demo</a></div></section> </main> <footer> <section style="background-color:var(--brand);padding:56px 7%;font-family:var(--font-body, Roboto, sans-serif)"><div style="display:flex;flex-wrap:wrap;gap:48px;max-width:1100px;margin:0 auto"><div style="flex:1 1 420px"><h3 style="font-family:var(--font-heading, Montserrat, sans-serif);font-weight:700;font-size:22px;color:#fff;margin:0 0 18px">Frequently asked questions</h3><style>.cm-faq-dark .cm-rich a { color: #fff; text-decoration: underline; } .cm-faq-dark .cm-rich a:hover { color: rgba(255,255,255,0.85); }</style><details class="cm-faq-dark" style="border-bottom:1px solid rgba(255,255,255,0.15);padding:12px 0"><summary style="font-family:var(--font-body, Roboto, sans-serif);font-weight:700;font-size:16px;cursor:pointer;color:#fff;list-style:none;display:flex;justify-content:space-between;align-items:center">Who can use Cup Manager?<svg class="cm-faq-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-left:16px;flex-shrink:0;transition:transform 0.15s"><path d="M6 9l6 6 6-6"></path></svg><style>details[open] > summary > .cm-faq-chevron { transform: rotate(180deg); }</style></summary><div style="font-family:var(--font-body, Roboto, sans-serif);font-size:14px;line-height:1.7;color:rgba(255,255,255,0.75);margin-top:12px;padding-right:32px"><style>
+.cm-rich > *:first-child { margin-top: 0; }
+.cm-rich > *:last-child { margin-bottom: 0; }
+.cm-rich p { margin: 0 0 0.9em; }
+.cm-rich ul { list-style: disc; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich ol { list-style: decimal; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich li { margin: 0.3em 0; }
+.cm-rich a { color: var(--brand); text-decoration: none; }
+.cm-rich a:hover { text-decoration: underline; }
+.cm-rich strong { font-weight: 700; }
+.cm-rich blockquote { border-left: 3px solid var(--brand); padding-left: 1em; margin: 1em 0; font-style: italic; opacity: 0.85; }
+.cm-rich h3, .cm-rich h4 { font-weight: 700; margin: 1.2em 0 0.5em; font-family: var(--font-heading, Montserrat, sans-serif); }
+.cm-rich h3 { font-size: 1.25em; }
+.cm-rich h4 { font-size: 1.1em; }
+.cm-rich table { border-collapse: collapse; margin: 1em 0; }
+.cm-rich th, .cm-rich td { border: 1px solid #d5d5d5; padding: 5px 10px; text-align: center; }
+.cm-rich th { background: rgba(0,0,0,0.045); font-weight: 700; }
+.cm-rich img { max-width: 100%; height: auto; }
+.cm-rich hr { border: none; border-top: 1px solid rgba(0,0,0,0.12); margin: 1.4em 0; }
+</style><div class="cm-rich"><p>Cup Manager is used by everything from the world&#x27;s largest tournaments to local tournaments with 30 teams. You can take advantage of different features depending on the size of your event. Even a simple tournament can save time and hassle by handling the match schedule and all communication in one place.</p></div></div></details><style>.cm-faq-dark .cm-rich a { color: #fff; text-decoration: underline; } .cm-faq-dark .cm-rich a:hover { color: rgba(255,255,255,0.85); }</style><details class="cm-faq-dark" style="border-bottom:1px solid rgba(255,255,255,0.15);padding:12px 0"><summary style="font-family:var(--font-body, Roboto, sans-serif);font-weight:700;font-size:16px;cursor:pointer;color:#fff;list-style:none;display:flex;justify-content:space-between;align-items:center">How do I get started?<svg class="cm-faq-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-left:16px;flex-shrink:0;transition:transform 0.15s"><path d="M6 9l6 6 6-6"></path></svg><style>details[open] > summary > .cm-faq-chevron { transform: rotate(180deg); }</style></summary><div style="font-family:var(--font-body, Roboto, sans-serif);font-size:14px;line-height:1.7;color:rgba(255,255,255,0.75);margin-top:12px;padding-right:32px"><style>
+.cm-rich > *:first-child { margin-top: 0; }
+.cm-rich > *:last-child { margin-bottom: 0; }
+.cm-rich p { margin: 0 0 0.9em; }
+.cm-rich ul { list-style: disc; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich ol { list-style: decimal; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich li { margin: 0.3em 0; }
+.cm-rich a { color: var(--brand); text-decoration: none; }
+.cm-rich a:hover { text-decoration: underline; }
+.cm-rich strong { font-weight: 700; }
+.cm-rich blockquote { border-left: 3px solid var(--brand); padding-left: 1em; margin: 1em 0; font-style: italic; opacity: 0.85; }
+.cm-rich h3, .cm-rich h4 { font-weight: 700; margin: 1.2em 0 0.5em; font-family: var(--font-heading, Montserrat, sans-serif); }
+.cm-rich h3 { font-size: 1.25em; }
+.cm-rich h4 { font-size: 1.1em; }
+.cm-rich table { border-collapse: collapse; margin: 1em 0; }
+.cm-rich th, .cm-rich td { border: 1px solid #d5d5d5; padding: 5px 10px; text-align: center; }
+.cm-rich th { background: rgba(0,0,0,0.045); font-weight: 700; }
+.cm-rich img { max-width: 100%; height: auto; }
+.cm-rich hr { border: none; border-top: 1px solid rgba(0,0,0,0.12); margin: 1.4em 0; }
+</style><div class="cm-rich"><p>Getting started with Cup Manager is easy. <a href="https://calendly.com/superinvite-cupmanager-en/demo">Book a demo</a>, or <a href="/en/support/">contact us directly by email or phone</a> and we&#x27;ll help you get going!</p></div></div></details><style>.cm-faq-dark .cm-rich a { color: #fff; text-decoration: underline; } .cm-faq-dark .cm-rich a:hover { color: rgba(255,255,255,0.85); }</style><details class="cm-faq-dark" style="border-bottom:1px solid rgba(255,255,255,0.15);padding:12px 0"><summary style="font-family:var(--font-body, Roboto, sans-serif);font-weight:700;font-size:16px;cursor:pointer;color:#fff;list-style:none;display:flex;justify-content:space-between;align-items:center">What does it cost?<svg class="cm-faq-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-left:16px;flex-shrink:0;transition:transform 0.15s"><path d="M6 9l6 6 6-6"></path></svg><style>details[open] > summary > .cm-faq-chevron { transform: rotate(180deg); }</style></summary><div style="font-family:var(--font-body, Roboto, sans-serif);font-size:14px;line-height:1.7;color:rgba(255,255,255,0.75);margin-top:12px;padding-right:32px"><style>
+.cm-rich > *:first-child { margin-top: 0; }
+.cm-rich > *:last-child { margin-bottom: 0; }
+.cm-rich p { margin: 0 0 0.9em; }
+.cm-rich ul { list-style: disc; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich ol { list-style: decimal; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich li { margin: 0.3em 0; }
+.cm-rich a { color: var(--brand); text-decoration: none; }
+.cm-rich a:hover { text-decoration: underline; }
+.cm-rich strong { font-weight: 700; }
+.cm-rich blockquote { border-left: 3px solid var(--brand); padding-left: 1em; margin: 1em 0; font-style: italic; opacity: 0.85; }
+.cm-rich h3, .cm-rich h4 { font-weight: 700; margin: 1.2em 0 0.5em; font-family: var(--font-heading, Montserrat, sans-serif); }
+.cm-rich h3 { font-size: 1.25em; }
+.cm-rich h4 { font-size: 1.1em; }
+.cm-rich table { border-collapse: collapse; margin: 1em 0; }
+.cm-rich th, .cm-rich td { border: 1px solid #d5d5d5; padding: 5px 10px; text-align: center; }
+.cm-rich th { background: rgba(0,0,0,0.045); font-weight: 700; }
+.cm-rich img { max-width: 100%; height: auto; }
+.cm-rich hr { border: none; border-top: 1px solid rgba(0,0,0,0.12); margin: 1.4em 0; }
+</style><div class="cm-rich"><p>We use a simple pricing model: a price per participating team, a transaction fee for online payments, and optional add-on services. Read more about <a href="/en/priser/">our pricing here</a>.</p></div></div></details><style>.cm-faq-dark .cm-rich a { color: #fff; text-decoration: underline; } .cm-faq-dark .cm-rich a:hover { color: rgba(255,255,255,0.85); }</style><details class="cm-faq-dark" style="border-bottom:1px solid rgba(255,255,255,0.15);padding:12px 0"><summary style="font-family:var(--font-body, Roboto, sans-serif);font-weight:700;font-size:16px;cursor:pointer;color:#fff;list-style:none;display:flex;justify-content:space-between;align-items:center">How much support is included in the license fee?<svg class="cm-faq-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-left:16px;flex-shrink:0;transition:transform 0.15s"><path d="M6 9l6 6 6-6"></path></svg><style>details[open] > summary > .cm-faq-chevron { transform: rotate(180deg); }</style></summary><div style="font-family:var(--font-body, Roboto, sans-serif);font-size:14px;line-height:1.7;color:rgba(255,255,255,0.75);margin-top:12px;padding-right:32px"><style>
+.cm-rich > *:first-child { margin-top: 0; }
+.cm-rich > *:last-child { margin-bottom: 0; }
+.cm-rich p { margin: 0 0 0.9em; }
+.cm-rich ul { list-style: disc; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich ol { list-style: decimal; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich li { margin: 0.3em 0; }
+.cm-rich a { color: var(--brand); text-decoration: none; }
+.cm-rich a:hover { text-decoration: underline; }
+.cm-rich strong { font-weight: 700; }
+.cm-rich blockquote { border-left: 3px solid var(--brand); padding-left: 1em; margin: 1em 0; font-style: italic; opacity: 0.85; }
+.cm-rich h3, .cm-rich h4 { font-weight: 700; margin: 1.2em 0 0.5em; font-family: var(--font-heading, Montserrat, sans-serif); }
+.cm-rich h3 { font-size: 1.25em; }
+.cm-rich h4 { font-size: 1.1em; }
+.cm-rich table { border-collapse: collapse; margin: 1em 0; }
+.cm-rich th, .cm-rich td { border: 1px solid #d5d5d5; padding: 5px 10px; text-align: center; }
+.cm-rich th { background: rgba(0,0,0,0.045); font-weight: 700; }
+.cm-rich img { max-width: 100%; height: auto; }
+.cm-rich hr { border: none; border-top: 1px solid rgba(0,0,0,0.12); margin: 1.4em 0; }
+</style><div class="cm-rich"><p>There&#x27;s no limit to how much support is included. All support, help and training are included. Our experience shows that things work best when you handle as much as possible yourselves, so our main goal with support is to explain how things are done — but of course, we&#x27;ll never leave you in the lurch.</p>
+<p>To get in touch with us, you can call or email us, or click the chat icon in the bottom right corner of this page. For longer matters, we recommend that you <a href="/en/boka/">book a meeting</a>.</p></div></div></details><style>.cm-faq-dark .cm-rich a { color: #fff; text-decoration: underline; } .cm-faq-dark .cm-rich a:hover { color: rgba(255,255,255,0.85); }</style><details class="cm-faq-dark" style="border-bottom:1px solid rgba(255,255,255,0.15);padding:12px 0"><summary style="font-family:var(--font-body, Roboto, sans-serif);font-weight:700;font-size:16px;cursor:pointer;color:#fff;list-style:none;display:flex;justify-content:space-between;align-items:center">Is on-call support available during the tournament?<svg class="cm-faq-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-left:16px;flex-shrink:0;transition:transform 0.15s"><path d="M6 9l6 6 6-6"></path></svg><style>details[open] > summary > .cm-faq-chevron { transform: rotate(180deg); }</style></summary><div style="font-family:var(--font-body, Roboto, sans-serif);font-size:14px;line-height:1.7;color:rgba(255,255,255,0.75);margin-top:12px;padding-right:32px"><style>
+.cm-rich > *:first-child { margin-top: 0; }
+.cm-rich > *:last-child { margin-bottom: 0; }
+.cm-rich p { margin: 0 0 0.9em; }
+.cm-rich ul { list-style: disc; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich ol { list-style: decimal; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich li { margin: 0.3em 0; }
+.cm-rich a { color: var(--brand); text-decoration: none; }
+.cm-rich a:hover { text-decoration: underline; }
+.cm-rich strong { font-weight: 700; }
+.cm-rich blockquote { border-left: 3px solid var(--brand); padding-left: 1em; margin: 1em 0; font-style: italic; opacity: 0.85; }
+.cm-rich h3, .cm-rich h4 { font-weight: 700; margin: 1.2em 0 0.5em; font-family: var(--font-heading, Montserrat, sans-serif); }
+.cm-rich h3 { font-size: 1.25em; }
+.cm-rich h4 { font-size: 1.1em; }
+.cm-rich table { border-collapse: collapse; margin: 1em 0; }
+.cm-rich th, .cm-rich td { border: 1px solid #d5d5d5; padding: 5px 10px; text-align: center; }
+.cm-rich th { background: rgba(0,0,0,0.045); font-weight: 700; }
+.cm-rich img { max-width: 100%; height: auto; }
+.cm-rich hr { border: none; border-top: 1px solid rgba(0,0,0,0.12); margin: 1.4em 0; }
+</style><div class="cm-rich"><p>On-call support is included for all tournaments. This means you can call us for help during the tournament days. Contact details can be found <a href="/en/support/">here</a>.</p></div></div></details></div><div style="flex:1 1 320px"><h3 style="font-family:var(--font-heading, Montserrat, sans-serif);font-weight:700;font-size:22px;color:#fff;margin:0 0 18px">Want to know more?</h3><p style="color:rgba(255,255,255,0.9);font-size:15px;line-height:1.7;margin:0 0 20px">Our help site for the Cup Manager system has manuals and documentation for how to use the different features.</p><div style="display:flex;flex-direction:column;gap:12px;align-items:flex-start"><a href="https://help.cupmanager.net/" style="display:inline-flex;align-items:center;gap:8px;background-color:#fff;color:#1a1a1a;padding:12px 24px;border-radius:3px;font-weight:600;font-size:15px;text-decoration:none;box-shadow:0 1px 4px rgba(0,0,0,0.15)">Go to Cup Manager&#x27;s help pages<!-- --> <span aria-hidden="true">›</span></a><a href="/en/rakna-pa-kapacitet/" style="display:inline-flex;align-items:center;gap:8px;background-color:#fff;color:#1a1a1a;padding:12px 24px;border-radius:3px;font-weight:600;font-size:15px;text-decoration:none;box-shadow:0 1px 4px rgba(0,0,0,0.15)">New tool! Calculate capacity for your tournament<!-- --> <span aria-hidden="true">›</span></a></div></div></div></section>
+<section style="background-color:#f4f4f4;padding:48px 7% 0;font-family:var(--font-body, Roboto, sans-serif)"><style>.cm-footer-mail { color: var(--brand); text-decoration: none; } .cm-footer-mail:hover, .cm-footer-link:hover { text-decoration: underline; }</style><div style="display:flex;flex-wrap:wrap;gap:40px;max-width:1100px;margin:0 auto;padding-bottom:32px"><div style="flex:1 1 260px"><img src="/media/shared/cupmanager_light.svg" alt="Cup Manager" style="max-height:48px;max-width:220px"/></div><div style="flex:1 1 180px"><h3 style="font-family:var(--font-heading, Montserrat, sans-serif);font-weight:700;font-size:17px;color:#1a1a1a;margin:0 0 18px">Navigation</h3><a href="/en/support/" class="cm-footer-link" style="color:var(--brand);text-decoration:none;font-size:14px;display:block;margin-bottom:8px">Support</a><a href="/en/priser/" class="cm-footer-link" style="color:var(--brand);text-decoration:none;font-size:14px;display:block;margin-bottom:8px">Pricing</a><a href="/en/om-cupmanager/" class="cm-footer-link" style="color:var(--brand);text-decoration:none;font-size:14px;display:block;margin-bottom:8px">About us</a><a href="/en/jobba-hos-oss/" class="cm-footer-link" style="color:var(--brand);text-decoration:none;font-size:14px;display:block;margin-bottom:8px">Careers</a></div><div style="flex:1 1 220px"><h3 style="font-family:var(--font-heading, Montserrat, sans-serif);font-weight:700;font-size:17px;color:#1a1a1a;margin:0 0 18px">Contact</h3><p style="color:#555;font-size:14px;line-height:1.8;margin:0">Telefon<!-- -->: <!-- -->046-52580<br/>Epost<!-- -->: <a class="cm-footer-mail" href="mailto:support@cupmanager.net">support@cupmanager.net</a></p></div></div><div style="border-top:1px solid rgba(0,0,0,0.08);padding:20px 0 24px;max-width:1100px;margin:0 auto;display:flex;flex-direction:column;gap:10px;align-items:center"><span style="display:flex;gap:18px"><a href="https://www.facebook.com/CupManager/" aria-label="Facebook"><svg width="22" height="22" viewBox="0 0 24 24" fill="var(--brand)"><path d="M22 12a10 10 0 1 0-11.56 9.88v-6.99H7.9V12h2.54V9.8c0-2.5 1.49-3.89 3.77-3.89 1.09 0 2.23.2 2.23.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56V12h2.78l-.45 2.89h-2.33v6.99A10 10 0 0 0 22 12z"></path></svg></a><a href="https://www.instagram.com/cupmanager/" aria-label="Instagram"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"></rect><circle cx="12" cy="12" r="4"></circle><circle cx="17.5" cy="6.5" r="1" fill="var(--brand)" stroke="none"></circle></svg></a></span><span style="color:#888;font-size:13px">Copyright 2026 Cup Manager</span></div></section> </footer> <a id="preview-btn" href="" data-fs-db="plinto-fs" class="fixed bottom-20 right-6 bg-amber-500 hover:bg-amber-600 text-black px-4 py-2 rounded-lg shadow-lg flex items-center gap-2 transition-colors z-40 font-medium" style="display:none"> <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"> <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path> <circle cx="12" cy="12" r="3"></circle> </svg>
+Preview Changes
+</a> <script type="module" src="/_astro/PreviewButton.astro_astro_type_script_index_0_lang.d8INO1zV.js"></script> <div id="lang-switcher" class="fixed bottom-6 right-6 z-50 group"><div class="flex flex-col gap-1 items-end max-h-0 overflow-hidden opacity-0 pointer-events-none group-hover:max-h-96 group-hover:mb-2 group-hover:opacity-100 group-hover:pointer-events-auto transition-all duration-150"><a href="/sv/for-norden/" class="flex items-center gap-2 bg-white border border-gray-200 shadow-md px-3 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors whitespace-nowrap"><svg width="20" height="14" viewBox="0 0 20 14" xmlns="http://www.w3.org/2000/svg"><rect width="20" height="14" fill="#006AA7"/><rect x="5" width="3" height="14" fill="#FECC02"/><rect y="5.5" width="20" height="3" fill="#FECC02"/></svg><span>Svenska</span></a><a href="/no/for-norden/" class="flex items-center gap-2 bg-white border border-gray-200 shadow-md px-3 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors whitespace-nowrap"><svg width="20" height="14" viewBox="0 0 20 14" xmlns="http://www.w3.org/2000/svg"><rect width="20" height="14" fill="#EF2B2D"/><rect x="5" width="3" height="14" fill="#fff"/><rect y="5.5" width="20" height="3" fill="#fff"/><rect x="5.5" width="2" height="14" fill="#002868"/><rect y="6" width="20" height="2" fill="#002868"/></svg><span>Norsk</span></a></div><button class="flex items-center gap-2 bg-white border border-gray-200 shadow-lg px-3 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors" aria-label="Switch language"><svg width="20" height="14" viewBox="0 0 60 42" xmlns="http://www.w3.org/2000/svg"><rect width="60" height="42" fill="#012169"/><path d="M0,0 L60,42 M60,0 L0,42" stroke="#fff" stroke-width="8"/><path d="M0,0 L60,42 M60,0 L0,42" stroke="#C8102E" stroke-width="4"/><path d="M30,0 V42 M0,21 H60" stroke="#fff" stroke-width="12"/><path d="M30,0 V42 M0,21 H60" stroke="#C8102E" stroke-width="7"/></svg><span>English</span><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="group-hover:rotate-180 transition-transform duration-150"><polyline points="18 15 12 9 6 15"></polyline></svg></button></div> </body></html>

@@ -1,0 +1,519 @@
+<!DOCTYPE html><html lang="en"> <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Bergen Basket Festival - Cup Manager</title><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400..800&family=Roboto:wght@300..700&display=swap"><link rel="icon" href="/media/shared/favicon.png" sizes="32x32"><link rel="icon" href="/media/shared/favicon.png" sizes="192x192"><link rel="apple-touch-icon" href="/media/shared/favicon.png"><meta name="msapplication-TileImage" content="/media/shared/favicon.png"><link rel="alternate" hreflang="sv" href="https://cupmanager.net/sv/bergen-basket-festival/"><link rel="alternate" hreflang="no" href="https://cupmanager.net/no/bergen-basket-festival/"><link rel="alternate" hreflang="en" href="https://cupmanager.net/en/bergen-basket-festival/"><link rel="alternate" hreflang="x-default" href="https://cupmanager.net/sv/bergen-basket-festival/"><link rel="stylesheet" href="/_astro/registry.4cHICgBS.css"></head> <body> <header class="plinto-header"> <a href="/en" style="display:inline-flex;align-items:center"><img src="/media/shared/cupmanager_light.svg" alt="Cup Manager" style="height:48px;width:auto;display:block"/></a>
+<nav class="cm-nav"><style>
+  .plinto-header {
+    --plinto-header-max-width: 1300px;
+    --plinto-header-padding-inline: 30px;
+    --plinto-header-padding-block: 0px;
+    --plinto-header-min-height: 100px;
+    --plinto-header-border-width: 0px;
+    --plinto-header-shadow: 0 0 20px rgba(0,0,0,0.1);
+  }
+</style><style>
+        .cm-nav { display: flex; align-items: center; gap: 30px; font-family: var(--font-body, Roboto, sans-serif); }
+        .cm-nav-toggle { display: none; }
+        .cm-nav-hamburger { display: none; cursor: pointer; padding: 8px; background: none; border: none; color: #333; }
+        .cm-nav-hamburger svg { display: block; }
+        .cm-nav-links { display: contents; }
+        .cm-nav a.cm-nav-link, .cm-nav span.cm-nav-link { color: #5C6B79; font-weight: 400; font-size: 17px; text-decoration: none; transition: color 0.15s; }
+        /* Chevron inherits the link colour, so it greens on hover too */
+        .cm-nav .cm-caret { margin-left: 5px; flex: none; }
+        @media (min-width: 1024px) {
+          /* Nav items span the full header height (as on cupmanager.net), for
+             two reasons: the mega panel is positioned at top:100% of its item,
+             so anything shorter drops it *inside* the header; and it gives the
+             hover target the whole bar rather than just the text. Going
+             inline-flex also stops the chevron inflating the trigger's line
+             box, which would knock it off the centre line of its neighbours. */
+          /* The nav must fill the header before its items can; otherwise
+             stretching them only reaches the nav's own content height. */
+          .cm-nav { align-self: stretch; }
+          .cm-nav > .cm-nav-links > a.cm-nav-link,
+          .cm-nav > .cm-nav-links > .cm-mi-wrap { align-self: stretch; display: inline-flex; align-items: center; }
+          .cm-nav .cm-mi-wrap > a.cm-nav-link,
+          .cm-nav .cm-mi-wrap > span.cm-nav-link { display: inline-flex; align-items: center; height: 100%; }
+        }
+        .cm-nav a.cm-nav-link:hover, .cm-nav .cm-mi-wrap:hover > a.cm-nav-link, .cm-nav .cm-mi-wrap:hover > span.cm-nav-link { color: var(--brand); }
+        .cm-nav span.cm-nav-link { cursor: default; }
+        @media (max-width: 1024px) {
+          .cm-nav .cm-caret { display: none; }
+          .cm-nav-hamburger { display: block; }
+          .cm-nav-links { display: none; flex-direction: column; width: 100%; position: absolute; top: 100%; left: 0; right: 0; background: #fff; border-bottom: 1px solid #eee; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); z-index: 50; padding: 0 24px 12px; }
+          .cm-nav-links > a, .cm-nav-links .cm-mi-wrap { display: block; padding: 12px 0; border-top: 1px solid #f0f0f0; }
+          .cm-nav-toggle:checked ~ .cm-nav-links { display: flex; }
+        }
+      </style><input type="checkbox" id="cm-nav-toggle" class="cm-nav-toggle" hidden=""/><label for="cm-nav-toggle" class="cm-nav-hamburger" aria-label="Menu"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg></label><div class="cm-nav-links"><a href="/en" class="cm-nav-link">Home</a><div class="cm-mi-wrap"><style>
+          /* Deliberately NOT positioned: the panel spans the viewport, so its
+             containing block has to be the header (.plinto-header is relative,
+             from the library's globals) rather than the item. Items stretch to
+             the full header height, so top:100% lands in the same place either
+             way. */
+          .cm-mi-panel { display: none; position: absolute; top: 100%; left: 0; right: 0; background: #fff; border-top: 1px solid var(--brand); border-bottom: 1px solid var(--brand); z-index: 60; }
+          .cm-mi-wrap:hover > .cm-mi-panel, .cm-mi-wrap:focus-within > .cm-mi-panel { display: block; }
+          /* The two halves meet at the centre of the viewport. Contained keeps
+             them inside the header's content width (cupmanager.net); full lets
+             the colour bleed to the edges (superinvite.com). */
+          .cm-mi-panel-inner { display: flex; max-width: var(--cm-panel-max-width, 1300px); margin: 0 auto; }
+          .cm-mi-panel-highlights { background: var(--brand); flex: 0 0 50%; min-width: 0; box-sizing: border-box; display: flex; flex-direction: column; gap: 20px; justify-content: center; padding: 44px 20px 44px 27%; }
+          .cm-nav .cm-mi-panel-highlights a.cm-nav-link { color: #fff; font-weight: 400; font-size: 18px; display: inline-flex; align-items: center; gap: 14px; }
+          .cm-mi-panel-highlights svg { width: 20px; height: 20px; flex: none; }
+          .cm-nav .cm-mi-panel-highlights a.cm-nav-link:hover { color: rgba(255,255,255,0.8); }
+          .cm-mi-panel-main { background: #f5f5f5; flex: 0 0 50%; min-width: 0; box-sizing: border-box; padding: 44px 6% 44px 5%; }
+          .cm-mi-panel-heading { font-family: var(--font-heading, Montserrat, sans-serif); font-weight: 600; font-size: 22px; color: #162B40; margin: 0 0 6px; padding-bottom: 14px; border-bottom: 2px solid var(--brand); }
+          /* Multi-column, not grid: the live panels fill the first column
+             before starting the second, and column-count does that for any
+             number of links without the markup naming a row count. */
+          .cm-mi-panel-links { columns: 2; column-gap: 32px; margin-top: 20px; }
+          .cm-nav .cm-mi-panel-links a.cm-nav-link { display: block; break-inside: avoid; margin-bottom: 18px; color: #5C6B79; font-weight: 400; font-size: 15px; }
+          .cm-nav .cm-mi-panel-links a.cm-nav-link:hover { color: var(--brand); }
+          @media (max-width: 1024px) {
+            .cm-mi-panel { display: block; position: static; border: 0; background: transparent; }
+            .cm-mi-panel-inner { display: block; max-width: none; }
+            .cm-mi-panel-highlights { display: none; }
+            .cm-mi-panel-main { background: transparent; padding: 8px 0 0 12px; }
+            .cm-mi-panel-heading { display: none; }
+            .cm-mi-panel-links { columns: 1; margin-top: 4px; }
+            .cm-nav .cm-mi-panel-links a.cm-nav-link { margin-bottom: 10px; }
+          }
+        </style><span class="cm-nav-link" tabindex="0" role="button" aria-haspopup="true">About Cup Manager<svg class="cm-caret" aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg></span><div class="cm-mi-panel"><div class="cm-mi-panel-inner"><div class="cm-mi-panel-highlights"><a href="/en/kort-och-klarna" class="cm-nav-link"><svg width="16" height="16" viewBox="0 0 512 512" fill="currentColor" aria-hidden="true"><path d="M448 96c17.7 0 32 14.3 32 32l0 64-448 0 0-64c0-17.7 14.3-32 32-32l384 0zm32 128l0 160c0 17.7-14.3 32-32 32L64 416c-17.7 0-32-14.3-32-32l0-160 448 0zM64 64C28.7 64 0 92.7 0 128L0 384c0 35.3 28.7 64 64 64l384 0c35.3 0 64-28.7 64-64l0-256c0-35.3-28.7-64-64-64L64 64zM96 336c0 8.8 7.2 16 16 16l32 0c8.8 0 16-7.2 16-16s-7.2-16-16-16l-32 0c-8.8 0-16 7.2-16 16zm96 0c0 8.8 7.2 16 16 16l32 0c8.8 0 16-7.2 16-16s-7.2-16-16-16l-32 0c-8.8 0-16 7.2-16 16z"></path></svg>Cards and Klarna</a><a href="/en/app" class="cm-nav-link"><svg width="16" height="16" viewBox="0 0 384 512" fill="currentColor" aria-hidden="true"><path d="M48 448c0 17.7 14.3 32 32 32l224 0c17.7 0 32-14.3 32-32l0-96-288 0 0 96zm0-128l288 0 0-256c0-17.7-14.3-32-32-32L80 32C62.3 32 48 46.3 48 64l0 256zM16 64C16 28.7 44.7 0 80 0L304 0c35.3 0 64 28.7 64 64l0 384c0 35.3-28.7 64-64 64L80 512c-35.3 0-64-28.7-64-64L16 64zM160 400l64 0c8.8 0 16 7.2 16 16s-7.2 16-16 16l-64 0c-8.8 0-16-7.2-16-16s7.2-16 16-16z"></path></svg>Your own tournament app</a><a href="/en/hemsida" class="cm-nav-link"><svg width="16" height="16" viewBox="0 0 512 512" fill="currentColor" aria-hidden="true"><path d="M288 64l0 64-64 0 0-64 64 0zm-64 96l16 0 0 64-128 0c-35.3 0-64 28.7-64 64l0 64-16 0c-17.7 0-32 14.3-32 32l0 64c0 17.7 14.3 32 32 32l64 0c17.7 0 32-14.3 32-32l0-64c0-17.7-14.3-32-32-32l-16 0 0-64c0-17.7 14.3-32 32-32l128 0 0 96-16 0c-17.7 0-32 14.3-32 32l0 64c0 17.7 14.3 32 32 32l64 0c17.7 0 32-14.3 32-32l0-64c0-17.7-14.3-32-32-32l-16 0 0-96 128 0c17.7 0 32 14.3 32 32l0 64-16 0c-17.7 0-32 14.3-32 32l0 64c0 17.7 14.3 32 32 32l64 0c17.7 0 32-14.3 32-32l0-64c0-17.7-14.3-32-32-32l-16 0 0-64c0-35.3-28.7-64-64-64l-128 0 0-64 16 0c17.7 0 32-14.3 32-32l0-64c0-17.7-14.3-32-32-32l-64 0c-17.7 0-32 14.3-32 32l0 64c0 17.7 14.3 32 32 32zM32 384l64 0 0 64-64 0 0-64zm192 0l64 0 0 64-64 0 0-64zm192 0l64 0 0 64-64 0 0-64z"></path></svg>Website included</a><a href="/en/streaming" class="cm-nav-link"><svg width="16" height="16" viewBox="0 0 512 512" fill="currentColor" aria-hidden="true"><path d="M256 32a224 224 0 1 1 0 448 224 224 0 1 1 0-448zm0 480a256 256 0 1 0 0-512 256 256 0 1 0 0 512zm72.7-256L208 329.7 208 182.3 328.7 256zM188.3 147.1c-7.6 4.2-12.3 12.3-12.3 20.9l0 176c0 8.7 4.7 16.7 12.3 20.9s16.8 4.1 24.3-.5l144-88c7.1-4.4 11.5-12.1 11.5-20.5s-4.4-16.1-11.5-20.5l-144-88c-7.4-4.5-16.7-4.7-24.3-.5z"></path></svg>Livestreaming</a><a href="/en/priser" class="cm-nav-link"><svg width="16" height="16" viewBox="0 0 512 512" fill="currentColor" aria-hidden="true"><path d="M64.1 96c0-17.7 14.3-32 32-32l156.1 0c8.5 0 16.6 3.4 22.6 9.4l192 192c12.5 12.5 12.5 32.8 0 45.2L310.7 466.7c-12.5 12.5-32.8 12.5-45.3 0l-192-192c-6-6-9.4-14.1-9.4-22.6L64.1 96zm32-64c-35.3 0-64 28.7-64 64l0 156.1c0 17 6.7 33.2 18.7 45.3l192 192c25 25 65.5 25 90.5 0L489.5 333.3c25-25 25-65.5 0-90.5l-192-192c-12-12-28.3-18.7-45.3-18.7L96.1 32zm48 136a24 24 0 1 0 0-48 24 24 0 1 0 0 48z"></path></svg>Pricing</a></div><div class="cm-mi-panel-main"><p class="cm-mi-panel-heading">Learn more about our features</p><div class="cm-mi-panel-links"><a href="/en/hemsida" class="cm-nav-link">Your own website for the tournament</a><a href="/en/anmalningar" class="cm-nav-link">Registration system for teams &amp; referees</a><a href="/en/kort-och-klarna" class="cm-nav-link">Integrated payment solutions</a><a href="/en/lagkonto-boende" class="cm-nav-link">Team accounts and accommodation management</a><a href="/en/lottning-schema" class="cm-nav-link">Draw and scheduling</a><a href="/en/resultat" class="cm-nav-link">Results and more during the tournament</a></div></div></div></div></div><a href="/en/support" class="cm-nav-link">Support</a><a href="/en/laddaner" class="cm-nav-link">Download</a><a href="/en/om-cupmanager" class="cm-nav-link">About us</a><a href="https://calendly.com/superinvite-cupmanager-en/demo" style="display:inline-flex;align-items:center;gap:8px;background-color:var(--brand);color:#fff;border-radius:3px;font-family:var(--font-body, Roboto, sans-serif);font-weight:300;text-decoration:none;white-space:nowrap;font-size:16px;padding:10px 30px">Book a demo</a></div><script>(function(){
+        var path = location.pathname.replace(/\/$/, '');
+        var links = document.querySelectorAll('.cm-nav > .cm-nav-links > a.cm-nav-link, .cm-nav > .cm-nav-links > .cm-mi-wrap > a.cm-nav-link');
+        links.forEach(function(a){
+          var href = a.getAttribute('href');
+          if (!href) return;
+          var norm = href.replace(/\/$/, '');
+          if (norm === path || (norm !== '/sv' && path.indexOf(norm + '/') === 0)) a.style.color = 'var(--brand)';
+        });
+      })();</script></nav> </header> <main> <section style="position:relative;min-height:480px;display:flex;align-items:center;justify-content:center;background-color:#1a1a1a;overflow:hidden"><img src="/media/bergen-basket-festival/toppbilde-kunde-case.jpg" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover"/><div style="position:absolute;inset:0;background-color:rgba(0,0,0,0.45)"></div><div style="position:relative;z-index:1;text-align:center;color:#fff;padding:0 24px;max-width:800px"><h1 style="font-size:clamp(2rem, 5vw, 3.5rem);font-weight:700;margin-bottom:20px;font-family:var(--font-heading, Montserrat, sans-serif)">Bergen Basket Festival</h1><p style="font-size:clamp(1rem, 2.5vw, 1.3rem);font-weight:400;margin-bottom:36px;line-height:1.5">- 50th anniversary 2024</p></div></section>
+<section style="padding:60px 10%;text-align:left"><style>.cm-sec-heading:has(> [data-puck-overlay-portal]:empty) { display: none; }</style><div style="max-width:100%;margin:0 auto"><div style="color:#333;font-size:16px;line-height:1.7;font-family:var(--font-body, Roboto, sans-serif)"><style>
+.cm-rich > *:first-child { margin-top: 0; }
+.cm-rich > *:last-child { margin-bottom: 0; }
+.cm-rich p { margin: 0 0 0.9em; }
+.cm-rich ul { list-style: disc; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich ol { list-style: decimal; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich li { margin: 0.3em 0; }
+.cm-rich a { color: var(--brand); text-decoration: none; }
+.cm-rich a:hover { text-decoration: underline; }
+.cm-rich strong { font-weight: 700; }
+.cm-rich blockquote { border-left: 3px solid var(--brand); padding-left: 1em; margin: 1em 0; font-style: italic; opacity: 0.85; }
+.cm-rich h3, .cm-rich h4 { font-weight: 700; margin: 1.2em 0 0.5em; font-family: var(--font-heading, Montserrat, sans-serif); }
+.cm-rich h3 { font-size: 1.25em; }
+.cm-rich h4 { font-size: 1.1em; }
+.cm-rich table { border-collapse: collapse; margin: 1em 0; }
+.cm-rich th, .cm-rich td { border: 1px solid #d5d5d5; padding: 5px 10px; text-align: center; }
+.cm-rich th { background: rgba(0,0,0,0.045); font-weight: 700; }
+.cm-rich img { max-width: 100%; height: auto; }
+.cm-rich hr { border: none; border-top: 1px solid rgba(0,0,0,0.12); margin: 1.4em 0; }
+</style><div class="cm-rich"><p>It&#x27;s just before New Year 2025, and we&#x27;re catching up with Geir Eikenes, one of the people behind the Bergen Basket Festival. The tournament is an overnight event with more than 250 teams and 2,200 players spread across two weekends. It used to be called simply “Hansacup”, but changed its name in 2019 to Bergen Basketfestival Hansacup.</p>
+<p>It&#x27;s an anniversary! For the 50th time, Ulriken Eagles Basketball Club is delighted to invite teams to the Bergen Basket Festival Hansacup in late April and early May 2025.</p>
+<p>But first, a few things about basketball you might not have known.</p>
+<p>Basketball was invented in 1891 by the Canadian James Naismith, and the original document defining the rules of the game sold for around 50 million in 2010. The first official game was played at the YMCA gymnasium on 20 January 1892, with nine players per team, on a court roughly half the size of today&#x27;s. But enough about that.</p>
+<p>Like most people from Bergen, Eikenes barely pauses for breath as he talks about how the sport of basketball has grown in recent years, and how that ties into the Bergen Basket Festival.</p>
+<p>- Basketball itself has stayed largely the same since 1963, when the sport really took hold in Norway (it used to be called “korgboll”), but the conditions around it have changed a fair bit since the 2000s. It&#x27;s become more global, more analytics-driven and star-focused, with a faster, more perimeter-oriented style of play.</p>
+<p>- When it comes to participation from further afield, things have changed as travel options have improved and become more accessible to most people. That&#x27;s just as important to think about when building a tournament that should be attractive to people from outside the Bergen area, says Eikenes.</p></div></div></div></section>
+<section style="padding:40px 7%;background-color:transparent"><style>
+        .cm-cols-1 { display: grid; grid-template-columns: repeat(1, 1fr); gap: 48px; max-width: 1140px; margin: 0 auto; text-align: center; }
+        /* In the editor Puck wraps the columns in a DropZone. display:contents
+           would make them cells of the grid above, but it also discards the
+           DropZone's own box — 0x0 while empty, so Puck's own min-height cannot
+           apply and a freshly dropped CmColumns cannot be filled at all: the
+           dragged block just relocates elsewhere on the page. The DropZone is
+           the grid instead, spanning the outer tracks and repeating them
+           inside. The rendered page has no DropZone, so there the rule above
+           does the work. */
+        .cm-cols-1 > [class*="DropZone"] {
+          grid-column: 1 / -1;
+          display: grid;
+          grid-template-columns: repeat(1, 1fr);
+          gap: 48px;
+        }
+        @media (max-width: 640px) {
+          .cm-cols-1 { grid-template-columns: 1fr; max-width: 100%; }
+          .cm-cols-1 > [class*="DropZone"] { grid-template-columns: 1fr; }
+        }
+      </style><div class="cm-cols-1"><figure class="py-4"><div class="relative w-full overflow-hidden rounded-lg"><img src="/media/bergen-basket-festival/festival-banner.png" alt="Bergen Basket Festival Banner" class="w-full h-auto"/></div></figure></div></section>
+<section style="padding:60px 10%;text-align:left"><style>.cm-sec-heading:has(> [data-puck-overlay-portal]:empty) { display: none; }</style><div style="max-width:100%;margin:0 auto"><h2 class="cm-sec-heading" style="color:#1a1a1a;font-size:clamp(1.4rem, 3vw, 2.1rem);font-weight:700;margin-bottom:20px;font-family:var(--font-heading, Montserrat, sans-serif)">We expect even higher international participation in the years ahead.</h2><div style="color:#333;font-size:16px;line-height:1.7;font-family:var(--font-body, Roboto, sans-serif)"><style>
+.cm-rich > *:first-child { margin-top: 0; }
+.cm-rich > *:last-child { margin-bottom: 0; }
+.cm-rich p { margin: 0 0 0.9em; }
+.cm-rich ul { list-style: disc; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich ol { list-style: decimal; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich li { margin: 0.3em 0; }
+.cm-rich a { color: var(--brand); text-decoration: none; }
+.cm-rich a:hover { text-decoration: underline; }
+.cm-rich strong { font-weight: 700; }
+.cm-rich blockquote { border-left: 3px solid var(--brand); padding-left: 1em; margin: 1em 0; font-style: italic; opacity: 0.85; }
+.cm-rich h3, .cm-rich h4 { font-weight: 700; margin: 1.2em 0 0.5em; font-family: var(--font-heading, Montserrat, sans-serif); }
+.cm-rich h3 { font-size: 1.25em; }
+.cm-rich h4 { font-size: 1.1em; }
+.cm-rich table { border-collapse: collapse; margin: 1em 0; }
+.cm-rich th, .cm-rich td { border: 1px solid #d5d5d5; padding: 5px 10px; text-align: center; }
+.cm-rich th { background: rgba(0,0,0,0.045); font-weight: 700; }
+.cm-rich img { max-width: 100%; height: auto; }
+.cm-rich hr { border: none; border-top: 1px solid rgba(0,0,0,0.12); margin: 1.4em 0; }
+</style><div class="cm-rich"><p>We now have registered teams from Spain (Club Bàsquet Torelló) — two of them — and there&#x27;s interest from Italy in joining the tournament in 2025.</p>
+<p>When it comes to our growth as a tournament, a lot of it comes down to things we started working on specifically in 2019. That&#x27;s when we made a push to professionalize the tournament: better marketing, more volunteers, and switching to a professional tournament system. Simply put, tackling the things that clearly needed improving, says Eikenes.</p></div></div></div></section>
+<section style="padding:40px 7%;background-color:transparent"><style>
+        .cm-cols-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 48px; max-width: 1140px; margin: 0 auto; text-align: center; }
+        /* In the editor Puck wraps the columns in a DropZone. display:contents
+           would make them cells of the grid above, but it also discards the
+           DropZone's own box — 0x0 while empty, so Puck's own min-height cannot
+           apply and a freshly dropped CmColumns cannot be filled at all: the
+           dragged block just relocates elsewhere on the page. The DropZone is
+           the grid instead, spanning the outer tracks and repeating them
+           inside. The rendered page has no DropZone, so there the rule above
+           does the work. */
+        .cm-cols-2 > [class*="DropZone"] {
+          grid-column: 1 / -1;
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
+          gap: 48px;
+        }
+        @media (max-width: 640px) {
+          .cm-cols-2 { grid-template-columns: 1fr; max-width: 100%; }
+          .cm-cols-2 > [class*="DropZone"] { grid-template-columns: 1fr; }
+        }
+      </style><div class="cm-cols-2"><figure class="py-4"><div class="relative w-full overflow-hidden rounded-lg"><img src="/media/bergen-basket-festival/basket-match.jpg" alt="A group of women is actively playing basketball on an indoor court. They are dressed in sports uniforms and athletic footwear, demonstrating various basketball moves. The scene captures the energy and teamwork involved in the game." class="w-full h-auto"/></div></figure><figure class="py-4"><div class="relative w-full overflow-hidden rounded-lg"><img src="/media/bergen-basket-festival/lagbild.jpg" alt="A group of people is posing for a photo, likely related to a basketball team or athletically focused event. They are dressed in sports uniforms and footwear appropriate for indoor sports. The image emphasizes teamwork and athleticism within a sporting context." class="w-full h-auto"/></div></figure></div></section>
+<section style="padding:60px 10%;text-align:left"><style>.cm-sec-heading:has(> [data-puck-overlay-portal]:empty) { display: none; }</style><div style="max-width:100%;margin:0 auto"><h2 class="cm-sec-heading" style="color:#1a1a1a;font-size:clamp(1.4rem, 3vw, 2.1rem);font-weight:700;margin-bottom:20px;font-family:var(--font-heading, Montserrat, sans-serif)">From club-run to parent-run</h2><div style="color:#333;font-size:16px;line-height:1.7;font-family:var(--font-body, Roboto, sans-serif)"><style>
+.cm-rich > *:first-child { margin-top: 0; }
+.cm-rich > *:last-child { margin-bottom: 0; }
+.cm-rich p { margin: 0 0 0.9em; }
+.cm-rich ul { list-style: disc; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich ol { list-style: decimal; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich li { margin: 0.3em 0; }
+.cm-rich a { color: var(--brand); text-decoration: none; }
+.cm-rich a:hover { text-decoration: underline; }
+.cm-rich strong { font-weight: 700; }
+.cm-rich blockquote { border-left: 3px solid var(--brand); padding-left: 1em; margin: 1em 0; font-style: italic; opacity: 0.85; }
+.cm-rich h3, .cm-rich h4 { font-weight: 700; margin: 1.2em 0 0.5em; font-family: var(--font-heading, Montserrat, sans-serif); }
+.cm-rich h3 { font-size: 1.25em; }
+.cm-rich h4 { font-size: 1.1em; }
+.cm-rich table { border-collapse: collapse; margin: 1em 0; }
+.cm-rich th, .cm-rich td { border: 1px solid #d5d5d5; padding: 5px 10px; text-align: center; }
+.cm-rich th { background: rgba(0,0,0,0.045); font-weight: 700; }
+.cm-rich img { max-width: 100%; height: auto; }
+.cm-rich hr { border: none; border-top: 1px solid rgba(0,0,0,0.12); margin: 1.4em 0; }
+</style><div class="cm-rich"><p>Geir points out that there have been some changes around who actually decides which teams take part in a tournament.</p>
+<p>The sport has become more parent-driven than club-driven, which used to be the case, and that&#x27;s important to keep in mind when thinking about who you&#x27;re dealing with. We&#x27;ve stayed aware of that in how we run the tournament. In the past it was the clubs that decided whether to take part or not, but now each team has more room to decide for itself — often led by a parent acting as team manager.</p></div></div></div></section>
+<section style="padding:20px 7%"><div style="max-width:1140px;margin:0 auto;background-color:var(--brand);padding:20px 28px;text-align:left;border-radius:3px"><h2 style="font-family:var(--font-heading, Montserrat, sans-serif);font-weight:700;font-size:clamp(1.3rem, 2.2vw, 1.8rem);color:#fff;margin:0;line-height:1.3">The tournament uses the following features in CupManager.</h2></div></section>
+<section style="padding:40px 7%;background-color:transparent"><style>
+        .cm-cols-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 48px; max-width: 1140px; margin: 0 auto; text-align: left; }
+        /* In the editor Puck wraps the columns in a DropZone. display:contents
+           would make them cells of the grid above, but it also discards the
+           DropZone's own box — 0x0 while empty, so Puck's own min-height cannot
+           apply and a freshly dropped CmColumns cannot be filled at all: the
+           dragged block just relocates elsewhere on the page. The DropZone is
+           the grid instead, spanning the outer tracks and repeating them
+           inside. The rendered page has no DropZone, so there the rule above
+           does the work. */
+        .cm-cols-2 > [class*="DropZone"] {
+          grid-column: 1 / -1;
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
+          gap: 48px;
+        }
+        @media (max-width: 640px) {
+          .cm-cols-2 { grid-template-columns: 1fr; max-width: 100%; }
+          .cm-cols-2 > [class*="DropZone"] { grid-template-columns: 1fr; }
+        }
+      </style><div class="cm-cols-2"><div><style>.cm-col-heading:has(> [data-puck-overlay-portal]:empty) { display: none; }</style><section style="max-width:calc(1140px + 80px);padding:40px;margin:0 auto;padding-top:0;padding-bottom:0"><div><details style="border-bottom:1px solid #e5e7eb;padding:16px 0"><summary style="font-family:var(--font-body, Roboto, sans-serif);font-weight:700;font-size:17px;cursor:pointer;color:#1a1a1a;list-style:none;display:flex;justify-content:space-between;align-items:center">Participant cards<svg class="cm-faq-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-left:16px;flex-shrink:0;transition:transform 0.15s"><path d="M6 9l6 6 6-6"></path></svg><style>details[open] > summary > .cm-faq-chevron { transform: rotate(180deg); }</style></summary><div style="font-family:var(--font-body, Roboto, sans-serif);font-size:15px;line-height:1.7;color:#555;margin-top:12px;padding-right:32px"><style>
+.cm-rich > *:first-child { margin-top: 0; }
+.cm-rich > *:last-child { margin-bottom: 0; }
+.cm-rich p { margin: 0 0 0.9em; }
+.cm-rich ul { list-style: disc; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich ol { list-style: decimal; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich li { margin: 0.3em 0; }
+.cm-rich a { color: var(--brand); text-decoration: none; }
+.cm-rich a:hover { text-decoration: underline; }
+.cm-rich strong { font-weight: 700; }
+.cm-rich blockquote { border-left: 3px solid var(--brand); padding-left: 1em; margin: 1em 0; font-style: italic; opacity: 0.85; }
+.cm-rich h3, .cm-rich h4 { font-weight: 700; margin: 1.2em 0 0.5em; font-family: var(--font-heading, Montserrat, sans-serif); }
+.cm-rich h3 { font-size: 1.25em; }
+.cm-rich h4 { font-size: 1.1em; }
+.cm-rich table { border-collapse: collapse; margin: 1em 0; }
+.cm-rich th, .cm-rich td { border: 1px solid #d5d5d5; padding: 5px 10px; text-align: center; }
+.cm-rich th { background: rgba(0,0,0,0.045); font-weight: 700; }
+.cm-rich img { max-width: 100%; height: auto; }
+.cm-rich hr { border: none; border-top: 1px solid rgba(0,0,0,0.12); margin: 1.4em 0; }
+</style><div class="cm-rich"><p>With participant cards, the tournament can easily keep track of who has which needs, and cards can be purchased in advance through CupManager.</p></div></div></details><details style="border-bottom:1px solid #e5e7eb;padding:16px 0"><summary style="font-family:var(--font-body, Roboto, sans-serif);font-weight:700;font-size:17px;cursor:pointer;color:#1a1a1a;list-style:none;display:flex;justify-content:space-between;align-items:center">Online payment<svg class="cm-faq-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-left:16px;flex-shrink:0;transition:transform 0.15s"><path d="M6 9l6 6 6-6"></path></svg><style>details[open] > summary > .cm-faq-chevron { transform: rotate(180deg); }</style></summary><div style="font-family:var(--font-body, Roboto, sans-serif);font-size:15px;line-height:1.7;color:#555;margin-top:12px;padding-right:32px"><style>
+.cm-rich > *:first-child { margin-top: 0; }
+.cm-rich > *:last-child { margin-bottom: 0; }
+.cm-rich p { margin: 0 0 0.9em; }
+.cm-rich ul { list-style: disc; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich ol { list-style: decimal; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich li { margin: 0.3em 0; }
+.cm-rich a { color: var(--brand); text-decoration: none; }
+.cm-rich a:hover { text-decoration: underline; }
+.cm-rich strong { font-weight: 700; }
+.cm-rich blockquote { border-left: 3px solid var(--brand); padding-left: 1em; margin: 1em 0; font-style: italic; opacity: 0.85; }
+.cm-rich h3, .cm-rich h4 { font-weight: 700; margin: 1.2em 0 0.5em; font-family: var(--font-heading, Montserrat, sans-serif); }
+.cm-rich h3 { font-size: 1.25em; }
+.cm-rich h4 { font-size: 1.1em; }
+.cm-rich table { border-collapse: collapse; margin: 1em 0; }
+.cm-rich th, .cm-rich td { border: 1px solid #d5d5d5; padding: 5px 10px; text-align: center; }
+.cm-rich th { background: rgba(0,0,0,0.045); font-weight: 700; }
+.cm-rich img { max-width: 100%; height: auto; }
+.cm-rich hr { border: none; border-top: 1px solid rgba(0,0,0,0.12); margin: 1.4em 0; }
+</style><div class="cm-rich"><p>Online payment makes it easy to handle registration and participation fees instead of manual payments. We offer card payments and Klarna as options, so you can keep everything in one place.</p></div></div></details><details style="border-bottom:1px solid #e5e7eb;padding:16px 0"><summary style="font-family:var(--font-body, Roboto, sans-serif);font-weight:700;font-size:17px;cursor:pointer;color:#1a1a1a;list-style:none;display:flex;justify-content:space-between;align-items:center">Cup-Pass<svg class="cm-faq-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-left:16px;flex-shrink:0;transition:transform 0.15s"><path d="M6 9l6 6 6-6"></path></svg><style>details[open] > summary > .cm-faq-chevron { transform: rotate(180deg); }</style></summary><div style="font-family:var(--font-body, Roboto, sans-serif);font-size:15px;line-height:1.7;color:#555;margin-top:12px;padding-right:32px"><style>
+.cm-rich > *:first-child { margin-top: 0; }
+.cm-rich > *:last-child { margin-bottom: 0; }
+.cm-rich p { margin: 0 0 0.9em; }
+.cm-rich ul { list-style: disc; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich ol { list-style: decimal; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich li { margin: 0.3em 0; }
+.cm-rich a { color: var(--brand); text-decoration: none; }
+.cm-rich a:hover { text-decoration: underline; }
+.cm-rich strong { font-weight: 700; }
+.cm-rich blockquote { border-left: 3px solid var(--brand); padding-left: 1em; margin: 1em 0; font-style: italic; opacity: 0.85; }
+.cm-rich h3, .cm-rich h4 { font-weight: 700; margin: 1.2em 0 0.5em; font-family: var(--font-heading, Montserrat, sans-serif); }
+.cm-rich h3 { font-size: 1.25em; }
+.cm-rich h4 { font-size: 1.1em; }
+.cm-rich table { border-collapse: collapse; margin: 1em 0; }
+.cm-rich th, .cm-rich td { border: 1px solid #d5d5d5; padding: 5px 10px; text-align: center; }
+.cm-rich th { background: rgba(0,0,0,0.045); font-weight: 700; }
+.cm-rich img { max-width: 100%; height: auto; }
+.cm-rich hr { border: none; border-top: 1px solid rgba(0,0,0,0.12); margin: 1.4em 0; }
+</style><div class="cm-rich"><p>With Cup-Pass, every team gets its own QR code giving access to pre-defined or purchased meals, transport and other tournament arrangements. The team manager always has full visibility into consumption and availability.</p></div></div></details><details style="border-bottom:1px solid #e5e7eb;padding:16px 0"><summary style="font-family:var(--font-body, Roboto, sans-serif);font-weight:700;font-size:17px;cursor:pointer;color:#1a1a1a;list-style:none;display:flex;justify-content:space-between;align-items:center">Live results<svg class="cm-faq-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-left:16px;flex-shrink:0;transition:transform 0.15s"><path d="M6 9l6 6 6-6"></path></svg><style>details[open] > summary > .cm-faq-chevron { transform: rotate(180deg); }</style></summary><div style="font-family:var(--font-body, Roboto, sans-serif);font-size:15px;line-height:1.7;color:#555;margin-top:12px;padding-right:32px"><style>
+.cm-rich > *:first-child { margin-top: 0; }
+.cm-rich > *:last-child { margin-bottom: 0; }
+.cm-rich p { margin: 0 0 0.9em; }
+.cm-rich ul { list-style: disc; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich ol { list-style: decimal; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich li { margin: 0.3em 0; }
+.cm-rich a { color: var(--brand); text-decoration: none; }
+.cm-rich a:hover { text-decoration: underline; }
+.cm-rich strong { font-weight: 700; }
+.cm-rich blockquote { border-left: 3px solid var(--brand); padding-left: 1em; margin: 1em 0; font-style: italic; opacity: 0.85; }
+.cm-rich h3, .cm-rich h4 { font-weight: 700; margin: 1.2em 0 0.5em; font-family: var(--font-heading, Montserrat, sans-serif); }
+.cm-rich h3 { font-size: 1.25em; }
+.cm-rich h4 { font-size: 1.1em; }
+.cm-rich table { border-collapse: collapse; margin: 1em 0; }
+.cm-rich th, .cm-rich td { border: 1px solid #d5d5d5; padding: 5px 10px; text-align: center; }
+.cm-rich th { background: rgba(0,0,0,0.045); font-weight: 700; }
+.cm-rich img { max-width: 100%; height: auto; }
+.cm-rich hr { border: none; border-top: 1px solid rgba(0,0,0,0.12); margin: 1.4em 0; }
+</style><div class="cm-rich"><p>With Live results, both spectators on site and people who can&#x27;t be there in person can follow scores and other match details in real time. See how it looked for the tournament here – <a href="https://hansacup.cups.nu/2024/result/">https://hansacup.cups.nu/2024/result/</a></p></div></div></details><details style="border-bottom:1px solid #e5e7eb;padding:16px 0"><summary style="font-family:var(--font-body, Roboto, sans-serif);font-weight:700;font-size:17px;cursor:pointer;color:#1a1a1a;list-style:none;display:flex;justify-content:space-between;align-items:center">Tournament website<svg class="cm-faq-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-left:16px;flex-shrink:0;transition:transform 0.15s"><path d="M6 9l6 6 6-6"></path></svg><style>details[open] > summary > .cm-faq-chevron { transform: rotate(180deg); }</style></summary><div style="font-family:var(--font-body, Roboto, sans-serif);font-size:15px;line-height:1.7;color:#555;margin-top:12px;padding-right:32px"><style>
+.cm-rich > *:first-child { margin-top: 0; }
+.cm-rich > *:last-child { margin-bottom: 0; }
+.cm-rich p { margin: 0 0 0.9em; }
+.cm-rich ul { list-style: disc; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich ol { list-style: decimal; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich li { margin: 0.3em 0; }
+.cm-rich a { color: var(--brand); text-decoration: none; }
+.cm-rich a:hover { text-decoration: underline; }
+.cm-rich strong { font-weight: 700; }
+.cm-rich blockquote { border-left: 3px solid var(--brand); padding-left: 1em; margin: 1em 0; font-style: italic; opacity: 0.85; }
+.cm-rich h3, .cm-rich h4 { font-weight: 700; margin: 1.2em 0 0.5em; font-family: var(--font-heading, Montserrat, sans-serif); }
+.cm-rich h3 { font-size: 1.25em; }
+.cm-rich h4 { font-size: 1.1em; }
+.cm-rich table { border-collapse: collapse; margin: 1em 0; }
+.cm-rich th, .cm-rich td { border: 1px solid #d5d5d5; padding: 5px 10px; text-align: center; }
+.cm-rich th { background: rgba(0,0,0,0.045); font-weight: 700; }
+.cm-rich img { max-width: 100%; height: auto; }
+.cm-rich hr { border: none; border-top: 1px solid rgba(0,0,0,0.12); margin: 1.4em 0; }
+</style><div class="cm-rich"><p>CupManager&#x27;s tournament website is a full-featured site for the tournament that you manage yourselves with ease. Post articles, photos and, of course, all the practical details about the tournament here. You can see the tournament&#x27;s website here – <a href="https://hansacup.cups.nu/start">https://hansacup.cups.nu/start</a></p></div></div></details><details style="border-bottom:1px solid #e5e7eb;padding:16px 0"><summary style="font-family:var(--font-body, Roboto, sans-serif);font-weight:700;font-size:17px;cursor:pointer;color:#1a1a1a;list-style:none;display:flex;justify-content:space-between;align-items:center">Your own tournament app<svg class="cm-faq-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-left:16px;flex-shrink:0;transition:transform 0.15s"><path d="M6 9l6 6 6-6"></path></svg><style>details[open] > summary > .cm-faq-chevron { transform: rotate(180deg); }</style></summary><div style="font-family:var(--font-body, Roboto, sans-serif);font-size:15px;line-height:1.7;color:#555;margin-top:12px;padding-right:32px"><style>
+.cm-rich > *:first-child { margin-top: 0; }
+.cm-rich > *:last-child { margin-bottom: 0; }
+.cm-rich p { margin: 0 0 0.9em; }
+.cm-rich ul { list-style: disc; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich ol { list-style: decimal; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich li { margin: 0.3em 0; }
+.cm-rich a { color: var(--brand); text-decoration: none; }
+.cm-rich a:hover { text-decoration: underline; }
+.cm-rich strong { font-weight: 700; }
+.cm-rich blockquote { border-left: 3px solid var(--brand); padding-left: 1em; margin: 1em 0; font-style: italic; opacity: 0.85; }
+.cm-rich h3, .cm-rich h4 { font-weight: 700; margin: 1.2em 0 0.5em; font-family: var(--font-heading, Montserrat, sans-serif); }
+.cm-rich h3 { font-size: 1.25em; }
+.cm-rich h4 { font-size: 1.1em; }
+.cm-rich table { border-collapse: collapse; margin: 1em 0; }
+.cm-rich th, .cm-rich td { border: 1px solid #d5d5d5; padding: 5px 10px; text-align: center; }
+.cm-rich th { background: rgba(0,0,0,0.045); font-weight: 700; }
+.cm-rich img { max-width: 100%; height: auto; }
+.cm-rich hr { border: none; border-top: 1px solid rgba(0,0,0,0.12); margin: 1.4em 0; }
+</style><div class="cm-rich"><p>With a dedicated app, the tournament gets its own unique app made just for it. It includes most features, such as live results, Cup-Pass management and more. If you want to see what it looks like, search for “Hansacup” in Google Play or the Apple App Store.</p></div></div></details><details style="border-bottom:1px solid #e5e7eb;padding:16px 0"><summary style="font-family:var(--font-body, Roboto, sans-serif);font-weight:700;font-size:17px;cursor:pointer;color:#1a1a1a;list-style:none;display:flex;justify-content:space-between;align-items:center">Tournament ratings<svg class="cm-faq-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-left:16px;flex-shrink:0;transition:transform 0.15s"><path d="M6 9l6 6 6-6"></path></svg><style>details[open] > summary > .cm-faq-chevron { transform: rotate(180deg); }</style></summary><div style="font-family:var(--font-body, Roboto, sans-serif);font-size:15px;line-height:1.7;color:#555;margin-top:12px;padding-right:32px"><style>
+.cm-rich > *:first-child { margin-top: 0; }
+.cm-rich > *:last-child { margin-bottom: 0; }
+.cm-rich p { margin: 0 0 0.9em; }
+.cm-rich ul { list-style: disc; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich ol { list-style: decimal; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich li { margin: 0.3em 0; }
+.cm-rich a { color: var(--brand); text-decoration: none; }
+.cm-rich a:hover { text-decoration: underline; }
+.cm-rich strong { font-weight: 700; }
+.cm-rich blockquote { border-left: 3px solid var(--brand); padding-left: 1em; margin: 1em 0; font-style: italic; opacity: 0.85; }
+.cm-rich h3, .cm-rich h4 { font-weight: 700; margin: 1.2em 0 0.5em; font-family: var(--font-heading, Montserrat, sans-serif); }
+.cm-rich h3 { font-size: 1.25em; }
+.cm-rich h4 { font-size: 1.1em; }
+.cm-rich table { border-collapse: collapse; margin: 1em 0; }
+.cm-rich th, .cm-rich td { border: 1px solid #d5d5d5; padding: 5px 10px; text-align: center; }
+.cm-rich th { background: rgba(0,0,0,0.045); font-weight: 700; }
+.cm-rich img { max-width: 100%; height: auto; }
+.cm-rich hr { border: none; border-top: 1px solid rgba(0,0,0,0.12); margin: 1.4em 0; }
+</style><div class="cm-rich"><p>It can be valuable to see what participants think of the tournament and what could be improved. That&#x27;s why this service is available to all tournaments through our tournament portal <a href="https://cupinvite.com/">https://cupinvite.com/</a>. There you&#x27;ll also find an overview of most tournaments in Scandinavia.</p></div></div></details></div></section></div><div><style>.cm-col-heading:has(> [data-puck-overlay-portal]:empty) { display: none; }</style><div class="py-4 max-w-2xl mx-auto text-left"><div class="text-gray-700 leading-relaxed"><style>
+.cm-rich > *:first-child { margin-top: 0; }
+.cm-rich > *:last-child { margin-bottom: 0; }
+.cm-rich p { margin: 0 0 0.9em; }
+.cm-rich ul { list-style: disc; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich ol { list-style: decimal; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich li { margin: 0.3em 0; }
+.cm-rich a { color: var(--brand); text-decoration: none; }
+.cm-rich a:hover { text-decoration: underline; }
+.cm-rich strong { font-weight: 700; }
+.cm-rich blockquote { border-left: 3px solid var(--brand); padding-left: 1em; margin: 1em 0; font-style: italic; opacity: 0.85; }
+.cm-rich h3, .cm-rich h4 { font-weight: 700; margin: 1.2em 0 0.5em; font-family: var(--font-heading, Montserrat, sans-serif); }
+.cm-rich h3 { font-size: 1.25em; }
+.cm-rich h4 { font-size: 1.1em; }
+.cm-rich table { border-collapse: collapse; margin: 1em 0; }
+.cm-rich th, .cm-rich td { border: 1px solid #d5d5d5; padding: 5px 10px; text-align: center; }
+.cm-rich th { background: rgba(0,0,0,0.045); font-weight: 700; }
+.cm-rich img { max-width: 100%; height: auto; }
+.cm-rich hr { border: none; border-top: 1px solid rgba(0,0,0,0.12); margin: 1.4em 0; }
+</style><div class="cm-rich"><p><a href="https://cupinvite.com/#?date=2025-01-07&amp;loc=Oslo&amp;country=NO&amp;coords=%5B60,11%5D"><img src="/media/bergen-basket-festival/hansa-cup-rating.png" alt="Hansa-Cup-rating"/></a></p></div></div></div></div></div></section>
+<section style="padding:60px 10%;text-align:left"><style>.cm-sec-heading:has(> [data-puck-overlay-portal]:empty) { display: none; }</style><div style="max-width:100%;margin:0 auto"><h2 class="cm-sec-heading" style="color:#1a1a1a;font-size:clamp(1.4rem, 3vw, 2.1rem);font-weight:700;margin-bottom:20px;font-family:var(--font-heading, Montserrat, sans-serif)">The tournament sold out in 2024 long before the registration deadline.</h2><div style="color:#333;font-size:16px;line-height:1.7;font-family:var(--font-body, Roboto, sans-serif)"><style>
+.cm-rich > *:first-child { margin-top: 0; }
+.cm-rich > *:last-child { margin-bottom: 0; }
+.cm-rich p { margin: 0 0 0.9em; }
+.cm-rich ul { list-style: disc; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich ol { list-style: decimal; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich li { margin: 0.3em 0; }
+.cm-rich a { color: var(--brand); text-decoration: none; }
+.cm-rich a:hover { text-decoration: underline; }
+.cm-rich strong { font-weight: 700; }
+.cm-rich blockquote { border-left: 3px solid var(--brand); padding-left: 1em; margin: 1em 0; font-style: italic; opacity: 0.85; }
+.cm-rich h3, .cm-rich h4 { font-weight: 700; margin: 1.2em 0 0.5em; font-family: var(--font-heading, Montserrat, sans-serif); }
+.cm-rich h3 { font-size: 1.25em; }
+.cm-rich h4 { font-size: 1.1em; }
+.cm-rich table { border-collapse: collapse; margin: 1em 0; }
+.cm-rich th, .cm-rich td { border: 1px solid #d5d5d5; padding: 5px 10px; text-align: center; }
+.cm-rich th { background: rgba(0,0,0,0.045); font-weight: 700; }
+.cm-rich img { max-width: 100%; height: auto; }
+.cm-rich hr { border: none; border-top: 1px solid rgba(0,0,0,0.12); margin: 1.4em 0; }
+</style><div class="cm-rich"><p>Do you have any tips or inspiration for others who want their tournament to be just as attractive?</p>
+<p>- We&#x27;re really just an ordinary tournament aiming to grow, because we know Ulrikken Eagles (the club behind the Bergen Basket Festival) can develop through tournament revenue. That&#x27;s the motivation behind it all — working to create growth that benefits children and young people.</p>
+<p>- Achieving growth and profitability, as I said, comes down to professionalizing the conditions around the tournament itself. That mainly means areas like social media marketing, a tournament solution that takes care of the whole ecosystem, and working on volunteer recruitment, which we depend on completely. It&#x27;s absolutely essential that the volunteers contribute.</p></div></div></div></section>
+<section style="background-color:#434649;padding:32px 40px"><div style="max-width:800px;margin:0 auto;background-color:#fff;border-radius:8px;padding:36px 40px;box-shadow:0 2px 10px rgba(0,0,0,0.15)"><blockquote style="font-size:clamp(1.1rem, 2.5vw, 1.6rem);font-weight:400;color:#333;line-height:1.6;font-family:var(--font-body, Roboto, sans-serif);margin:0 0 32px;font-style:italic">“<!-- -->We came all the way from Tromsø and had a fantastic experience at Hansacup (Bergen Basket Festival). We&#x27;d love to come back!<!-- -->”</blockquote><div style="display:flex;align-items:center;gap:20px"><div><p style="font-weight:700;color:#1a1a1a;font-size:15px;margin-bottom:2px;font-family:var(--font-body, Roboto, sans-serif)">Eirik Vorland</p><p style="color:#777;font-size:13px;font-family:var(--font-body, Roboto, sans-serif)">Tromsø Storm Ungdom</p></div></div></div></section>
+<section style="padding:60px 10%;text-align:left"><style>.cm-sec-heading:has(> [data-puck-overlay-portal]:empty) { display: none; }</style><div style="max-width:100%;margin:0 auto"><h2 class="cm-sec-heading" style="color:#1a1a1a;font-size:clamp(1.4rem, 3vw, 2.1rem);font-weight:700;margin-bottom:20px;font-family:var(--font-heading, Montserrat, sans-serif)">Bergen Basket Festival received a 4.9 rating from participants in 2024.</h2><div style="color:#333;font-size:16px;line-height:1.7;font-family:var(--font-body, Roboto, sans-serif)"><style>
+.cm-rich > *:first-child { margin-top: 0; }
+.cm-rich > *:last-child { margin-bottom: 0; }
+.cm-rich p { margin: 0 0 0.9em; }
+.cm-rich ul { list-style: disc; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich ol { list-style: decimal; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich li { margin: 0.3em 0; }
+.cm-rich a { color: var(--brand); text-decoration: none; }
+.cm-rich a:hover { text-decoration: underline; }
+.cm-rich strong { font-weight: 700; }
+.cm-rich blockquote { border-left: 3px solid var(--brand); padding-left: 1em; margin: 1em 0; font-style: italic; opacity: 0.85; }
+.cm-rich h3, .cm-rich h4 { font-weight: 700; margin: 1.2em 0 0.5em; font-family: var(--font-heading, Montserrat, sans-serif); }
+.cm-rich h3 { font-size: 1.25em; }
+.cm-rich h4 { font-size: 1.1em; }
+.cm-rich table { border-collapse: collapse; margin: 1em 0; }
+.cm-rich th, .cm-rich td { border: 1px solid #d5d5d5; padding: 5px 10px; text-align: center; }
+.cm-rich th { background: rgba(0,0,0,0.045); font-weight: 700; }
+.cm-rich img { max-width: 100%; height: auto; }
+.cm-rich hr { border: none; border-top: 1px solid rgba(0,0,0,0.12); margin: 1.4em 0; }
+</style><div class="cm-rich"><p>On the subject of volunteers, Eikenes mentions that CupManager could use a good solution for managing volunteers during a tournament.</p>
+<p>- There are probably around 150 volunteers helping out with the tournament — before, during and after. Organizing them in a simple, predictable way is something we&#x27;re missing. I&#x27;ve mentioned this to CupManager too, and they&#x27;ve promised to look into it. Otherwise, I want to praise CupManager&#x27;s support team, who are absolutely fantastic sparring partners for finding good solutions whenever we need them. Those Swedes really know their tournaments.</p>
+<blockquote>
+<p>This year&#x27;s anniversary tournament is going to be the biggest yet. Some age groups are already nearly full, so don&#x27;t wait too long to register. If you think your team would like to take part in Bergen Basket Festival 2025, you can easily register your team through CupManager <a href="https://hansacup.cups.nu/j/public/reg">here</a>.</p>
+</blockquote>
+<p>Thanks for the chat, and happy new year to everyone!</p>
+<p>PS: Want a demo of CupManager?</p>
+<p><a href="https://calendly.com/superinvite-cupmanager-en/demo?month=2025-01">Book a demo with one of our amazing support staff.</a></p></div></div></div></section> </main> <footer> <section style="background-color:var(--brand);padding:56px 7%;font-family:var(--font-body, Roboto, sans-serif)"><div style="display:flex;flex-wrap:wrap;gap:48px;max-width:1100px;margin:0 auto"><div style="flex:1 1 420px"><h3 style="font-family:var(--font-heading, Montserrat, sans-serif);font-weight:700;font-size:22px;color:#fff;margin:0 0 18px">Frequently asked questions</h3><style>.cm-faq-dark .cm-rich a { color: #fff; text-decoration: underline; } .cm-faq-dark .cm-rich a:hover { color: rgba(255,255,255,0.85); }</style><details class="cm-faq-dark" style="border-bottom:1px solid rgba(255,255,255,0.15);padding:12px 0"><summary style="font-family:var(--font-body, Roboto, sans-serif);font-weight:700;font-size:16px;cursor:pointer;color:#fff;list-style:none;display:flex;justify-content:space-between;align-items:center">Who can use Cup Manager?<svg class="cm-faq-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-left:16px;flex-shrink:0;transition:transform 0.15s"><path d="M6 9l6 6 6-6"></path></svg><style>details[open] > summary > .cm-faq-chevron { transform: rotate(180deg); }</style></summary><div style="font-family:var(--font-body, Roboto, sans-serif);font-size:14px;line-height:1.7;color:rgba(255,255,255,0.75);margin-top:12px;padding-right:32px"><style>
+.cm-rich > *:first-child { margin-top: 0; }
+.cm-rich > *:last-child { margin-bottom: 0; }
+.cm-rich p { margin: 0 0 0.9em; }
+.cm-rich ul { list-style: disc; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich ol { list-style: decimal; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich li { margin: 0.3em 0; }
+.cm-rich a { color: var(--brand); text-decoration: none; }
+.cm-rich a:hover { text-decoration: underline; }
+.cm-rich strong { font-weight: 700; }
+.cm-rich blockquote { border-left: 3px solid var(--brand); padding-left: 1em; margin: 1em 0; font-style: italic; opacity: 0.85; }
+.cm-rich h3, .cm-rich h4 { font-weight: 700; margin: 1.2em 0 0.5em; font-family: var(--font-heading, Montserrat, sans-serif); }
+.cm-rich h3 { font-size: 1.25em; }
+.cm-rich h4 { font-size: 1.1em; }
+.cm-rich table { border-collapse: collapse; margin: 1em 0; }
+.cm-rich th, .cm-rich td { border: 1px solid #d5d5d5; padding: 5px 10px; text-align: center; }
+.cm-rich th { background: rgba(0,0,0,0.045); font-weight: 700; }
+.cm-rich img { max-width: 100%; height: auto; }
+.cm-rich hr { border: none; border-top: 1px solid rgba(0,0,0,0.12); margin: 1.4em 0; }
+</style><div class="cm-rich"><p>Cup Manager is used by everything from the world&#x27;s largest tournaments to local tournaments with 30 teams. You can take advantage of different features depending on the size of your event. Even a simple tournament can save time and hassle by handling the match schedule and all communication in one place.</p></div></div></details><style>.cm-faq-dark .cm-rich a { color: #fff; text-decoration: underline; } .cm-faq-dark .cm-rich a:hover { color: rgba(255,255,255,0.85); }</style><details class="cm-faq-dark" style="border-bottom:1px solid rgba(255,255,255,0.15);padding:12px 0"><summary style="font-family:var(--font-body, Roboto, sans-serif);font-weight:700;font-size:16px;cursor:pointer;color:#fff;list-style:none;display:flex;justify-content:space-between;align-items:center">How do I get started?<svg class="cm-faq-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-left:16px;flex-shrink:0;transition:transform 0.15s"><path d="M6 9l6 6 6-6"></path></svg><style>details[open] > summary > .cm-faq-chevron { transform: rotate(180deg); }</style></summary><div style="font-family:var(--font-body, Roboto, sans-serif);font-size:14px;line-height:1.7;color:rgba(255,255,255,0.75);margin-top:12px;padding-right:32px"><style>
+.cm-rich > *:first-child { margin-top: 0; }
+.cm-rich > *:last-child { margin-bottom: 0; }
+.cm-rich p { margin: 0 0 0.9em; }
+.cm-rich ul { list-style: disc; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich ol { list-style: decimal; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich li { margin: 0.3em 0; }
+.cm-rich a { color: var(--brand); text-decoration: none; }
+.cm-rich a:hover { text-decoration: underline; }
+.cm-rich strong { font-weight: 700; }
+.cm-rich blockquote { border-left: 3px solid var(--brand); padding-left: 1em; margin: 1em 0; font-style: italic; opacity: 0.85; }
+.cm-rich h3, .cm-rich h4 { font-weight: 700; margin: 1.2em 0 0.5em; font-family: var(--font-heading, Montserrat, sans-serif); }
+.cm-rich h3 { font-size: 1.25em; }
+.cm-rich h4 { font-size: 1.1em; }
+.cm-rich table { border-collapse: collapse; margin: 1em 0; }
+.cm-rich th, .cm-rich td { border: 1px solid #d5d5d5; padding: 5px 10px; text-align: center; }
+.cm-rich th { background: rgba(0,0,0,0.045); font-weight: 700; }
+.cm-rich img { max-width: 100%; height: auto; }
+.cm-rich hr { border: none; border-top: 1px solid rgba(0,0,0,0.12); margin: 1.4em 0; }
+</style><div class="cm-rich"><p>Getting started with Cup Manager is easy. <a href="https://calendly.com/superinvite-cupmanager-en/demo">Book a demo</a>, or <a href="/en/support/">contact us directly by email or phone</a> and we&#x27;ll help you get going!</p></div></div></details><style>.cm-faq-dark .cm-rich a { color: #fff; text-decoration: underline; } .cm-faq-dark .cm-rich a:hover { color: rgba(255,255,255,0.85); }</style><details class="cm-faq-dark" style="border-bottom:1px solid rgba(255,255,255,0.15);padding:12px 0"><summary style="font-family:var(--font-body, Roboto, sans-serif);font-weight:700;font-size:16px;cursor:pointer;color:#fff;list-style:none;display:flex;justify-content:space-between;align-items:center">What does it cost?<svg class="cm-faq-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-left:16px;flex-shrink:0;transition:transform 0.15s"><path d="M6 9l6 6 6-6"></path></svg><style>details[open] > summary > .cm-faq-chevron { transform: rotate(180deg); }</style></summary><div style="font-family:var(--font-body, Roboto, sans-serif);font-size:14px;line-height:1.7;color:rgba(255,255,255,0.75);margin-top:12px;padding-right:32px"><style>
+.cm-rich > *:first-child { margin-top: 0; }
+.cm-rich > *:last-child { margin-bottom: 0; }
+.cm-rich p { margin: 0 0 0.9em; }
+.cm-rich ul { list-style: disc; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich ol { list-style: decimal; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich li { margin: 0.3em 0; }
+.cm-rich a { color: var(--brand); text-decoration: none; }
+.cm-rich a:hover { text-decoration: underline; }
+.cm-rich strong { font-weight: 700; }
+.cm-rich blockquote { border-left: 3px solid var(--brand); padding-left: 1em; margin: 1em 0; font-style: italic; opacity: 0.85; }
+.cm-rich h3, .cm-rich h4 { font-weight: 700; margin: 1.2em 0 0.5em; font-family: var(--font-heading, Montserrat, sans-serif); }
+.cm-rich h3 { font-size: 1.25em; }
+.cm-rich h4 { font-size: 1.1em; }
+.cm-rich table { border-collapse: collapse; margin: 1em 0; }
+.cm-rich th, .cm-rich td { border: 1px solid #d5d5d5; padding: 5px 10px; text-align: center; }
+.cm-rich th { background: rgba(0,0,0,0.045); font-weight: 700; }
+.cm-rich img { max-width: 100%; height: auto; }
+.cm-rich hr { border: none; border-top: 1px solid rgba(0,0,0,0.12); margin: 1.4em 0; }
+</style><div class="cm-rich"><p>We use a simple pricing model: a price per participating team, a transaction fee for online payments, and optional add-on services. Read more about <a href="/en/priser/">our pricing here</a>.</p></div></div></details><style>.cm-faq-dark .cm-rich a { color: #fff; text-decoration: underline; } .cm-faq-dark .cm-rich a:hover { color: rgba(255,255,255,0.85); }</style><details class="cm-faq-dark" style="border-bottom:1px solid rgba(255,255,255,0.15);padding:12px 0"><summary style="font-family:var(--font-body, Roboto, sans-serif);font-weight:700;font-size:16px;cursor:pointer;color:#fff;list-style:none;display:flex;justify-content:space-between;align-items:center">How much support is included in the license fee?<svg class="cm-faq-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-left:16px;flex-shrink:0;transition:transform 0.15s"><path d="M6 9l6 6 6-6"></path></svg><style>details[open] > summary > .cm-faq-chevron { transform: rotate(180deg); }</style></summary><div style="font-family:var(--font-body, Roboto, sans-serif);font-size:14px;line-height:1.7;color:rgba(255,255,255,0.75);margin-top:12px;padding-right:32px"><style>
+.cm-rich > *:first-child { margin-top: 0; }
+.cm-rich > *:last-child { margin-bottom: 0; }
+.cm-rich p { margin: 0 0 0.9em; }
+.cm-rich ul { list-style: disc; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich ol { list-style: decimal; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich li { margin: 0.3em 0; }
+.cm-rich a { color: var(--brand); text-decoration: none; }
+.cm-rich a:hover { text-decoration: underline; }
+.cm-rich strong { font-weight: 700; }
+.cm-rich blockquote { border-left: 3px solid var(--brand); padding-left: 1em; margin: 1em 0; font-style: italic; opacity: 0.85; }
+.cm-rich h3, .cm-rich h4 { font-weight: 700; margin: 1.2em 0 0.5em; font-family: var(--font-heading, Montserrat, sans-serif); }
+.cm-rich h3 { font-size: 1.25em; }
+.cm-rich h4 { font-size: 1.1em; }
+.cm-rich table { border-collapse: collapse; margin: 1em 0; }
+.cm-rich th, .cm-rich td { border: 1px solid #d5d5d5; padding: 5px 10px; text-align: center; }
+.cm-rich th { background: rgba(0,0,0,0.045); font-weight: 700; }
+.cm-rich img { max-width: 100%; height: auto; }
+.cm-rich hr { border: none; border-top: 1px solid rgba(0,0,0,0.12); margin: 1.4em 0; }
+</style><div class="cm-rich"><p>There&#x27;s no limit to how much support is included. All support, help and training are included. Our experience shows that things work best when you handle as much as possible yourselves, so our main goal with support is to explain how things are done — but of course, we&#x27;ll never leave you in the lurch.</p>
+<p>To get in touch with us, you can call or email us, or click the chat icon in the bottom right corner of this page. For longer matters, we recommend that you <a href="/en/boka/">book a meeting</a>.</p></div></div></details><style>.cm-faq-dark .cm-rich a { color: #fff; text-decoration: underline; } .cm-faq-dark .cm-rich a:hover { color: rgba(255,255,255,0.85); }</style><details class="cm-faq-dark" style="border-bottom:1px solid rgba(255,255,255,0.15);padding:12px 0"><summary style="font-family:var(--font-body, Roboto, sans-serif);font-weight:700;font-size:16px;cursor:pointer;color:#fff;list-style:none;display:flex;justify-content:space-between;align-items:center">Is on-call support available during the tournament?<svg class="cm-faq-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-left:16px;flex-shrink:0;transition:transform 0.15s"><path d="M6 9l6 6 6-6"></path></svg><style>details[open] > summary > .cm-faq-chevron { transform: rotate(180deg); }</style></summary><div style="font-family:var(--font-body, Roboto, sans-serif);font-size:14px;line-height:1.7;color:rgba(255,255,255,0.75);margin-top:12px;padding-right:32px"><style>
+.cm-rich > *:first-child { margin-top: 0; }
+.cm-rich > *:last-child { margin-bottom: 0; }
+.cm-rich p { margin: 0 0 0.9em; }
+.cm-rich ul { list-style: disc; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich ol { list-style: decimal; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich li { margin: 0.3em 0; }
+.cm-rich a { color: var(--brand); text-decoration: none; }
+.cm-rich a:hover { text-decoration: underline; }
+.cm-rich strong { font-weight: 700; }
+.cm-rich blockquote { border-left: 3px solid var(--brand); padding-left: 1em; margin: 1em 0; font-style: italic; opacity: 0.85; }
+.cm-rich h3, .cm-rich h4 { font-weight: 700; margin: 1.2em 0 0.5em; font-family: var(--font-heading, Montserrat, sans-serif); }
+.cm-rich h3 { font-size: 1.25em; }
+.cm-rich h4 { font-size: 1.1em; }
+.cm-rich table { border-collapse: collapse; margin: 1em 0; }
+.cm-rich th, .cm-rich td { border: 1px solid #d5d5d5; padding: 5px 10px; text-align: center; }
+.cm-rich th { background: rgba(0,0,0,0.045); font-weight: 700; }
+.cm-rich img { max-width: 100%; height: auto; }
+.cm-rich hr { border: none; border-top: 1px solid rgba(0,0,0,0.12); margin: 1.4em 0; }
+</style><div class="cm-rich"><p>On-call support is included for all tournaments. This means you can call us for help during the tournament days. Contact details can be found <a href="/en/support/">here</a>.</p></div></div></details></div><div style="flex:1 1 320px"><h3 style="font-family:var(--font-heading, Montserrat, sans-serif);font-weight:700;font-size:22px;color:#fff;margin:0 0 18px">Want to know more?</h3><p style="color:rgba(255,255,255,0.9);font-size:15px;line-height:1.7;margin:0 0 20px">Our help site for the Cup Manager system has manuals and documentation for how to use the different features.</p><div style="display:flex;flex-direction:column;gap:12px;align-items:flex-start"><a href="https://help.cupmanager.net/" style="display:inline-flex;align-items:center;gap:8px;background-color:#fff;color:#1a1a1a;padding:12px 24px;border-radius:3px;font-weight:600;font-size:15px;text-decoration:none;box-shadow:0 1px 4px rgba(0,0,0,0.15)">Go to Cup Manager&#x27;s help pages<!-- --> <span aria-hidden="true">›</span></a><a href="/en/rakna-pa-kapacitet/" style="display:inline-flex;align-items:center;gap:8px;background-color:#fff;color:#1a1a1a;padding:12px 24px;border-radius:3px;font-weight:600;font-size:15px;text-decoration:none;box-shadow:0 1px 4px rgba(0,0,0,0.15)">New tool! Calculate capacity for your tournament<!-- --> <span aria-hidden="true">›</span></a></div></div></div></section>
+<section style="background-color:#f4f4f4;padding:48px 7% 0;font-family:var(--font-body, Roboto, sans-serif)"><style>.cm-footer-mail { color: var(--brand); text-decoration: none; } .cm-footer-mail:hover, .cm-footer-link:hover { text-decoration: underline; }</style><div style="display:flex;flex-wrap:wrap;gap:40px;max-width:1100px;margin:0 auto;padding-bottom:32px"><div style="flex:1 1 260px"><img src="/media/shared/cupmanager_light.svg" alt="Cup Manager" style="max-height:48px;max-width:220px"/></div><div style="flex:1 1 180px"><h3 style="font-family:var(--font-heading, Montserrat, sans-serif);font-weight:700;font-size:17px;color:#1a1a1a;margin:0 0 18px">Navigation</h3><a href="/en/support/" class="cm-footer-link" style="color:var(--brand);text-decoration:none;font-size:14px;display:block;margin-bottom:8px">Support</a><a href="/en/priser/" class="cm-footer-link" style="color:var(--brand);text-decoration:none;font-size:14px;display:block;margin-bottom:8px">Pricing</a><a href="/en/om-cupmanager/" class="cm-footer-link" style="color:var(--brand);text-decoration:none;font-size:14px;display:block;margin-bottom:8px">About us</a><a href="/en/jobba-hos-oss/" class="cm-footer-link" style="color:var(--brand);text-decoration:none;font-size:14px;display:block;margin-bottom:8px">Careers</a></div><div style="flex:1 1 220px"><h3 style="font-family:var(--font-heading, Montserrat, sans-serif);font-weight:700;font-size:17px;color:#1a1a1a;margin:0 0 18px">Contact</h3><p style="color:#555;font-size:14px;line-height:1.8;margin:0">Telefon<!-- -->: <!-- -->046-52580<br/>Epost<!-- -->: <a class="cm-footer-mail" href="mailto:support@cupmanager.net">support@cupmanager.net</a></p></div></div><div style="border-top:1px solid rgba(0,0,0,0.08);padding:20px 0 24px;max-width:1100px;margin:0 auto;display:flex;flex-direction:column;gap:10px;align-items:center"><span style="display:flex;gap:18px"><a href="https://www.facebook.com/CupManager/" aria-label="Facebook"><svg width="22" height="22" viewBox="0 0 24 24" fill="var(--brand)"><path d="M22 12a10 10 0 1 0-11.56 9.88v-6.99H7.9V12h2.54V9.8c0-2.5 1.49-3.89 3.77-3.89 1.09 0 2.23.2 2.23.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56V12h2.78l-.45 2.89h-2.33v6.99A10 10 0 0 0 22 12z"></path></svg></a><a href="https://www.instagram.com/cupmanager/" aria-label="Instagram"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"></rect><circle cx="12" cy="12" r="4"></circle><circle cx="17.5" cy="6.5" r="1" fill="var(--brand)" stroke="none"></circle></svg></a></span><span style="color:#888;font-size:13px">Copyright 2026 Cup Manager</span></div></section> </footer> <a id="preview-btn" href="" data-fs-db="plinto-fs" class="fixed bottom-20 right-6 bg-amber-500 hover:bg-amber-600 text-black px-4 py-2 rounded-lg shadow-lg flex items-center gap-2 transition-colors z-40 font-medium" style="display:none"> <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"> <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path> <circle cx="12" cy="12" r="3"></circle> </svg>
+Preview Changes
+</a> <script type="module" src="/_astro/PreviewButton.astro_astro_type_script_index_0_lang.d8INO1zV.js"></script> <div id="lang-switcher" class="fixed bottom-6 right-6 z-50 group"><div class="flex flex-col gap-1 items-end max-h-0 overflow-hidden opacity-0 pointer-events-none group-hover:max-h-96 group-hover:mb-2 group-hover:opacity-100 group-hover:pointer-events-auto transition-all duration-150"><a href="/sv/bergen-basket-festival/" class="flex items-center gap-2 bg-white border border-gray-200 shadow-md px-3 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors whitespace-nowrap"><svg width="20" height="14" viewBox="0 0 20 14" xmlns="http://www.w3.org/2000/svg"><rect width="20" height="14" fill="#006AA7"/><rect x="5" width="3" height="14" fill="#FECC02"/><rect y="5.5" width="20" height="3" fill="#FECC02"/></svg><span>Svenska</span></a><a href="/no/bergen-basket-festival/" class="flex items-center gap-2 bg-white border border-gray-200 shadow-md px-3 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors whitespace-nowrap"><svg width="20" height="14" viewBox="0 0 20 14" xmlns="http://www.w3.org/2000/svg"><rect width="20" height="14" fill="#EF2B2D"/><rect x="5" width="3" height="14" fill="#fff"/><rect y="5.5" width="20" height="3" fill="#fff"/><rect x="5.5" width="2" height="14" fill="#002868"/><rect y="6" width="20" height="2" fill="#002868"/></svg><span>Norsk</span></a></div><button class="flex items-center gap-2 bg-white border border-gray-200 shadow-lg px-3 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors" aria-label="Switch language"><svg width="20" height="14" viewBox="0 0 60 42" xmlns="http://www.w3.org/2000/svg"><rect width="60" height="42" fill="#012169"/><path d="M0,0 L60,42 M60,0 L0,42" stroke="#fff" stroke-width="8"/><path d="M0,0 L60,42 M60,0 L0,42" stroke="#C8102E" stroke-width="4"/><path d="M30,0 V42 M0,21 H60" stroke="#fff" stroke-width="12"/><path d="M30,0 V42 M0,21 H60" stroke="#C8102E" stroke-width="7"/></svg><span>English</span><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="group-hover:rotate-180 transition-transform duration-150"><polyline points="18 15 12 9 6 15"></polyline></svg></button></div> </body></html>

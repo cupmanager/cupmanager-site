@@ -1,0 +1,728 @@
+<!DOCTYPE html><html lang="sv"> <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Lottning och schemaläggning - Cup Manager</title><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400..800&family=Roboto:wght@300..700&display=swap"><link rel="icon" href="/media/shared/favicon.png" sizes="32x32"><link rel="icon" href="/media/shared/favicon.png" sizes="192x192"><link rel="apple-touch-icon" href="/media/shared/favicon.png"><meta name="msapplication-TileImage" content="/media/shared/favicon.png"><link rel="alternate" hreflang="sv" href="https://cupmanager.net/sv/lottning-schema/"><link rel="alternate" hreflang="no" href="https://cupmanager.net/no/lottning-schema/"><link rel="alternate" hreflang="en" href="https://cupmanager.net/en/lottning-schema/"><link rel="alternate" hreflang="x-default" href="https://cupmanager.net/sv/lottning-schema/"><link rel="stylesheet" href="/_astro/registry.4cHICgBS.css"></head> <body> <header class="plinto-header"> <a href="/sv" style="display:inline-flex;align-items:center"><img src="/media/shared/cupmanager_light.svg" alt="Cup Manager" style="height:48px;width:auto;display:block"/></a>
+<nav class="cm-nav"><style>
+  .plinto-header {
+    --plinto-header-max-width: 1300px;
+    --plinto-header-padding-inline: 30px;
+    --plinto-header-padding-block: 0px;
+    --plinto-header-min-height: 100px;
+    --plinto-header-border-width: 0px;
+    --plinto-header-shadow: 0 0 20px rgba(0,0,0,0.1);
+  }
+</style><style>
+        .cm-nav { display: flex; align-items: center; gap: 30px; font-family: var(--font-body, Roboto, sans-serif); }
+        .cm-nav-toggle { display: none; }
+        .cm-nav-hamburger { display: none; cursor: pointer; padding: 8px; background: none; border: none; color: #333; }
+        .cm-nav-hamburger svg { display: block; }
+        .cm-nav-links { display: contents; }
+        .cm-nav a.cm-nav-link, .cm-nav span.cm-nav-link { color: #5C6B79; font-weight: 400; font-size: 17px; text-decoration: none; transition: color 0.15s; }
+        /* Chevron inherits the link colour, so it greens on hover too */
+        .cm-nav .cm-caret { margin-left: 5px; flex: none; }
+        @media (min-width: 1024px) {
+          /* Nav items span the full header height (as on cupmanager.net), for
+             two reasons: the mega panel is positioned at top:100% of its item,
+             so anything shorter drops it *inside* the header; and it gives the
+             hover target the whole bar rather than just the text. Going
+             inline-flex also stops the chevron inflating the trigger's line
+             box, which would knock it off the centre line of its neighbours. */
+          /* The nav must fill the header before its items can; otherwise
+             stretching them only reaches the nav's own content height. */
+          .cm-nav { align-self: stretch; }
+          .cm-nav > .cm-nav-links > a.cm-nav-link,
+          .cm-nav > .cm-nav-links > .cm-mi-wrap { align-self: stretch; display: inline-flex; align-items: center; }
+          .cm-nav .cm-mi-wrap > a.cm-nav-link,
+          .cm-nav .cm-mi-wrap > span.cm-nav-link { display: inline-flex; align-items: center; height: 100%; }
+        }
+        .cm-nav a.cm-nav-link:hover, .cm-nav .cm-mi-wrap:hover > a.cm-nav-link, .cm-nav .cm-mi-wrap:hover > span.cm-nav-link { color: var(--brand); }
+        .cm-nav span.cm-nav-link { cursor: default; }
+        @media (max-width: 1024px) {
+          .cm-nav .cm-caret { display: none; }
+          .cm-nav-hamburger { display: block; }
+          .cm-nav-links { display: none; flex-direction: column; width: 100%; position: absolute; top: 100%; left: 0; right: 0; background: #fff; border-bottom: 1px solid #eee; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); z-index: 50; padding: 0 24px 12px; }
+          .cm-nav-links > a, .cm-nav-links .cm-mi-wrap { display: block; padding: 12px 0; border-top: 1px solid #f0f0f0; }
+          .cm-nav-toggle:checked ~ .cm-nav-links { display: flex; }
+        }
+      </style><input type="checkbox" id="cm-nav-toggle" class="cm-nav-toggle" hidden=""/><label for="cm-nav-toggle" class="cm-nav-hamburger" aria-label="Menu"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg></label><div class="cm-nav-links"><a href="/sv" class="cm-nav-link">Hem</a><div class="cm-mi-wrap"><style>
+          /* Deliberately NOT positioned: the panel spans the viewport, so its
+             containing block has to be the header (.plinto-header is relative,
+             from the library's globals) rather than the item. Items stretch to
+             the full header height, so top:100% lands in the same place either
+             way. */
+          .cm-mi-panel { display: none; position: absolute; top: 100%; left: 0; right: 0; background: #fff; border-top: 1px solid var(--brand); border-bottom: 1px solid var(--brand); z-index: 60; }
+          .cm-mi-wrap:hover > .cm-mi-panel, .cm-mi-wrap:focus-within > .cm-mi-panel { display: block; }
+          /* The two halves meet at the centre of the viewport. Contained keeps
+             them inside the header's content width (cupmanager.net); full lets
+             the colour bleed to the edges (superinvite.com). */
+          .cm-mi-panel-inner { display: flex; max-width: var(--cm-panel-max-width, 1300px); margin: 0 auto; }
+          .cm-mi-panel-highlights { background: var(--brand); flex: 0 0 50%; min-width: 0; box-sizing: border-box; display: flex; flex-direction: column; gap: 20px; justify-content: center; padding: 44px 20px 44px 27%; }
+          .cm-nav .cm-mi-panel-highlights a.cm-nav-link { color: #fff; font-weight: 400; font-size: 18px; display: inline-flex; align-items: center; gap: 14px; }
+          .cm-mi-panel-highlights svg { width: 20px; height: 20px; flex: none; }
+          .cm-nav .cm-mi-panel-highlights a.cm-nav-link:hover { color: rgba(255,255,255,0.8); }
+          .cm-mi-panel-main { background: #f5f5f5; flex: 0 0 50%; min-width: 0; box-sizing: border-box; padding: 44px 6% 44px 5%; }
+          .cm-mi-panel-heading { font-family: var(--font-heading, Montserrat, sans-serif); font-weight: 600; font-size: 22px; color: #162B40; margin: 0 0 6px; padding-bottom: 14px; border-bottom: 2px solid var(--brand); }
+          /* Multi-column, not grid: the live panels fill the first column
+             before starting the second, and column-count does that for any
+             number of links without the markup naming a row count. */
+          .cm-mi-panel-links { columns: 2; column-gap: 32px; margin-top: 20px; }
+          .cm-nav .cm-mi-panel-links a.cm-nav-link { display: block; break-inside: avoid; margin-bottom: 18px; color: #5C6B79; font-weight: 400; font-size: 15px; }
+          .cm-nav .cm-mi-panel-links a.cm-nav-link:hover { color: var(--brand); }
+          @media (max-width: 1024px) {
+            .cm-mi-panel { display: block; position: static; border: 0; background: transparent; }
+            .cm-mi-panel-inner { display: block; max-width: none; }
+            .cm-mi-panel-highlights { display: none; }
+            .cm-mi-panel-main { background: transparent; padding: 8px 0 0 12px; }
+            .cm-mi-panel-heading { display: none; }
+            .cm-mi-panel-links { columns: 1; margin-top: 4px; }
+            .cm-nav .cm-mi-panel-links a.cm-nav-link { margin-bottom: 10px; }
+          }
+        </style><span class="cm-nav-link" tabindex="0" role="button" aria-haspopup="true">Om Cup Manager<svg class="cm-caret" aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg></span><div class="cm-mi-panel"><div class="cm-mi-panel-inner"><div class="cm-mi-panel-highlights"><a href="/sv/kort-och-klarna" class="cm-nav-link"><svg width="16" height="16" viewBox="0 0 512 512" fill="currentColor" aria-hidden="true"><path d="M448 96c17.7 0 32 14.3 32 32l0 64-448 0 0-64c0-17.7 14.3-32 32-32l384 0zm32 128l0 160c0 17.7-14.3 32-32 32L64 416c-17.7 0-32-14.3-32-32l0-160 448 0zM64 64C28.7 64 0 92.7 0 128L0 384c0 35.3 28.7 64 64 64l384 0c35.3 0 64-28.7 64-64l0-256c0-35.3-28.7-64-64-64L64 64zM96 336c0 8.8 7.2 16 16 16l32 0c8.8 0 16-7.2 16-16s-7.2-16-16-16l-32 0c-8.8 0-16 7.2-16 16zm96 0c0 8.8 7.2 16 16 16l32 0c8.8 0 16-7.2 16-16s-7.2-16-16-16l-32 0c-8.8 0-16 7.2-16 16z"></path></svg>Kort och Klarna</a><a href="/sv/app" class="cm-nav-link"><svg width="16" height="16" viewBox="0 0 384 512" fill="currentColor" aria-hidden="true"><path d="M48 448c0 17.7 14.3 32 32 32l224 0c17.7 0 32-14.3 32-32l0-96-288 0 0 96zm0-128l288 0 0-256c0-17.7-14.3-32-32-32L80 32C62.3 32 48 46.3 48 64l0 256zM16 64C16 28.7 44.7 0 80 0L304 0c35.3 0 64 28.7 64 64l0 384c0 35.3-28.7 64-64 64L80 512c-35.3 0-64-28.7-64-64L16 64zM160 400l64 0c8.8 0 16 7.2 16 16s-7.2 16-16 16l-64 0c-8.8 0-16-7.2-16-16s7.2-16 16-16z"></path></svg>Egen turneringsapp</a><a href="/sv/hemsida" class="cm-nav-link"><svg width="16" height="16" viewBox="0 0 512 512" fill="currentColor" aria-hidden="true"><path d="M288 64l0 64-64 0 0-64 64 0zm-64 96l16 0 0 64-128 0c-35.3 0-64 28.7-64 64l0 64-16 0c-17.7 0-32 14.3-32 32l0 64c0 17.7 14.3 32 32 32l64 0c17.7 0 32-14.3 32-32l0-64c0-17.7-14.3-32-32-32l-16 0 0-64c0-17.7 14.3-32 32-32l128 0 0 96-16 0c-17.7 0-32 14.3-32 32l0 64c0 17.7 14.3 32 32 32l64 0c17.7 0 32-14.3 32-32l0-64c0-17.7-14.3-32-32-32l-16 0 0-96 128 0c17.7 0 32 14.3 32 32l0 64-16 0c-17.7 0-32 14.3-32 32l0 64c0 17.7 14.3 32 32 32l64 0c17.7 0 32-14.3 32-32l0-64c0-17.7-14.3-32-32-32l-16 0 0-64c0-35.3-28.7-64-64-64l-128 0 0-64 16 0c17.7 0 32-14.3 32-32l0-64c0-17.7-14.3-32-32-32l-64 0c-17.7 0-32 14.3-32 32l0 64c0 17.7 14.3 32 32 32zM32 384l64 0 0 64-64 0 0-64zm192 0l64 0 0 64-64 0 0-64zm192 0l64 0 0 64-64 0 0-64z"></path></svg>Hemsida ingår</a><a href="/sv/streaming" class="cm-nav-link"><svg width="16" height="16" viewBox="0 0 512 512" fill="currentColor" aria-hidden="true"><path d="M256 32a224 224 0 1 1 0 448 224 224 0 1 1 0-448zm0 480a256 256 0 1 0 0-512 256 256 0 1 0 0 512zm72.7-256L208 329.7 208 182.3 328.7 256zM188.3 147.1c-7.6 4.2-12.3 12.3-12.3 20.9l0 176c0 8.7 4.7 16.7 12.3 20.9s16.8 4.1 24.3-.5l144-88c7.1-4.4 11.5-12.1 11.5-20.5s-4.4-16.1-11.5-20.5l-144-88c-7.4-4.5-16.7-4.7-24.3-.5z"></path></svg>Livestreaming</a><a href="/sv/priser" class="cm-nav-link"><svg width="16" height="16" viewBox="0 0 512 512" fill="currentColor" aria-hidden="true"><path d="M64.1 96c0-17.7 14.3-32 32-32l156.1 0c8.5 0 16.6 3.4 22.6 9.4l192 192c12.5 12.5 12.5 32.8 0 45.2L310.7 466.7c-12.5 12.5-32.8 12.5-45.3 0l-192-192c-6-6-9.4-14.1-9.4-22.6L64.1 96zm32-64c-35.3 0-64 28.7-64 64l0 156.1c0 17 6.7 33.2 18.7 45.3l192 192c25 25 65.5 25 90.5 0L489.5 333.3c25-25 25-65.5 0-90.5l-192-192c-12-12-28.3-18.7-45.3-18.7L96.1 32zm48 136a24 24 0 1 0 0-48 24 24 0 1 0 0 48z"></path></svg>Priser</a></div><div class="cm-mi-panel-main"><p class="cm-mi-panel-heading">Läs mer om våra funktioner</p><div class="cm-mi-panel-links"><a href="/sv/hemsida" class="cm-nav-link">Egen hemsida för turneringen</a><a href="/sv/anmalningar" class="cm-nav-link">Anmälningssystem för lag &amp; domare</a><a href="/sv/kort-och-klarna" class="cm-nav-link">Integrerade betalningslösningar</a><a href="/sv/lagkonto-boende" class="cm-nav-link">Lagkonto och boendehantering</a><a href="/sv/lottning-schema" class="cm-nav-link">Lottning och schemaläggning</a><a href="/sv/resultat" class="cm-nav-link">Resultat och annat under turneringen</a></div></div></div></div></div><a href="/sv/support" class="cm-nav-link">Support</a><a href="/sv/laddaner" class="cm-nav-link">Ladda ner</a><a href="/sv/om-cupmanager" class="cm-nav-link">Om oss</a><a href="https://calendly.com/superinvite-cupmanager-en/demo" style="display:inline-flex;align-items:center;gap:8px;background-color:var(--brand);color:#fff;border-radius:3px;font-family:var(--font-body, Roboto, sans-serif);font-weight:300;text-decoration:none;white-space:nowrap;font-size:16px;padding:10px 30px">Boka demo</a></div><script>(function(){
+        var path = location.pathname.replace(/\/$/, '');
+        var links = document.querySelectorAll('.cm-nav > .cm-nav-links > a.cm-nav-link, .cm-nav > .cm-nav-links > .cm-mi-wrap > a.cm-nav-link');
+        links.forEach(function(a){
+          var href = a.getAttribute('href');
+          if (!href) return;
+          var norm = href.replace(/\/$/, '');
+          if (norm === path || (norm !== '/sv' && path.indexOf(norm + '/') === 0)) a.style.color = 'var(--brand)';
+        });
+      })();</script></nav> </header> <main> <section style="background-color:#fff;padding:0"><style>
+        /* Side by side only while the copy still fits the fixed-ratio row.
+           Measured on the longest row of the start page: against the 460px box
+           the roomy padding leaves just 3px of slack from 1441px to 1560px and
+           overflows below that, so the tighter padding covers everything up to
+           1599px and buys back the ~60px that makes the copy fit down to 960px.
+           From 1600px up the roomy padding has 28px to spare on its own. */
+        @media (min-width: 961px) and (max-width: 1599px) {
+          .cm-frow:not(.cm-frow-contained):not(.cm-frow-split) > div:last-child > div {
+            padding: 40px 5% !important;
+          }
+        }
+        @media (max-width: 960px) {
+          /* Stacked: the row is content-height, and the image keeps a fixed
+             ratio of its own so every stacked row still matches the others. */
+          .cm-frow { flex-direction: column !important; min-height: 0 !important; }
+          /* flex-basis becomes HEIGHT in column direction — reset it */
+          .cm-frow > div { flex-basis: auto !important; }
+          .cm-frow:not(.cm-frow-contained) > div:first-child {
+            aspect-ratio: 16 / 9;
+            min-height: 0 !important;
+          }
+        }
+      </style><div class="cm-frow cm-frow-split" style="display:flex;flex-direction:row-reverse;min-height:460px;max-width:100%;gap:0;align-items:stretch"><div style="flex:1;min-width:0;position:relative;overflow:hidden;min-height:300px"><img src="/media/slutspel.webp" alt="Utskrivna spelträd från en turnering" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;display:block"/></div><div style="flex:1;min-width:0;display:flex;align-items:center;background-color:#fff"><div style="padding:60px 48px 60px max(40px, calc((100vw - 1140px) / 2))"><div><h2 style="font-size:clamp(1.4rem, 2.5vw, 2rem);font-weight:700;color:var(--brand);margin-bottom:16px;line-height:1.2;font-family:var(--font-heading, Montserrat, sans-serif)">Lottning och schemaläggning</h2><div style="width:60px;height:2px;background-color:var(--brand);margin-bottom:20px"></div><div style="color:#555;font-size:15px;line-height:1.7;margin-bottom:28px;font-family:var(--font-body, Roboto, sans-serif)"><style>
+.cm-rich > *:first-child { margin-top: 0; }
+.cm-rich > *:last-child { margin-bottom: 0; }
+.cm-rich p { margin: 0 0 0.9em; }
+.cm-rich ul { list-style: disc; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich ol { list-style: decimal; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich li { margin: 0.3em 0; }
+.cm-rich a { color: var(--brand); text-decoration: none; }
+.cm-rich a:hover { text-decoration: underline; }
+.cm-rich strong { font-weight: 700; }
+.cm-rich blockquote { border-left: 3px solid var(--brand); padding-left: 1em; margin: 1em 0; font-style: italic; opacity: 0.85; }
+.cm-rich h3, .cm-rich h4 { font-weight: 700; margin: 1.2em 0 0.5em; font-family: var(--font-heading, Montserrat, sans-serif); }
+.cm-rich h3 { font-size: 1.25em; }
+.cm-rich h4 { font-size: 1.1em; }
+.cm-rich table { border-collapse: collapse; margin: 1em 0; }
+.cm-rich th, .cm-rich td { border: 1px solid #d5d5d5; padding: 5px 10px; text-align: center; }
+.cm-rich th { background: rgba(0,0,0,0.045); font-weight: 700; }
+.cm-rich img { max-width: 100%; height: auto; }
+.cm-rich hr { border: none; border-top: 1px solid rgba(0,0,0,0.12); margin: 1.4em 0; }
+</style><div class="cm-rich"><p><strong>Cup Manager är byggt från grunden för att ge dig som användare stöd i varje steg när du genererar ditt spelschema. Istället för fasta mallar använder sig Cup Manager av avancerade algoritmer både vid gruppindelning, lottning av lag och schemaläggning. Det gör att vi kan erbjuda funktioner som är automatiska på riktigt.</strong></p><p>Vi vet samtidigt att det är komplicerat att konstruera ett spelschema även om man har automatiska funktioner till hjälp. I varje steg behöver man ta beslut som kan ha svåröverskådliga följder. Därför tycker vi också det är viktigt med tydliga översikter och stödfunktioner för att kontrollera och manuellt göra små förändringar av ett färdigt schema.</p><p>Slutligen vet vi att ett system inte är allt som behövs. Därför är vi alltid redo att svara på frågor och ge råd. Det ingår alltid i den licenskostnad ni betalar, så tveka inte att <a href="/sv/support/">kontakta oss</a>. Du kan också hitta svar bland våra <a href="https://help.cupmanager.net/sv/collections/226221-spelschema-lottning-schema-banor">manualer</a>.</p></div></div></div></div></div></div></section>
+<section style="max-width:calc(1140px + 80px);padding:40px;margin:0 auto;padding-top:70px;padding-bottom:70px"><h2 style="font-family:var(--font-body, Roboto, sans-serif);font-weight:800;font-size:28px;color:#1a1a1a;margin-bottom:24px;text-align:left">Lottningsfunktioner</h2><div><details style="border-bottom:1px solid #e5e7eb;padding:16px 0"><summary style="font-family:var(--font-body, Roboto, sans-serif);font-weight:700;font-size:17px;cursor:pointer;color:#1a1a1a;list-style:none;display:flex;justify-content:space-between;align-items:center">Total översikt över lottningen<svg class="cm-faq-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-left:16px;flex-shrink:0;transition:transform 0.15s"><path d="M6 9l6 6 6-6"></path></svg><style>details[open] > summary > .cm-faq-chevron { transform: rotate(180deg); }</style></summary><div style="font-family:var(--font-body, Roboto, sans-serif);font-size:15px;line-height:1.7;color:#555;margin-top:12px;padding-right:32px"><style>
+.cm-rich > *:first-child { margin-top: 0; }
+.cm-rich > *:last-child { margin-bottom: 0; }
+.cm-rich p { margin: 0 0 0.9em; }
+.cm-rich ul { list-style: disc; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich ol { list-style: decimal; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich li { margin: 0.3em 0; }
+.cm-rich a { color: var(--brand); text-decoration: none; }
+.cm-rich a:hover { text-decoration: underline; }
+.cm-rich strong { font-weight: 700; }
+.cm-rich blockquote { border-left: 3px solid var(--brand); padding-left: 1em; margin: 1em 0; font-style: italic; opacity: 0.85; }
+.cm-rich h3, .cm-rich h4 { font-weight: 700; margin: 1.2em 0 0.5em; font-family: var(--font-heading, Montserrat, sans-serif); }
+.cm-rich h3 { font-size: 1.25em; }
+.cm-rich h4 { font-size: 1.1em; }
+.cm-rich table { border-collapse: collapse; margin: 1em 0; }
+.cm-rich th, .cm-rich td { border: 1px solid #d5d5d5; padding: 5px 10px; text-align: center; }
+.cm-rich th { background: rgba(0,0,0,0.045); font-weight: 700; }
+.cm-rich img { max-width: 100%; height: auto; }
+.cm-rich hr { border: none; border-top: 1px solid rgba(0,0,0,0.12); margin: 1.4em 0; }
+</style><div class="cm-rich"><p>För att alltid ge dig en tydlig överblick över din turnering är det första som möter dig i Cup Managers lottningsfunktion en översiktsbild över alla dina åldersklasser. I den kan du enkelt få en överblick där du ser alla grupper, slutspel och övergångar mellan dem. Du ser också om det finns lag som inte är med i lottningen än, eller som väntar i en reservlista.</p>
+<p>Läs mer i vår <a href="https://help.cupmanager.net/sv/articles/619057-lotta-flikens-oversiktssida">manual</a> för att få lite mer exempel på detaljerna i översikten.</p></div></div></details><details style="border-bottom:1px solid #e5e7eb;padding:16px 0"><summary style="font-family:var(--font-body, Roboto, sans-serif);font-weight:700;font-size:17px;cursor:pointer;color:#1a1a1a;list-style:none;display:flex;justify-content:space-between;align-items:center">Enkel guide för automatisk lottning<svg class="cm-faq-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-left:16px;flex-shrink:0;transition:transform 0.15s"><path d="M6 9l6 6 6-6"></path></svg><style>details[open] > summary > .cm-faq-chevron { transform: rotate(180deg); }</style></summary><div style="font-family:var(--font-body, Roboto, sans-serif);font-size:15px;line-height:1.7;color:#555;margin-top:12px;padding-right:32px"><style>
+.cm-rich > *:first-child { margin-top: 0; }
+.cm-rich > *:last-child { margin-bottom: 0; }
+.cm-rich p { margin: 0 0 0.9em; }
+.cm-rich ul { list-style: disc; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich ol { list-style: decimal; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich li { margin: 0.3em 0; }
+.cm-rich a { color: var(--brand); text-decoration: none; }
+.cm-rich a:hover { text-decoration: underline; }
+.cm-rich strong { font-weight: 700; }
+.cm-rich blockquote { border-left: 3px solid var(--brand); padding-left: 1em; margin: 1em 0; font-style: italic; opacity: 0.85; }
+.cm-rich h3, .cm-rich h4 { font-weight: 700; margin: 1.2em 0 0.5em; font-family: var(--font-heading, Montserrat, sans-serif); }
+.cm-rich h3 { font-size: 1.25em; }
+.cm-rich h4 { font-size: 1.1em; }
+.cm-rich table { border-collapse: collapse; margin: 1em 0; }
+.cm-rich th, .cm-rich td { border: 1px solid #d5d5d5; padding: 5px 10px; text-align: center; }
+.cm-rich th { background: rgba(0,0,0,0.045); font-weight: 700; }
+.cm-rich img { max-width: 100%; height: auto; }
+.cm-rich hr { border: none; border-top: 1px solid rgba(0,0,0,0.12); margin: 1.4em 0; }
+</style><div class="cm-rich"><p>Du kan såklart själva skapa varje grupp i hela din lottning manuellt och placera ut lagen själv, men Cup Manager har också en guide som hjälper dig att utnyttja Cup Managers alla automatiska lottningsfunktioner. Välj om du vill ha resultat eller inte i klassen, vilka gruppstorlekar du föredrar och vilka lag som går till slutspel, så genererar Cup Manager en lottning till dig automatiskt. Vill du sen göra manuella justeringar i någon klass går det såklart bra! Läs vår manual till <a href="http://help.cupmanager.net/sv/articles/2370368-2-1-lottningsguiden">lottningsguiden här</a>.</p>
+<p>Är du intresserad kan du läsa mer om vad Cup Manager tar hänsyn till i vår <a href="/sv/for-norden/">informationstext till turneringsnördar</a>.</p></div></div></details><details style="border-bottom:1px solid #e5e7eb;padding:16px 0"><summary style="font-family:var(--font-body, Roboto, sans-serif);font-weight:700;font-size:17px;cursor:pointer;color:#1a1a1a;list-style:none;display:flex;justify-content:space-between;align-items:center">Gömda matcher<svg class="cm-faq-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-left:16px;flex-shrink:0;transition:transform 0.15s"><path d="M6 9l6 6 6-6"></path></svg><style>details[open] > summary > .cm-faq-chevron { transform: rotate(180deg); }</style></summary><div style="font-family:var(--font-body, Roboto, sans-serif);font-size:15px;line-height:1.7;color:#555;margin-top:12px;padding-right:32px"><style>
+.cm-rich > *:first-child { margin-top: 0; }
+.cm-rich > *:last-child { margin-bottom: 0; }
+.cm-rich p { margin: 0 0 0.9em; }
+.cm-rich ul { list-style: disc; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich ol { list-style: decimal; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich li { margin: 0.3em 0; }
+.cm-rich a { color: var(--brand); text-decoration: none; }
+.cm-rich a:hover { text-decoration: underline; }
+.cm-rich strong { font-weight: 700; }
+.cm-rich blockquote { border-left: 3px solid var(--brand); padding-left: 1em; margin: 1em 0; font-style: italic; opacity: 0.85; }
+.cm-rich h3, .cm-rich h4 { font-weight: 700; margin: 1.2em 0 0.5em; font-family: var(--font-heading, Montserrat, sans-serif); }
+.cm-rich h3 { font-size: 1.25em; }
+.cm-rich h4 { font-size: 1.1em; }
+.cm-rich table { border-collapse: collapse; margin: 1em 0; }
+.cm-rich th, .cm-rich td { border: 1px solid #d5d5d5; padding: 5px 10px; text-align: center; }
+.cm-rich th { background: rgba(0,0,0,0.045); font-weight: 700; }
+.cm-rich img { max-width: 100%; height: auto; }
+.cm-rich hr { border: none; border-top: 1px solid rgba(0,0,0,0.12); margin: 1.4em 0; }
+</style><div class="cm-rich"><p>För att inte låsa dig vid exakt det antal lag som anmält sig till cupen när du genomför en lottning har Cup Manager ett koncept vi kallar för gömda matcher. Det innebär att du i lottningen kan skapa plats för lag som inte finns (eller dragit sig ur turneringen). De matcher som laget som inte finns skulle spelat, både i gruppspelet och i eventuella slutspel, göms då för era besökare. Däremot syns de fortfarande för er administratörer så att ni kan välja att schemalägga dem och tillsätta domare redan innan laget anmält sig, eller medan ni väntar på att ett ersättningslag dyker upp.</p>
+<p>Läs mer om gömda matcher i vår <a href="http://help.cupmanager.net/sv/articles/958632-vad-ar-gomda-matcher-och-hur-fungerar-de">manual</a>.</p></div></div></details><details style="border-bottom:1px solid #e5e7eb;padding:16px 0"><summary style="font-family:var(--font-body, Roboto, sans-serif);font-weight:700;font-size:17px;cursor:pointer;color:#1a1a1a;list-style:none;display:flex;justify-content:space-between;align-items:center">Jämna slutspelsträd med Bästa 3:orna<svg class="cm-faq-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-left:16px;flex-shrink:0;transition:transform 0.15s"><path d="M6 9l6 6 6-6"></path></svg><style>details[open] > summary > .cm-faq-chevron { transform: rotate(180deg); }</style></summary><div style="font-family:var(--font-body, Roboto, sans-serif);font-size:15px;line-height:1.7;color:#555;margin-top:12px;padding-right:32px"><style>
+.cm-rich > *:first-child { margin-top: 0; }
+.cm-rich > *:last-child { margin-bottom: 0; }
+.cm-rich p { margin: 0 0 0.9em; }
+.cm-rich ul { list-style: disc; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich ol { list-style: decimal; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich li { margin: 0.3em 0; }
+.cm-rich a { color: var(--brand); text-decoration: none; }
+.cm-rich a:hover { text-decoration: underline; }
+.cm-rich strong { font-weight: 700; }
+.cm-rich blockquote { border-left: 3px solid var(--brand); padding-left: 1em; margin: 1em 0; font-style: italic; opacity: 0.85; }
+.cm-rich h3, .cm-rich h4 { font-weight: 700; margin: 1.2em 0 0.5em; font-family: var(--font-heading, Montserrat, sans-serif); }
+.cm-rich h3 { font-size: 1.25em; }
+.cm-rich h4 { font-size: 1.1em; }
+.cm-rich table { border-collapse: collapse; margin: 1em 0; }
+.cm-rich th, .cm-rich td { border: 1px solid #d5d5d5; padding: 5px 10px; text-align: center; }
+.cm-rich th { background: rgba(0,0,0,0.045); font-weight: 700; }
+.cm-rich img { max-width: 100%; height: auto; }
+.cm-rich hr { border: none; border-top: 1px solid rgba(0,0,0,0.12); margin: 1.4em 0; }
+</style><div class="cm-rich"><p>Cup Manager har stöd för att du i dina slutspelsträd (eller kvargrupper) istället för att ta lagen från fasta grupper, rangordnar t.ex. alla grupp 3:or för att låta de bästa gå vidare till A-slutspel. På så vis kan du se till att alltid ha ett A-slutspel som går jämnt upp. Givetvis räknas ordningen ut helt automatiskt när du under turneringen lägger in resultat i gruppspelet.</p></div></div></details><details style="border-bottom:1px solid #e5e7eb;padding:16px 0"><summary style="font-family:var(--font-body, Roboto, sans-serif);font-weight:700;font-size:17px;cursor:pointer;color:#1a1a1a;list-style:none;display:flex;justify-content:space-between;align-items:center">Obegränsade lottningsstrukturer<svg class="cm-faq-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-left:16px;flex-shrink:0;transition:transform 0.15s"><path d="M6 9l6 6 6-6"></path></svg><style>details[open] > summary > .cm-faq-chevron { transform: rotate(180deg); }</style></summary><div style="font-family:var(--font-body, Roboto, sans-serif);font-size:15px;line-height:1.7;color:#555;margin-top:12px;padding-right:32px"><style>
+.cm-rich > *:first-child { margin-top: 0; }
+.cm-rich > *:last-child { margin-bottom: 0; }
+.cm-rich p { margin: 0 0 0.9em; }
+.cm-rich ul { list-style: disc; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich ol { list-style: decimal; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich li { margin: 0.3em 0; }
+.cm-rich a { color: var(--brand); text-decoration: none; }
+.cm-rich a:hover { text-decoration: underline; }
+.cm-rich strong { font-weight: 700; }
+.cm-rich blockquote { border-left: 3px solid var(--brand); padding-left: 1em; margin: 1em 0; font-style: italic; opacity: 0.85; }
+.cm-rich h3, .cm-rich h4 { font-weight: 700; margin: 1.2em 0 0.5em; font-family: var(--font-heading, Montserrat, sans-serif); }
+.cm-rich h3 { font-size: 1.25em; }
+.cm-rich h4 { font-size: 1.1em; }
+.cm-rich table { border-collapse: collapse; margin: 1em 0; }
+.cm-rich th, .cm-rich td { border: 1px solid #d5d5d5; padding: 5px 10px; text-align: center; }
+.cm-rich th { background: rgba(0,0,0,0.045); font-weight: 700; }
+.cm-rich img { max-width: 100%; height: auto; }
+.cm-rich hr { border: none; border-top: 1px solid rgba(0,0,0,0.12); margin: 1.4em 0; }
+</style><div class="cm-rich"><p>Cup Manager har inga begränsningar när det gäller antalet lag, grupper, slutspel, stadier, klasser, platser, matcher när du skapar ditt schema. Vissa kombinationer kan givetvis vara omständiga, men vi stödjer det ändå. Räkna med att vi intresserat frågar hur ni tänkt om ni gör saker på ett speciellt sätt. Kanske är det värt att ta efter!</p></div></div></details><details style="border-bottom:1px solid #e5e7eb;padding:16px 0"><summary style="font-family:var(--font-body, Roboto, sans-serif);font-weight:700;font-size:17px;cursor:pointer;color:#1a1a1a;list-style:none;display:flex;justify-content:space-between;align-items:center">Geografisk indelning av lag i grupper<svg class="cm-faq-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-left:16px;flex-shrink:0;transition:transform 0.15s"><path d="M6 9l6 6 6-6"></path></svg><style>details[open] > summary > .cm-faq-chevron { transform: rotate(180deg); }</style></summary><div style="font-family:var(--font-body, Roboto, sans-serif);font-size:15px;line-height:1.7;color:#555;margin-top:12px;padding-right:32px"><style>
+.cm-rich > *:first-child { margin-top: 0; }
+.cm-rich > *:last-child { margin-bottom: 0; }
+.cm-rich p { margin: 0 0 0.9em; }
+.cm-rich ul { list-style: disc; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich ol { list-style: decimal; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich li { margin: 0.3em 0; }
+.cm-rich a { color: var(--brand); text-decoration: none; }
+.cm-rich a:hover { text-decoration: underline; }
+.cm-rich strong { font-weight: 700; }
+.cm-rich blockquote { border-left: 3px solid var(--brand); padding-left: 1em; margin: 1em 0; font-style: italic; opacity: 0.85; }
+.cm-rich h3, .cm-rich h4 { font-weight: 700; margin: 1.2em 0 0.5em; font-family: var(--font-heading, Montserrat, sans-serif); }
+.cm-rich h3 { font-size: 1.25em; }
+.cm-rich h4 { font-size: 1.1em; }
+.cm-rich table { border-collapse: collapse; margin: 1em 0; }
+.cm-rich th, .cm-rich td { border: 1px solid #d5d5d5; padding: 5px 10px; text-align: center; }
+.cm-rich th { background: rgba(0,0,0,0.045); font-weight: 700; }
+.cm-rich img { max-width: 100%; height: auto; }
+.cm-rich hr { border: none; border-top: 1px solid rgba(0,0,0,0.12); margin: 1.4em 0; }
+</style><div class="cm-rich"><p>Det är självklart så att lag från samma klubb inte ska hamna i samma grupp och tvingas spela mot varandra, men Cup Manager tar det flera steg längre genom att i sin algoritm för att dela ut lag också tar hänsyn till:</p>
+<ol>
+<li>Stad</li>
+<li>Distrikt</li>
+<li>Postkod</li>
+<li>Land</li>
+<li>Landsregion</li>
+<li>Tröjfärg</li>
+</ol>
+<p>Det gör att du kommer få balanserade grupper oavsett vilket geografiskt område din turnering täcker. Om du är intresserad beskriver vi mer i detalj hur det går till i vår sida med <a href="/sv/for-norden/">information till turneringsnördar</a>.</p></div></div></details><details style="border-bottom:1px solid #e5e7eb;padding:16px 0"><summary style="font-family:var(--font-body, Roboto, sans-serif);font-weight:700;font-size:17px;cursor:pointer;color:#1a1a1a;list-style:none;display:flex;justify-content:space-between;align-items:center">Automatiska slutspelsträd<svg class="cm-faq-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-left:16px;flex-shrink:0;transition:transform 0.15s"><path d="M6 9l6 6 6-6"></path></svg><style>details[open] > summary > .cm-faq-chevron { transform: rotate(180deg); }</style></summary><div style="font-family:var(--font-body, Roboto, sans-serif);font-size:15px;line-height:1.7;color:#555;margin-top:12px;padding-right:32px"><style>
+.cm-rich > *:first-child { margin-top: 0; }
+.cm-rich > *:last-child { margin-bottom: 0; }
+.cm-rich p { margin: 0 0 0.9em; }
+.cm-rich ul { list-style: disc; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich ol { list-style: decimal; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich li { margin: 0.3em 0; }
+.cm-rich a { color: var(--brand); text-decoration: none; }
+.cm-rich a:hover { text-decoration: underline; }
+.cm-rich strong { font-weight: 700; }
+.cm-rich blockquote { border-left: 3px solid var(--brand); padding-left: 1em; margin: 1em 0; font-style: italic; opacity: 0.85; }
+.cm-rich h3, .cm-rich h4 { font-weight: 700; margin: 1.2em 0 0.5em; font-family: var(--font-heading, Montserrat, sans-serif); }
+.cm-rich h3 { font-size: 1.25em; }
+.cm-rich h4 { font-size: 1.1em; }
+.cm-rich table { border-collapse: collapse; margin: 1em 0; }
+.cm-rich th, .cm-rich td { border: 1px solid #d5d5d5; padding: 5px 10px; text-align: center; }
+.cm-rich th { background: rgba(0,0,0,0.045); font-weight: 700; }
+.cm-rich img { max-width: 100%; height: auto; }
+.cm-rich hr { border: none; border-top: 1px solid rgba(0,0,0,0.12); margin: 1.4em 0; }
+</style><div class="cm-rich"><p>Cup Manager använder sig inte av mallar för att konstruera slutspelträden i en turnering utan av en avancerad algoritm som bygger ett optimalt slutspelsträd oavsett förutsättningarna. Det gör att du inte behöver oroa dig för att manuellt ändra i dina slutspelsträd om du har en komplicerad samling av lag som t.ex. gått vidare till ert B-slutspel eller om ni har många ojämna slutspelsträd.</p>
+<p>Har ni kvalgrupper kommer Cup Manager automatiskt se till att lag från samma grupp i det ursprungliga gruppspelet möts så sent som möjligt i slutspelsträden.</p>
+<p>Läs mer på vår <a href="/sv/for-norden/">sida till turneringsnördar</a> om du är intresserad av hur det går till.</p></div></div></details><details style="border-bottom:1px solid #e5e7eb;padding:16px 0"><summary style="font-family:var(--font-body, Roboto, sans-serif);font-weight:700;font-size:17px;cursor:pointer;color:#1a1a1a;list-style:none;display:flex;justify-content:space-between;align-items:center">Smidig färgläggning<svg class="cm-faq-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-left:16px;flex-shrink:0;transition:transform 0.15s"><path d="M6 9l6 6 6-6"></path></svg><style>details[open] > summary > .cm-faq-chevron { transform: rotate(180deg); }</style></summary><div style="font-family:var(--font-body, Roboto, sans-serif);font-size:15px;line-height:1.7;color:#555;margin-top:12px;padding-right:32px"><style>
+.cm-rich > *:first-child { margin-top: 0; }
+.cm-rich > *:last-child { margin-bottom: 0; }
+.cm-rich p { margin: 0 0 0.9em; }
+.cm-rich ul { list-style: disc; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich ol { list-style: decimal; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich li { margin: 0.3em 0; }
+.cm-rich a { color: var(--brand); text-decoration: none; }
+.cm-rich a:hover { text-decoration: underline; }
+.cm-rich strong { font-weight: 700; }
+.cm-rich blockquote { border-left: 3px solid var(--brand); padding-left: 1em; margin: 1em 0; font-style: italic; opacity: 0.85; }
+.cm-rich h3, .cm-rich h4 { font-weight: 700; margin: 1.2em 0 0.5em; font-family: var(--font-heading, Montserrat, sans-serif); }
+.cm-rich h3 { font-size: 1.25em; }
+.cm-rich h4 { font-size: 1.1em; }
+.cm-rich table { border-collapse: collapse; margin: 1em 0; }
+.cm-rich th, .cm-rich td { border: 1px solid #d5d5d5; padding: 5px 10px; text-align: center; }
+.cm-rich th { background: rgba(0,0,0,0.045); font-weight: 700; }
+.cm-rich img { max-width: 100%; height: auto; }
+.cm-rich hr { border: none; border-top: 1px solid rgba(0,0,0,0.12); margin: 1.4em 0; }
+</style><div class="cm-rich"><p>För att enkelt få en överblick av hur lag från olika länder eller städer delats ut mellan de olika grupperna i din lottning kan du välja att färglägga lagen efter olika egenskaper.</p>
+<p>Du kan t.ex. färglägga efter:</p>
+<ul>
+<li>Land</li>
+<li>Kommun</li>
+<li>Landskap</li>
+</ul>
+<p>men också saker av annan betydelse, t.ex:</p>
+<ul>
+<li>Ankomstdag</li>
+<li>Möts i slutspel (visar lag från samma klubb som har möjlighet att mötas tidigt i slutspelet)</li>
+</ul>
+<p><img src="/media/lottning-schema/coloring.png" alt="Färgläggning av lag efter geografi i lottningsvyn"/></p></div></div></details><details style="border-bottom:1px solid #e5e7eb;padding:16px 0"><summary style="font-family:var(--font-body, Roboto, sans-serif);font-weight:700;font-size:17px;cursor:pointer;color:#1a1a1a;list-style:none;display:flex;justify-content:space-between;align-items:center">Generera automatiska kvalgrupper<svg class="cm-faq-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-left:16px;flex-shrink:0;transition:transform 0.15s"><path d="M6 9l6 6 6-6"></path></svg><style>details[open] > summary > .cm-faq-chevron { transform: rotate(180deg); }</style></summary><div style="font-family:var(--font-body, Roboto, sans-serif);font-size:15px;line-height:1.7;color:#555;margin-top:12px;padding-right:32px"><style>
+.cm-rich > *:first-child { margin-top: 0; }
+.cm-rich > *:last-child { margin-bottom: 0; }
+.cm-rich p { margin: 0 0 0.9em; }
+.cm-rich ul { list-style: disc; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich ol { list-style: decimal; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich li { margin: 0.3em 0; }
+.cm-rich a { color: var(--brand); text-decoration: none; }
+.cm-rich a:hover { text-decoration: underline; }
+.cm-rich strong { font-weight: 700; }
+.cm-rich blockquote { border-left: 3px solid var(--brand); padding-left: 1em; margin: 1em 0; font-style: italic; opacity: 0.85; }
+.cm-rich h3, .cm-rich h4 { font-weight: 700; margin: 1.2em 0 0.5em; font-family: var(--font-heading, Montserrat, sans-serif); }
+.cm-rich h3 { font-size: 1.25em; }
+.cm-rich h4 { font-size: 1.1em; }
+.cm-rich table { border-collapse: collapse; margin: 1em 0; }
+.cm-rich th, .cm-rich td { border: 1px solid #d5d5d5; padding: 5px 10px; text-align: center; }
+.cm-rich th { background: rgba(0,0,0,0.045); font-weight: 700; }
+.cm-rich img { max-width: 100%; height: auto; }
+.cm-rich hr { border: none; border-top: 1px solid rgba(0,0,0,0.12); margin: 1.4em 0; }
+</style><div class="cm-rich"><p>Om du har en mer komplicerad struktur på din lottning som inkluderar kvalgrupper och fler slutspel, kan Cup Manager automatisk hjälpa dig båda skapa kvalgrupper och slutspel som automatisk ser till att lag från samma grupp i gruppspelet möts så sent i slutspelen som möjligt, även om vägen går via kvalgrupper. Inget mer manuellt pysslande helt enkelt.</p></div></div></details><details style="border-bottom:1px solid #e5e7eb;padding:16px 0"><summary style="font-family:var(--font-body, Roboto, sans-serif);font-weight:700;font-size:17px;cursor:pointer;color:#1a1a1a;list-style:none;display:flex;justify-content:space-between;align-items:center">Kämpande klasser utan resultat<svg class="cm-faq-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-left:16px;flex-shrink:0;transition:transform 0.15s"><path d="M6 9l6 6 6-6"></path></svg><style>details[open] > summary > .cm-faq-chevron { transform: rotate(180deg); }</style></summary><div style="font-family:var(--font-body, Roboto, sans-serif);font-size:15px;line-height:1.7;color:#555;margin-top:12px;padding-right:32px"><style>
+.cm-rich > *:first-child { margin-top: 0; }
+.cm-rich > *:last-child { margin-bottom: 0; }
+.cm-rich p { margin: 0 0 0.9em; }
+.cm-rich ul { list-style: disc; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich ol { list-style: decimal; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich li { margin: 0.3em 0; }
+.cm-rich a { color: var(--brand); text-decoration: none; }
+.cm-rich a:hover { text-decoration: underline; }
+.cm-rich strong { font-weight: 700; }
+.cm-rich blockquote { border-left: 3px solid var(--brand); padding-left: 1em; margin: 1em 0; font-style: italic; opacity: 0.85; }
+.cm-rich h3, .cm-rich h4 { font-weight: 700; margin: 1.2em 0 0.5em; font-family: var(--font-heading, Montserrat, sans-serif); }
+.cm-rich h3 { font-size: 1.25em; }
+.cm-rich h4 { font-size: 1.1em; }
+.cm-rich table { border-collapse: collapse; margin: 1em 0; }
+.cm-rich th, .cm-rich td { border: 1px solid #d5d5d5; padding: 5px 10px; text-align: center; }
+.cm-rich th { background: rgba(0,0,0,0.045); font-weight: 700; }
+.cm-rich img { max-width: 100%; height: auto; }
+.cm-rich hr { border: none; border-top: 1px solid rgba(0,0,0,0.12); margin: 1.4em 0; }
+</style><div class="cm-rich"><p>Cup Manager har avancerat stöd för resultatlösa klasser som går utöver att resultaten döljs på er hemsida. Vi förespråkar två olika upplägg på en turnering med yngre åldersklasser utan resultat.</p>
+<p>Om man har tid för det (t.ex. om man spelar över två dagar), kan man bygga upp två gruppspel efter varandra där man i det andra gruppspelet samlar lag som är ungefär lika bra. Genom att samla in resultat i det första gruppspelet kan Cup Manager sortera lagen till det andra gruppspelet automatisk utan att man manuellt behöver göra en ny lottning inför turneringens andra dag. Det gör också att Cup Manager redan från turneringens start kan visa vilka matcher ett lag potentiellt kommer spela andra dagen för att underlätta planeringen för de deltagande lagen. För att undvika att lag från samma klubb råkar hamna i samma grupp dag 2, kan man använda en utav Cup Managers färgläggningar som varnar om det finns en risk att det händer.</p>
+<p>Alternativ 2 är att man samlar alla sina lag i en klass i samma grupp och låter Cup Manager välja ut vilka matcher som ska spelas mellan lagen. Genom att ta hänsyn till varifrån lagen kommer kan Cup Manager välja ut matcher mellan lag som är så olika som möjligt för att skapa ett så spännande schema som möjligt. Detta underlättar så klart också om man har lite för få lag för att skapa riktiga grupper, men ändå vill låta alla spela lika många matcher. T.ex. med bara 7 lag, men alla ska spela 5 matcher.</p></div></div></details><details style="border-bottom:1px solid #e5e7eb;padding:16px 0"><summary style="font-family:var(--font-body, Roboto, sans-serif);font-weight:700;font-size:17px;cursor:pointer;color:#1a1a1a;list-style:none;display:flex;justify-content:space-between;align-items:center">Slå ihop klasser utan att påverka anmälningsformuläret<svg class="cm-faq-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-left:16px;flex-shrink:0;transition:transform 0.15s"><path d="M6 9l6 6 6-6"></path></svg><style>details[open] > summary > .cm-faq-chevron { transform: rotate(180deg); }</style></summary><div style="font-family:var(--font-body, Roboto, sans-serif);font-size:15px;line-height:1.7;color:#555;margin-top:12px;padding-right:32px"><style>
+.cm-rich > *:first-child { margin-top: 0; }
+.cm-rich > *:last-child { margin-bottom: 0; }
+.cm-rich p { margin: 0 0 0.9em; }
+.cm-rich ul { list-style: disc; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich ol { list-style: decimal; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich li { margin: 0.3em 0; }
+.cm-rich a { color: var(--brand); text-decoration: none; }
+.cm-rich a:hover { text-decoration: underline; }
+.cm-rich strong { font-weight: 700; }
+.cm-rich blockquote { border-left: 3px solid var(--brand); padding-left: 1em; margin: 1em 0; font-style: italic; opacity: 0.85; }
+.cm-rich h3, .cm-rich h4 { font-weight: 700; margin: 1.2em 0 0.5em; font-family: var(--font-heading, Montserrat, sans-serif); }
+.cm-rich h3 { font-size: 1.25em; }
+.cm-rich h4 { font-size: 1.1em; }
+.cm-rich table { border-collapse: collapse; margin: 1em 0; }
+.cm-rich th, .cm-rich td { border: 1px solid #d5d5d5; padding: 5px 10px; text-align: center; }
+.cm-rich th { background: rgba(0,0,0,0.045); font-weight: 700; }
+.cm-rich img { max-width: 100%; height: auto; }
+.cm-rich hr { border: none; border-top: 1px solid rgba(0,0,0,0.12); margin: 1.4em 0; }
+</style><div class="cm-rich"><p>Om ni har för få lag i någon åldersklass kan ni när ni lottar välja att slå samman lagen från två klasser till en klass i lottningen. Sammanslagningen kommer bara påverka lottningen och inte anmälan av lagen. Det gör både att det är enkelt att ångra, men också att ni kan låta anmälan vara öppen till båda klasserna även efter sammanslagningen ifall det dyker upp några fler lag så att ni kan dela upp klasserna igen.</p></div></div></details><details style="border-bottom:1px solid #e5e7eb;padding:16px 0"><summary style="font-family:var(--font-body, Roboto, sans-serif);font-weight:700;font-size:17px;cursor:pointer;color:#1a1a1a;list-style:none;display:flex;justify-content:space-between;align-items:center">Hantera reservlag direkt i lottningen<svg class="cm-faq-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-left:16px;flex-shrink:0;transition:transform 0.15s"><path d="M6 9l6 6 6-6"></path></svg><style>details[open] > summary > .cm-faq-chevron { transform: rotate(180deg); }</style></summary><div style="font-family:var(--font-body, Roboto, sans-serif);font-size:15px;line-height:1.7;color:#555;margin-top:12px;padding-right:32px"><style>
+.cm-rich > *:first-child { margin-top: 0; }
+.cm-rich > *:last-child { margin-bottom: 0; }
+.cm-rich p { margin: 0 0 0.9em; }
+.cm-rich ul { list-style: disc; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich ol { list-style: decimal; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich li { margin: 0.3em 0; }
+.cm-rich a { color: var(--brand); text-decoration: none; }
+.cm-rich a:hover { text-decoration: underline; }
+.cm-rich strong { font-weight: 700; }
+.cm-rich blockquote { border-left: 3px solid var(--brand); padding-left: 1em; margin: 1em 0; font-style: italic; opacity: 0.85; }
+.cm-rich h3, .cm-rich h4 { font-weight: 700; margin: 1.2em 0 0.5em; font-family: var(--font-heading, Montserrat, sans-serif); }
+.cm-rich h3 { font-size: 1.25em; }
+.cm-rich h4 { font-size: 1.1em; }
+.cm-rich table { border-collapse: collapse; margin: 1em 0; }
+.cm-rich th, .cm-rich td { border: 1px solid #d5d5d5; padding: 5px 10px; text-align: center; }
+.cm-rich th { background: rgba(0,0,0,0.045); font-weight: 700; }
+.cm-rich img { max-width: 100%; height: auto; }
+.cm-rich hr { border: none; border-top: 1px solid rgba(0,0,0,0.12); margin: 1.4em 0; }
+</style><div class="cm-rich"><p>När man lottar en åldersklass har man hela tiden koll på status för klassens reservlistor och inte godkända anmälningar direkt i lottningsgränssnittet. Det gör att man enkelt kan flytta in lag från reservlistan om det skulle uppstå en lucka någonstans i lottningen.</p></div></div></details></div></section>
+<section style="max-width:calc(1140px + 80px);padding:40px;margin:0 auto;padding-top:0;padding-bottom:70px"><h2 style="font-family:var(--font-body, Roboto, sans-serif);font-weight:800;font-size:28px;color:#1a1a1a;margin-bottom:24px;text-align:left">Schemaläggning</h2><div><details style="border-bottom:1px solid #e5e7eb;padding:16px 0"><summary style="font-family:var(--font-body, Roboto, sans-serif);font-weight:700;font-size:17px;cursor:pointer;color:#1a1a1a;list-style:none;display:flex;justify-content:space-between;align-items:center">Grafiskt schema<svg class="cm-faq-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-left:16px;flex-shrink:0;transition:transform 0.15s"><path d="M6 9l6 6 6-6"></path></svg><style>details[open] > summary > .cm-faq-chevron { transform: rotate(180deg); }</style></summary><div style="font-family:var(--font-body, Roboto, sans-serif);font-size:15px;line-height:1.7;color:#555;margin-top:12px;padding-right:32px"><style>
+.cm-rich > *:first-child { margin-top: 0; }
+.cm-rich > *:last-child { margin-bottom: 0; }
+.cm-rich p { margin: 0 0 0.9em; }
+.cm-rich ul { list-style: disc; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich ol { list-style: decimal; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich li { margin: 0.3em 0; }
+.cm-rich a { color: var(--brand); text-decoration: none; }
+.cm-rich a:hover { text-decoration: underline; }
+.cm-rich strong { font-weight: 700; }
+.cm-rich blockquote { border-left: 3px solid var(--brand); padding-left: 1em; margin: 1em 0; font-style: italic; opacity: 0.85; }
+.cm-rich h3, .cm-rich h4 { font-weight: 700; margin: 1.2em 0 0.5em; font-family: var(--font-heading, Montserrat, sans-serif); }
+.cm-rich h3 { font-size: 1.25em; }
+.cm-rich h4 { font-size: 1.1em; }
+.cm-rich table { border-collapse: collapse; margin: 1em 0; }
+.cm-rich th, .cm-rich td { border: 1px solid #d5d5d5; padding: 5px 10px; text-align: center; }
+.cm-rich th { background: rgba(0,0,0,0.045); font-weight: 700; }
+.cm-rich img { max-width: 100%; height: auto; }
+.cm-rich hr { border: none; border-top: 1px solid rgba(0,0,0,0.12); margin: 1.4em 0; }
+</style><div class="cm-rich"><p>Precis som i lottning tror vi att det är viktigt med en tydlig översikt även över turneringens schema. Därför kan man alltid få upp hela turneringens spelprogram i ett grafiskt schema med alla matcher. Här kan man enkelt få information om varje enskild match, men också enkelt se varningar och fel i schemat med hjälp av de stödlinjer som visas.</p>
+<p>Vill du kan du gruppera dina planer och få ett schema med varje grupp av planer. Cup Manager erbjuder automatiskt grupper per geografiskt område eller storlek på spelplanen (t.ex. 7-manna och 11-manna) i fotboll, men man kan skapa grupper själv om man vill. T.ex. med alla planer där det spelas finaler, eller uppdelat per helg om man spelar flera helger.</p>
+<p>Håller man muspekaren över en match får man direkt en inforuta med matchens detaljer, men man kan också klicka och t.ex. få reda på var hemmalag och bortalag spelar alla sina matcher. I slutspel ser man så klart kopplingar till tidigare och nästa match i slutspelet.</p>
+<p><img src="/media/lottning-schema/schedule.png" alt="Grafiskt schema med alla matcher"/></p></div></div></details><details style="border-bottom:1px solid #e5e7eb;padding:16px 0"><summary style="font-family:var(--font-body, Roboto, sans-serif);font-weight:700;font-size:17px;cursor:pointer;color:#1a1a1a;list-style:none;display:flex;justify-content:space-between;align-items:center">Automatisk schemaläggning enligt era regler<svg class="cm-faq-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-left:16px;flex-shrink:0;transition:transform 0.15s"><path d="M6 9l6 6 6-6"></path></svg><style>details[open] > summary > .cm-faq-chevron { transform: rotate(180deg); }</style></summary><div style="font-family:var(--font-body, Roboto, sans-serif);font-size:15px;line-height:1.7;color:#555;margin-top:12px;padding-right:32px"><style>
+.cm-rich > *:first-child { margin-top: 0; }
+.cm-rich > *:last-child { margin-bottom: 0; }
+.cm-rich p { margin: 0 0 0.9em; }
+.cm-rich ul { list-style: disc; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich ol { list-style: decimal; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich li { margin: 0.3em 0; }
+.cm-rich a { color: var(--brand); text-decoration: none; }
+.cm-rich a:hover { text-decoration: underline; }
+.cm-rich strong { font-weight: 700; }
+.cm-rich blockquote { border-left: 3px solid var(--brand); padding-left: 1em; margin: 1em 0; font-style: italic; opacity: 0.85; }
+.cm-rich h3, .cm-rich h4 { font-weight: 700; margin: 1.2em 0 0.5em; font-family: var(--font-heading, Montserrat, sans-serif); }
+.cm-rich h3 { font-size: 1.25em; }
+.cm-rich h4 { font-size: 1.1em; }
+.cm-rich table { border-collapse: collapse; margin: 1em 0; }
+.cm-rich th, .cm-rich td { border: 1px solid #d5d5d5; padding: 5px 10px; text-align: center; }
+.cm-rich th { background: rgba(0,0,0,0.045); font-weight: 700; }
+.cm-rich img { max-width: 100%; height: auto; }
+.cm-rich hr { border: none; border-top: 1px solid rgba(0,0,0,0.12); margin: 1.4em 0; }
+</style><div class="cm-rich"><p>Cup Manager har en inbyggd automatisk schemaläggningsfunktion. Är du mer intresserad av hur den fungerar under huven finns det lite mer <a href="/sv/for-norden/">information här</a>. Den automatiska schemaläggningen tar själv hänsyn till vilotider, ankomsttider och öppettider på era spelplatser, men förutom det finns det en uppsjö av regler man kan lägga till för att få till det schema ni vill ha i turneringen. Spelar ni t.ex. över flera dagar? Ska alla få minst en match på er fina huvudarena? Vill ni ha ett schema med så lite vila som möjligt för alla lag? Kanske ska en vila vara längre för att de ska hinna äta ett snacks från er kiosk?</p>
+<p>Även med en automatisk funktion för både lottning och schemaläggning finns det massvis med frågor att ta ställning till. Vi tror att ett system inte blir bra förrän man också har en bra support. Därför uppmanar vi alla våra kunder att <a href="/sv/boka/">boka en workshop</a> med våra duktiga medarbetare där de får möjlighet att visa tips, tricks och alla smarta funktioner som just ni med era förutsättningar har nytta av! <a href="https://help.cupmanager.net/sv/articles/2808938-3-4-a-automatisk-schemalaggning">Här</a> finns också en manual med de vanligaste inställningarna.</p></div></div></details><details style="border-bottom:1px solid #e5e7eb;padding:16px 0"><summary style="font-family:var(--font-body, Roboto, sans-serif);font-weight:700;font-size:17px;cursor:pointer;color:#1a1a1a;list-style:none;display:flex;justify-content:space-between;align-items:center">Tar hänsyn till ankomstinformation<svg class="cm-faq-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-left:16px;flex-shrink:0;transition:transform 0.15s"><path d="M6 9l6 6 6-6"></path></svg><style>details[open] > summary > .cm-faq-chevron { transform: rotate(180deg); }</style></summary><div style="font-family:var(--font-body, Roboto, sans-serif);font-size:15px;line-height:1.7;color:#555;margin-top:12px;padding-right:32px"><style>
+.cm-rich > *:first-child { margin-top: 0; }
+.cm-rich > *:last-child { margin-bottom: 0; }
+.cm-rich p { margin: 0 0 0.9em; }
+.cm-rich ul { list-style: disc; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich ol { list-style: decimal; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich li { margin: 0.3em 0; }
+.cm-rich a { color: var(--brand); text-decoration: none; }
+.cm-rich a:hover { text-decoration: underline; }
+.cm-rich strong { font-weight: 700; }
+.cm-rich blockquote { border-left: 3px solid var(--brand); padding-left: 1em; margin: 1em 0; font-style: italic; opacity: 0.85; }
+.cm-rich h3, .cm-rich h4 { font-weight: 700; margin: 1.2em 0 0.5em; font-family: var(--font-heading, Montserrat, sans-serif); }
+.cm-rich h3 { font-size: 1.25em; }
+.cm-rich h4 { font-size: 1.1em; }
+.cm-rich table { border-collapse: collapse; margin: 1em 0; }
+.cm-rich th, .cm-rich td { border: 1px solid #d5d5d5; padding: 5px 10px; text-align: center; }
+.cm-rich th { background: rgba(0,0,0,0.045); font-weight: 700; }
+.cm-rich img { max-width: 100%; height: auto; }
+.cm-rich hr { border: none; border-top: 1px solid rgba(0,0,0,0.12); margin: 1.4em 0; }
+</style><div class="cm-rich"><p>Cup Manager tar automatiskt hänsyn till den ankomstinformation som lagen lagt till i sin anmälan om ni låtit dem göra det. Både i det grafiska schemat som visar varningar om första matchen är innan ankomsttid, men även i den automatiska schemaläggningen. Det gör att du enkelt kan se till att de deltagande lagen inte fått för tidiga matcher, och om det är oundvikligt kan man enkelt se vilka lag som behöver kontaktas för att se om det går att lösa på något annat sätt.</p></div></div></details><details style="border-bottom:1px solid #e5e7eb;padding:16px 0"><summary style="font-family:var(--font-body, Roboto, sans-serif);font-weight:700;font-size:17px;cursor:pointer;color:#1a1a1a;list-style:none;display:flex;justify-content:space-between;align-items:center">Enkel drag-and-drop för finjusteringar<svg class="cm-faq-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-left:16px;flex-shrink:0;transition:transform 0.15s"><path d="M6 9l6 6 6-6"></path></svg><style>details[open] > summary > .cm-faq-chevron { transform: rotate(180deg); }</style></summary><div style="font-family:var(--font-body, Roboto, sans-serif);font-size:15px;line-height:1.7;color:#555;margin-top:12px;padding-right:32px"><style>
+.cm-rich > *:first-child { margin-top: 0; }
+.cm-rich > *:last-child { margin-bottom: 0; }
+.cm-rich p { margin: 0 0 0.9em; }
+.cm-rich ul { list-style: disc; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich ol { list-style: decimal; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich li { margin: 0.3em 0; }
+.cm-rich a { color: var(--brand); text-decoration: none; }
+.cm-rich a:hover { text-decoration: underline; }
+.cm-rich strong { font-weight: 700; }
+.cm-rich blockquote { border-left: 3px solid var(--brand); padding-left: 1em; margin: 1em 0; font-style: italic; opacity: 0.85; }
+.cm-rich h3, .cm-rich h4 { font-weight: 700; margin: 1.2em 0 0.5em; font-family: var(--font-heading, Montserrat, sans-serif); }
+.cm-rich h3 { font-size: 1.25em; }
+.cm-rich h4 { font-size: 1.1em; }
+.cm-rich table { border-collapse: collapse; margin: 1em 0; }
+.cm-rich th, .cm-rich td { border: 1px solid #d5d5d5; padding: 5px 10px; text-align: center; }
+.cm-rich th { background: rgba(0,0,0,0.045); font-weight: 700; }
+.cm-rich img { max-width: 100%; height: auto; }
+.cm-rich hr { border: none; border-top: 1px solid rgba(0,0,0,0.12); margin: 1.4em 0; }
+</style><div class="cm-rich"><p>Självklart kan du flytta matcher direkt i schemat genom att dra och släppa dem till sin nya plats. Medan du flyttar dem kommer systemet också visa relaterade matcher och annan viktig information för att du enkelt ska kunna hitta platser där matchen passar in.</p></div></div></details><details style="border-bottom:1px solid #e5e7eb;padding:16px 0"><summary style="font-family:var(--font-body, Roboto, sans-serif);font-weight:700;font-size:17px;cursor:pointer;color:#1a1a1a;list-style:none;display:flex;justify-content:space-between;align-items:center">Stödlinjer och varningar direkt i schemat<svg class="cm-faq-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-left:16px;flex-shrink:0;transition:transform 0.15s"><path d="M6 9l6 6 6-6"></path></svg><style>details[open] > summary > .cm-faq-chevron { transform: rotate(180deg); }</style></summary><div style="font-family:var(--font-body, Roboto, sans-serif);font-size:15px;line-height:1.7;color:#555;margin-top:12px;padding-right:32px"><style>
+.cm-rich > *:first-child { margin-top: 0; }
+.cm-rich > *:last-child { margin-bottom: 0; }
+.cm-rich p { margin: 0 0 0.9em; }
+.cm-rich ul { list-style: disc; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich ol { list-style: decimal; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich li { margin: 0.3em 0; }
+.cm-rich a { color: var(--brand); text-decoration: none; }
+.cm-rich a:hover { text-decoration: underline; }
+.cm-rich strong { font-weight: 700; }
+.cm-rich blockquote { border-left: 3px solid var(--brand); padding-left: 1em; margin: 1em 0; font-style: italic; opacity: 0.85; }
+.cm-rich h3, .cm-rich h4 { font-weight: 700; margin: 1.2em 0 0.5em; font-family: var(--font-heading, Montserrat, sans-serif); }
+.cm-rich h3 { font-size: 1.25em; }
+.cm-rich h4 { font-size: 1.1em; }
+.cm-rich table { border-collapse: collapse; margin: 1em 0; }
+.cm-rich th, .cm-rich td { border: 1px solid #d5d5d5; padding: 5px 10px; text-align: center; }
+.cm-rich th { background: rgba(0,0,0,0.045); font-weight: 700; }
+.cm-rich img { max-width: 100%; height: auto; }
+.cm-rich hr { border: none; border-top: 1px solid rgba(0,0,0,0.12); margin: 1.4em 0; }
+</style><div class="cm-rich"><p>Om Cup Manager hittar ett problem med schemat du skapat kommer varningarna visas direkt i det grafiska schemat för att du enkelt ska få en överblick. Bland annat visas dubbelbokning, för kort vilotid och om ett lag spelar sin första match innan sin ankomsttid.</p>
+<p>Klickar du på en match eller drar den i schemat kan du också få hjälp med att se alla andra matcher som lagen i matchen du valt spelar i för att enkelt kontrollera längden på pauser eller hitta luckor i schemat om du måste flytta matchen manuellt.</p></div></div></details><details style="border-bottom:1px solid #e5e7eb;padding:16px 0"><summary style="font-family:var(--font-body, Roboto, sans-serif);font-weight:700;font-size:17px;cursor:pointer;color:#1a1a1a;list-style:none;display:flex;justify-content:space-between;align-items:center">Synkroniseras till er webb, app och streaming<svg class="cm-faq-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-left:16px;flex-shrink:0;transition:transform 0.15s"><path d="M6 9l6 6 6-6"></path></svg><style>details[open] > summary > .cm-faq-chevron { transform: rotate(180deg); }</style></summary><div style="font-family:var(--font-body, Roboto, sans-serif);font-size:15px;line-height:1.7;color:#555;margin-top:12px;padding-right:32px"><style>
+.cm-rich > *:first-child { margin-top: 0; }
+.cm-rich > *:last-child { margin-bottom: 0; }
+.cm-rich p { margin: 0 0 0.9em; }
+.cm-rich ul { list-style: disc; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich ol { list-style: decimal; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich li { margin: 0.3em 0; }
+.cm-rich a { color: var(--brand); text-decoration: none; }
+.cm-rich a:hover { text-decoration: underline; }
+.cm-rich strong { font-weight: 700; }
+.cm-rich blockquote { border-left: 3px solid var(--brand); padding-left: 1em; margin: 1em 0; font-style: italic; opacity: 0.85; }
+.cm-rich h3, .cm-rich h4 { font-weight: 700; margin: 1.2em 0 0.5em; font-family: var(--font-heading, Montserrat, sans-serif); }
+.cm-rich h3 { font-size: 1.25em; }
+.cm-rich h4 { font-size: 1.1em; }
+.cm-rich table { border-collapse: collapse; margin: 1em 0; }
+.cm-rich th, .cm-rich td { border: 1px solid #d5d5d5; padding: 5px 10px; text-align: center; }
+.cm-rich th { background: rgba(0,0,0,0.045); font-weight: 700; }
+.cm-rich img { max-width: 100%; height: auto; }
+.cm-rich hr { border: none; border-top: 1px solid rgba(0,0,0,0.12); margin: 1.4em 0; }
+</style><div class="cm-rich"><p>Alla ändringar du sparar kommer automatiskt synkroniseras med alla era informationskanaler utåt. Det gör att du aldrig behöver oroa dig för att en gammal version av ert spelschema ligger ute på er hemsida eller i er app.</p></div></div></details><details style="border-bottom:1px solid #e5e7eb;padding:16px 0"><summary style="font-family:var(--font-body, Roboto, sans-serif);font-weight:700;font-size:17px;cursor:pointer;color:#1a1a1a;list-style:none;display:flex;justify-content:space-between;align-items:center">Översikt över start-, slut-, och vilotider för alla lag<svg class="cm-faq-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-left:16px;flex-shrink:0;transition:transform 0.15s"><path d="M6 9l6 6 6-6"></path></svg><style>details[open] > summary > .cm-faq-chevron { transform: rotate(180deg); }</style></summary><div style="font-family:var(--font-body, Roboto, sans-serif);font-size:15px;line-height:1.7;color:#555;margin-top:12px;padding-right:32px"><style>
+.cm-rich > *:first-child { margin-top: 0; }
+.cm-rich > *:last-child { margin-bottom: 0; }
+.cm-rich p { margin: 0 0 0.9em; }
+.cm-rich ul { list-style: disc; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich ol { list-style: decimal; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich li { margin: 0.3em 0; }
+.cm-rich a { color: var(--brand); text-decoration: none; }
+.cm-rich a:hover { text-decoration: underline; }
+.cm-rich strong { font-weight: 700; }
+.cm-rich blockquote { border-left: 3px solid var(--brand); padding-left: 1em; margin: 1em 0; font-style: italic; opacity: 0.85; }
+.cm-rich h3, .cm-rich h4 { font-weight: 700; margin: 1.2em 0 0.5em; font-family: var(--font-heading, Montserrat, sans-serif); }
+.cm-rich h3 { font-size: 1.25em; }
+.cm-rich h4 { font-size: 1.1em; }
+.cm-rich table { border-collapse: collapse; margin: 1em 0; }
+.cm-rich th, .cm-rich td { border: 1px solid #d5d5d5; padding: 5px 10px; text-align: center; }
+.cm-rich th { background: rgba(0,0,0,0.045); font-weight: 700; }
+.cm-rich img { max-width: 100%; height: auto; }
+.cm-rich hr { border: none; border-top: 1px solid rgba(0,0,0,0.12); margin: 1.4em 0; }
+</style><div class="cm-rich"><p>När du är färdig med ditt schema kan du öppna upp en tabell för allt från enskilda grupper till alla lag i turneringen för att snabbt få en översikt över viktiga nyckeltal. Det låter dig kontrollera att alla har ungefär lika många långa dagar, pauser eller spelar rätt mängd matcher de olika speldagarna om din turnering går över flera dagar.</p>
+<p><img src="/media/lottning-schema/overview.png" alt="Tabell med översikt över antal matcher, start- och sluttider samt pauser för alla lag"/></p></div></div></details><details style="border-bottom:1px solid #e5e7eb;padding:16px 0"><summary style="font-family:var(--font-body, Roboto, sans-serif);font-weight:700;font-size:17px;cursor:pointer;color:#1a1a1a;list-style:none;display:flex;justify-content:space-between;align-items:center">Publicera bara enskilda dagar eller klasser<svg class="cm-faq-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-left:16px;flex-shrink:0;transition:transform 0.15s"><path d="M6 9l6 6 6-6"></path></svg><style>details[open] > summary > .cm-faq-chevron { transform: rotate(180deg); }</style></summary><div style="font-family:var(--font-body, Roboto, sans-serif);font-size:15px;line-height:1.7;color:#555;margin-top:12px;padding-right:32px"><style>
+.cm-rich > *:first-child { margin-top: 0; }
+.cm-rich > *:last-child { margin-bottom: 0; }
+.cm-rich p { margin: 0 0 0.9em; }
+.cm-rich ul { list-style: disc; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich ol { list-style: decimal; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich li { margin: 0.3em 0; }
+.cm-rich a { color: var(--brand); text-decoration: none; }
+.cm-rich a:hover { text-decoration: underline; }
+.cm-rich strong { font-weight: 700; }
+.cm-rich blockquote { border-left: 3px solid var(--brand); padding-left: 1em; margin: 1em 0; font-style: italic; opacity: 0.85; }
+.cm-rich h3, .cm-rich h4 { font-weight: 700; margin: 1.2em 0 0.5em; font-family: var(--font-heading, Montserrat, sans-serif); }
+.cm-rich h3 { font-size: 1.25em; }
+.cm-rich h4 { font-size: 1.1em; }
+.cm-rich table { border-collapse: collapse; margin: 1em 0; }
+.cm-rich th, .cm-rich td { border: 1px solid #d5d5d5; padding: 5px 10px; text-align: center; }
+.cm-rich th { background: rgba(0,0,0,0.045); font-weight: 700; }
+.cm-rich img { max-width: 100%; height: auto; }
+.cm-rich hr { border: none; border-top: 1px solid rgba(0,0,0,0.12); margin: 1.4em 0; }
+</style><div class="cm-rich"><p>Om du till exempel bara vill publicera spelschemat för en enskild klass eller kanske första dagen av turneringen styr du det enkelt i Cup Manager. Det låter dig publicera den första matchen för alla deltagande lag, utan att hela spelschemat behöver vara helt klart.</p>
+<p>Läs mer om hur publicering av lottning och spelschema fungerar <a href="https://help.cupmanager.net/sv/articles/1795409-publicera-spelschemat-pa-natet">i den här manualen</a>.</p></div></div></details></div></section>
+<section style="background-color:#fff;padding:0"><style>
+        /* Side by side only while the copy still fits the fixed-ratio row.
+           Measured on the longest row of the start page: against the 460px box
+           the roomy padding leaves just 3px of slack from 1441px to 1560px and
+           overflows below that, so the tighter padding covers everything up to
+           1599px and buys back the ~60px that makes the copy fit down to 960px.
+           From 1600px up the roomy padding has 28px to spare on its own. */
+        @media (min-width: 961px) and (max-width: 1599px) {
+          .cm-frow:not(.cm-frow-contained):not(.cm-frow-split) > div:last-child > div {
+            padding: 40px 5% !important;
+          }
+        }
+        @media (max-width: 960px) {
+          /* Stacked: the row is content-height, and the image keeps a fixed
+             ratio of its own so every stacked row still matches the others. */
+          .cm-frow { flex-direction: column !important; min-height: 0 !important; }
+          /* flex-basis becomes HEIGHT in column direction — reset it */
+          .cm-frow > div { flex-basis: auto !important; }
+          .cm-frow:not(.cm-frow-contained) > div:first-child {
+            aspect-ratio: 16 / 9;
+            min-height: 0 !important;
+          }
+        }
+      </style><div class="cm-frow" style="display:flex;flex-direction:row;min-height:460px;max-width:100%;gap:0;align-items:stretch"><div style="flex:1;min-width:0;position:relative;overflow:hidden;min-height:300px"><img src="/media/lottning-schema/depositphotos_6271357.jpg" alt="Taktiktavla med uppritad spelstrategi" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;display:block"/></div><div style="flex:1;min-width:0;display:flex;align-items:center;background-color:#fff"><div style="padding:60px 7%;max-width:1000px"><div><h2 style="font-size:clamp(1.4rem, 2.5vw, 2rem);font-weight:700;color:var(--brand);margin-bottom:16px;line-height:1.2;font-family:var(--font-heading, Montserrat, sans-serif)">Support i världsklass!</h2><div style="width:60px;height:2px;background-color:var(--brand);margin-bottom:20px"></div><div style="color:#555;font-size:15px;line-height:1.7;margin-bottom:28px;font-family:var(--font-body, Roboto, sans-serif)"><style>
+.cm-rich > *:first-child { margin-top: 0; }
+.cm-rich > *:last-child { margin-bottom: 0; }
+.cm-rich p { margin: 0 0 0.9em; }
+.cm-rich ul { list-style: disc; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich ol { list-style: decimal; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich li { margin: 0.3em 0; }
+.cm-rich a { color: var(--brand); text-decoration: none; }
+.cm-rich a:hover { text-decoration: underline; }
+.cm-rich strong { font-weight: 700; }
+.cm-rich blockquote { border-left: 3px solid var(--brand); padding-left: 1em; margin: 1em 0; font-style: italic; opacity: 0.85; }
+.cm-rich h3, .cm-rich h4 { font-weight: 700; margin: 1.2em 0 0.5em; font-family: var(--font-heading, Montserrat, sans-serif); }
+.cm-rich h3 { font-size: 1.25em; }
+.cm-rich h4 { font-size: 1.1em; }
+.cm-rich table { border-collapse: collapse; margin: 1em 0; }
+.cm-rich th, .cm-rich td { border: 1px solid #d5d5d5; padding: 5px 10px; text-align: center; }
+.cm-rich th { background: rgba(0,0,0,0.045); font-weight: 700; }
+.cm-rich img { max-width: 100%; height: auto; }
+.cm-rich hr { border: none; border-top: 1px solid rgba(0,0,0,0.12); margin: 1.4em 0; }
+</style><div class="cm-rich"><p>Vi vet att det är komplicerat att både bygga turneringsplaner och ett bra spelschema. Särskilt under press när turneringen närmar sig och några lag i sista stund hoppar av. Vi är också vana vid det och har erfarenhet av hur man löser problemen som uppstår på bästa sätt.</p><p>Därför inkluderar vi alltid full support i alla licensavgifter. Vi tycker helt enkelt inte att ni ska sitta ensamma i båten. Använder ni Cup Manager löser vi problemen ni har ihop! Tveka därför inte att kontakta <a href="/sv/support/">supporten</a> om du har frågor, vi vill inget hellre!</p></div></div></div></div></div></div></section>
+<section style="padding:60px 10%;text-align:left"><style>.cm-sec-heading:has(> [data-puck-overlay-portal]:empty) { display: none; }</style><div style="max-width:100%;margin:0 auto"><h2 class="cm-sec-heading" style="color:var(--brand);font-size:clamp(1.4rem, 3vw, 2.1rem);font-weight:700;margin-bottom:20px;font-family:var(--font-heading, Montserrat, sans-serif)">Används till världens största turneringar (och de minsta)</h2><div style="color:#333;font-size:16px;line-height:1.7;font-family:var(--font-body, Roboto, sans-serif)"><style>
+.cm-rich > *:first-child { margin-top: 0; }
+.cm-rich > *:last-child { margin-bottom: 0; }
+.cm-rich p { margin: 0 0 0.9em; }
+.cm-rich ul { list-style: disc; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich ol { list-style: decimal; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich li { margin: 0.3em 0; }
+.cm-rich a { color: var(--brand); text-decoration: none; }
+.cm-rich a:hover { text-decoration: underline; }
+.cm-rich strong { font-weight: 700; }
+.cm-rich blockquote { border-left: 3px solid var(--brand); padding-left: 1em; margin: 1em 0; font-style: italic; opacity: 0.85; }
+.cm-rich h3, .cm-rich h4 { font-weight: 700; margin: 1.2em 0 0.5em; font-family: var(--font-heading, Montserrat, sans-serif); }
+.cm-rich h3 { font-size: 1.25em; }
+.cm-rich h4 { font-size: 1.1em; }
+.cm-rich table { border-collapse: collapse; margin: 1em 0; }
+.cm-rich th, .cm-rich td { border: 1px solid #d5d5d5; padding: 5px 10px; text-align: center; }
+.cm-rich th { background: rgba(0,0,0,0.045); font-weight: 700; }
+.cm-rich img { max-width: 100%; height: auto; }
+.cm-rich hr { border: none; border-top: 1px solid rgba(0,0,0,0.12); margin: 1.4em 0; }
+</style><div class="cm-rich"><p>Cup Manager används både till små 3v3 turneringar utan resultat som snabbt vill skapa spelscheman till världens största ungdomsidrottsturneringar som förutom alla funktioner enkelt behöver få översikt. Vi erbjuder något till alla, men framför allt kan man lita på att vi ser till att saker fungerar när det gäller!</p></div></div></div></section>
+<section style="padding:56px 7%;background-color:#fff"><div style="display:flex;flex-wrap:wrap;gap:40px;align-items:center;max-width:1140px;margin:0 auto"><div style="flex:0 0 220px;text-align:center"><img src="/media/shared/telefonsupport.png" alt="Cup Managers telefonsupport" style="width:200px;height:200px;object-fit:cover;border-radius:50%"/></div><div style="flex:1 1 280px;font-family:var(--font-body, Roboto, sans-serif);color:#555;font-size:15px;line-height:1.7;border-left:3px solid var(--brand);padding-left:24px"><style>
+.cm-rich > *:first-child { margin-top: 0; }
+.cm-rich > *:last-child { margin-bottom: 0; }
+.cm-rich p { margin: 0 0 0.9em; }
+.cm-rich ul { list-style: disc; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich ol { list-style: decimal; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich li { margin: 0.3em 0; }
+.cm-rich a { color: var(--brand); text-decoration: none; }
+.cm-rich a:hover { text-decoration: underline; }
+.cm-rich strong { font-weight: 700; }
+.cm-rich blockquote { border-left: 3px solid var(--brand); padding-left: 1em; margin: 1em 0; font-style: italic; opacity: 0.85; }
+.cm-rich h3, .cm-rich h4 { font-weight: 700; margin: 1.2em 0 0.5em; font-family: var(--font-heading, Montserrat, sans-serif); }
+.cm-rich h3 { font-size: 1.25em; }
+.cm-rich h4 { font-size: 1.1em; }
+.cm-rich table { border-collapse: collapse; margin: 1em 0; }
+.cm-rich th, .cm-rich td { border: 1px solid #d5d5d5; padding: 5px 10px; text-align: center; }
+.cm-rich th { background: rgba(0,0,0,0.045); font-weight: 700; }
+.cm-rich img { max-width: 100%; height: auto; }
+.cm-rich hr { border: none; border-top: 1px solid rgba(0,0,0,0.12); margin: 1.4em 0; }
+</style><div class="cm-rich"><p>På supporten har vi tillsammans med våra turneringar gjort tusentals spelscheman. Vi älskar att dela med oss av vår erfarenhet. Kontakta oss så hjälper vi dig!</p>
+<p><strong>Cup Manager support</strong></p></div><p style="margin-top:12px"><span style="display:block"><strong style="color:#1a1a1a">Telefon:</strong> <!-- -->046-52580</span><span style="display:block"><strong style="color:#1a1a1a">E-post:</strong> <a href="mailto:support@cupmanager.net" style="color:var(--brand);text-decoration:none">support@cupmanager.net</a></span></p></div></div><div style="background-color:#EBEBEB;border-radius:10px;padding:32px 28px;max-width:1140px;margin:30px auto 0"><h3 style="font-family:var(--font-heading, Montserrat, sans-serif);font-weight:700;font-size:22px;color:#1a1a1a;margin:0 0 10px">Vill du ha ett bra schema?</h3><p style="font-family:var(--font-body, Roboto, sans-serif);font-size:15px;color:#555;line-height:1.6;margin:0 0 20px">Ta kontakt med oss, eller välj en tid för att boka en demo av Cup Manager. Vi ser fram emot att få visa vårt system för dig.</p><a href="https://calendly.com/superinvite-cupmanager-en/demo" style="display:inline-flex;align-items:center;gap:8px;background-color:var(--brand);color:#fff;border-radius:3px;font-family:var(--font-body, Roboto, sans-serif);font-weight:300;text-decoration:none;font-size:15px;padding:8px 20px">Välj en tid för demo</a></div></section> </main> <footer> <section style="background-color:var(--brand);padding:56px 7%;font-family:var(--font-body, Roboto, sans-serif)"><div style="display:flex;flex-wrap:wrap;gap:48px;max-width:1100px;margin:0 auto"><div style="flex:1 1 420px"><h3 style="font-family:var(--font-heading, Montserrat, sans-serif);font-weight:700;font-size:22px;color:#fff;margin:0 0 18px">Vanliga frågor</h3><style>.cm-faq-dark .cm-rich a { color: #fff; text-decoration: underline; } .cm-faq-dark .cm-rich a:hover { color: rgba(255,255,255,0.85); }</style><details class="cm-faq-dark" style="border-bottom:1px solid rgba(255,255,255,0.15);padding:12px 0"><summary style="font-family:var(--font-body, Roboto, sans-serif);font-weight:700;font-size:16px;cursor:pointer;color:#fff;list-style:none;display:flex;justify-content:space-between;align-items:center">Vem kan använda Cup Manager?<svg class="cm-faq-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-left:16px;flex-shrink:0;transition:transform 0.15s"><path d="M6 9l6 6 6-6"></path></svg><style>details[open] > summary > .cm-faq-chevron { transform: rotate(180deg); }</style></summary><div style="font-family:var(--font-body, Roboto, sans-serif);font-size:14px;line-height:1.7;color:rgba(255,255,255,0.75);margin-top:12px;padding-right:32px"><style>
+.cm-rich > *:first-child { margin-top: 0; }
+.cm-rich > *:last-child { margin-bottom: 0; }
+.cm-rich p { margin: 0 0 0.9em; }
+.cm-rich ul { list-style: disc; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich ol { list-style: decimal; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich li { margin: 0.3em 0; }
+.cm-rich a { color: var(--brand); text-decoration: none; }
+.cm-rich a:hover { text-decoration: underline; }
+.cm-rich strong { font-weight: 700; }
+.cm-rich blockquote { border-left: 3px solid var(--brand); padding-left: 1em; margin: 1em 0; font-style: italic; opacity: 0.85; }
+.cm-rich h3, .cm-rich h4 { font-weight: 700; margin: 1.2em 0 0.5em; font-family: var(--font-heading, Montserrat, sans-serif); }
+.cm-rich h3 { font-size: 1.25em; }
+.cm-rich h4 { font-size: 1.1em; }
+.cm-rich table { border-collapse: collapse; margin: 1em 0; }
+.cm-rich th, .cm-rich td { border: 1px solid #d5d5d5; padding: 5px 10px; text-align: center; }
+.cm-rich th { background: rgba(0,0,0,0.045); font-weight: 700; }
+.cm-rich img { max-width: 100%; height: auto; }
+.cm-rich hr { border: none; border-top: 1px solid rgba(0,0,0,0.12); margin: 1.4em 0; }
+</style><div class="cm-rich"><p>Cup Manager används av allt från världens största turneringar till lokala turneringar med 30 lag. Det går att nyttja olika många fördelar beroende på er storlek. Även en enkel turnering kan spara tid och huvudbry genom att hantera spelschemat och sköta kommunikationen på ett och samma ställe.</p></div></div></details><style>.cm-faq-dark .cm-rich a { color: #fff; text-decoration: underline; } .cm-faq-dark .cm-rich a:hover { color: rgba(255,255,255,0.85); }</style><details class="cm-faq-dark" style="border-bottom:1px solid rgba(255,255,255,0.15);padding:12px 0"><summary style="font-family:var(--font-body, Roboto, sans-serif);font-weight:700;font-size:16px;cursor:pointer;color:#fff;list-style:none;display:flex;justify-content:space-between;align-items:center">Hur kommer jag igång?<svg class="cm-faq-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-left:16px;flex-shrink:0;transition:transform 0.15s"><path d="M6 9l6 6 6-6"></path></svg><style>details[open] > summary > .cm-faq-chevron { transform: rotate(180deg); }</style></summary><div style="font-family:var(--font-body, Roboto, sans-serif);font-size:14px;line-height:1.7;color:rgba(255,255,255,0.75);margin-top:12px;padding-right:32px"><style>
+.cm-rich > *:first-child { margin-top: 0; }
+.cm-rich > *:last-child { margin-bottom: 0; }
+.cm-rich p { margin: 0 0 0.9em; }
+.cm-rich ul { list-style: disc; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich ol { list-style: decimal; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich li { margin: 0.3em 0; }
+.cm-rich a { color: var(--brand); text-decoration: none; }
+.cm-rich a:hover { text-decoration: underline; }
+.cm-rich strong { font-weight: 700; }
+.cm-rich blockquote { border-left: 3px solid var(--brand); padding-left: 1em; margin: 1em 0; font-style: italic; opacity: 0.85; }
+.cm-rich h3, .cm-rich h4 { font-weight: 700; margin: 1.2em 0 0.5em; font-family: var(--font-heading, Montserrat, sans-serif); }
+.cm-rich h3 { font-size: 1.25em; }
+.cm-rich h4 { font-size: 1.1em; }
+.cm-rich table { border-collapse: collapse; margin: 1em 0; }
+.cm-rich th, .cm-rich td { border: 1px solid #d5d5d5; padding: 5px 10px; text-align: center; }
+.cm-rich th { background: rgba(0,0,0,0.045); font-weight: 700; }
+.cm-rich img { max-width: 100%; height: auto; }
+.cm-rich hr { border: none; border-top: 1px solid rgba(0,0,0,0.12); margin: 1.4em 0; }
+</style><div class="cm-rich"><p>Det är enkelt att komma igång med Cup Manager. <a href="https://calendly.com/superinvite-cupmanager-en/demo">Boka ett demo</a>, eller <a href="/sv/support/">kontakta oss direkt per mail eller telefon</a> så hjälper vi dig igång!</p></div></div></details><style>.cm-faq-dark .cm-rich a { color: #fff; text-decoration: underline; } .cm-faq-dark .cm-rich a:hover { color: rgba(255,255,255,0.85); }</style><details class="cm-faq-dark" style="border-bottom:1px solid rgba(255,255,255,0.15);padding:12px 0"><summary style="font-family:var(--font-body, Roboto, sans-serif);font-weight:700;font-size:16px;cursor:pointer;color:#fff;list-style:none;display:flex;justify-content:space-between;align-items:center">Vad kostar det?<svg class="cm-faq-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-left:16px;flex-shrink:0;transition:transform 0.15s"><path d="M6 9l6 6 6-6"></path></svg><style>details[open] > summary > .cm-faq-chevron { transform: rotate(180deg); }</style></summary><div style="font-family:var(--font-body, Roboto, sans-serif);font-size:14px;line-height:1.7;color:rgba(255,255,255,0.75);margin-top:12px;padding-right:32px"><style>
+.cm-rich > *:first-child { margin-top: 0; }
+.cm-rich > *:last-child { margin-bottom: 0; }
+.cm-rich p { margin: 0 0 0.9em; }
+.cm-rich ul { list-style: disc; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich ol { list-style: decimal; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich li { margin: 0.3em 0; }
+.cm-rich a { color: var(--brand); text-decoration: none; }
+.cm-rich a:hover { text-decoration: underline; }
+.cm-rich strong { font-weight: 700; }
+.cm-rich blockquote { border-left: 3px solid var(--brand); padding-left: 1em; margin: 1em 0; font-style: italic; opacity: 0.85; }
+.cm-rich h3, .cm-rich h4 { font-weight: 700; margin: 1.2em 0 0.5em; font-family: var(--font-heading, Montserrat, sans-serif); }
+.cm-rich h3 { font-size: 1.25em; }
+.cm-rich h4 { font-size: 1.1em; }
+.cm-rich table { border-collapse: collapse; margin: 1em 0; }
+.cm-rich th, .cm-rich td { border: 1px solid #d5d5d5; padding: 5px 10px; text-align: center; }
+.cm-rich th { background: rgba(0,0,0,0.045); font-weight: 700; }
+.cm-rich img { max-width: 100%; height: auto; }
+.cm-rich hr { border: none; border-top: 1px solid rgba(0,0,0,0.12); margin: 1.4em 0; }
+</style><div class="cm-rich"><p>Vi har en enkel modell med ett pris per lag som deltar, en transaktionsavgift för onlinebetalning och möjlighet för extratjänster. Läs mer om <a href="/sv/priser/">våra priser här</a>.</p></div></div></details><style>.cm-faq-dark .cm-rich a { color: #fff; text-decoration: underline; } .cm-faq-dark .cm-rich a:hover { color: rgba(255,255,255,0.85); }</style><details class="cm-faq-dark" style="border-bottom:1px solid rgba(255,255,255,0.15);padding:12px 0"><summary style="font-family:var(--font-body, Roboto, sans-serif);font-weight:700;font-size:16px;cursor:pointer;color:#fff;list-style:none;display:flex;justify-content:space-between;align-items:center">Hur mycket support ingår i licensavgiften?<svg class="cm-faq-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-left:16px;flex-shrink:0;transition:transform 0.15s"><path d="M6 9l6 6 6-6"></path></svg><style>details[open] > summary > .cm-faq-chevron { transform: rotate(180deg); }</style></summary><div style="font-family:var(--font-body, Roboto, sans-serif);font-size:14px;line-height:1.7;color:rgba(255,255,255,0.75);margin-top:12px;padding-right:32px"><style>
+.cm-rich > *:first-child { margin-top: 0; }
+.cm-rich > *:last-child { margin-bottom: 0; }
+.cm-rich p { margin: 0 0 0.9em; }
+.cm-rich ul { list-style: disc; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich ol { list-style: decimal; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich li { margin: 0.3em 0; }
+.cm-rich a { color: var(--brand); text-decoration: none; }
+.cm-rich a:hover { text-decoration: underline; }
+.cm-rich strong { font-weight: 700; }
+.cm-rich blockquote { border-left: 3px solid var(--brand); padding-left: 1em; margin: 1em 0; font-style: italic; opacity: 0.85; }
+.cm-rich h3, .cm-rich h4 { font-weight: 700; margin: 1.2em 0 0.5em; font-family: var(--font-heading, Montserrat, sans-serif); }
+.cm-rich h3 { font-size: 1.25em; }
+.cm-rich h4 { font-size: 1.1em; }
+.cm-rich table { border-collapse: collapse; margin: 1em 0; }
+.cm-rich th, .cm-rich td { border: 1px solid #d5d5d5; padding: 5px 10px; text-align: center; }
+.cm-rich th { background: rgba(0,0,0,0.045); font-weight: 700; }
+.cm-rich img { max-width: 100%; height: auto; }
+.cm-rich hr { border: none; border-top: 1px solid rgba(0,0,0,0.12); margin: 1.4em 0; }
+</style><div class="cm-rich"><p>Det finns ingen gräns på hur mycket support som ingår. All support, hjälp och upplärning ingår. Av erfarenhet vet vi att det blir bäst om ni försöker göra så mycket som möjligt själva och därför är vårt huvudsakliga mål med supporten att förklara hur man gör, men vi lämnar er självklart aldrig i sticket.</p>
+<p>För att komma i kontakt med oss kan ni ringa eller maila oss, eller klicka på chatikonen nere till höger på denna sidan. Har ni längre ärenden så rekommenderar vi att ni <a href="/sv/boka/">bokar ett möte</a>.</p></div></div></details><style>.cm-faq-dark .cm-rich a { color: #fff; text-decoration: underline; } .cm-faq-dark .cm-rich a:hover { color: rgba(255,255,255,0.85); }</style><details class="cm-faq-dark" style="border-bottom:1px solid rgba(255,255,255,0.15);padding:12px 0"><summary style="font-family:var(--font-body, Roboto, sans-serif);font-weight:700;font-size:16px;cursor:pointer;color:#fff;list-style:none;display:flex;justify-content:space-between;align-items:center">Kan man få joursupport under cupen?<svg class="cm-faq-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-left:16px;flex-shrink:0;transition:transform 0.15s"><path d="M6 9l6 6 6-6"></path></svg><style>details[open] > summary > .cm-faq-chevron { transform: rotate(180deg); }</style></summary><div style="font-family:var(--font-body, Roboto, sans-serif);font-size:14px;line-height:1.7;color:rgba(255,255,255,0.75);margin-top:12px;padding-right:32px"><style>
+.cm-rich > *:first-child { margin-top: 0; }
+.cm-rich > *:last-child { margin-bottom: 0; }
+.cm-rich p { margin: 0 0 0.9em; }
+.cm-rich ul { list-style: disc; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich ol { list-style: decimal; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich li { margin: 0.3em 0; }
+.cm-rich a { color: var(--brand); text-decoration: none; }
+.cm-rich a:hover { text-decoration: underline; }
+.cm-rich strong { font-weight: 700; }
+.cm-rich blockquote { border-left: 3px solid var(--brand); padding-left: 1em; margin: 1em 0; font-style: italic; opacity: 0.85; }
+.cm-rich h3, .cm-rich h4 { font-weight: 700; margin: 1.2em 0 0.5em; font-family: var(--font-heading, Montserrat, sans-serif); }
+.cm-rich h3 { font-size: 1.25em; }
+.cm-rich h4 { font-size: 1.1em; }
+.cm-rich table { border-collapse: collapse; margin: 1em 0; }
+.cm-rich th, .cm-rich td { border: 1px solid #d5d5d5; padding: 5px 10px; text-align: center; }
+.cm-rich th { background: rgba(0,0,0,0.045); font-weight: 700; }
+.cm-rich img { max-width: 100%; height: auto; }
+.cm-rich hr { border: none; border-top: 1px solid rgba(0,0,0,0.12); margin: 1.4em 0; }
+</style><div class="cm-rich"><p>Joursupport ingår för alla turneringar. Det innebär att ni under turneringsdagarna kan ringa oss och få hjälp. Kontaktuppgifter finns <a href="/sv/support/">här</a>.</p></div></div></details></div><div style="flex:1 1 320px"><h3 style="font-family:var(--font-heading, Montserrat, sans-serif);font-weight:700;font-size:22px;color:#fff;margin:0 0 18px">Vill du veta mer?</h3><p style="color:rgba(255,255,255,0.9);font-size:15px;line-height:1.7;margin:0 0 20px">På vår hjälpsida för systemet Cup Manager finns manualer och dokumentation för hur man använder de olika funktionerna.</p><div style="display:flex;flex-direction:column;gap:12px;align-items:flex-start"><a href="https://help.cupmanager.net/" style="display:inline-flex;align-items:center;gap:8px;background-color:#fff;color:#1a1a1a;padding:12px 24px;border-radius:3px;font-weight:600;font-size:15px;text-decoration:none;box-shadow:0 1px 4px rgba(0,0,0,0.15)">Gå till Cup Managers hjälpsidor<!-- --> <span aria-hidden="true">›</span></a><a href="/sv/rakna-pa-kapacitet/" style="display:inline-flex;align-items:center;gap:8px;background-color:#fff;color:#1a1a1a;padding:12px 24px;border-radius:3px;font-weight:600;font-size:15px;text-decoration:none;box-shadow:0 1px 4px rgba(0,0,0,0.15)">Nytt verktyg! Räkna på kapacitet i din turnering<!-- --> <span aria-hidden="true">›</span></a></div></div></div></section>
+<section style="background-color:#f4f4f4;padding:48px 7% 0;font-family:var(--font-body, Roboto, sans-serif)"><style>.cm-footer-mail { color: var(--brand); text-decoration: none; } .cm-footer-mail:hover, .cm-footer-link:hover { text-decoration: underline; }</style><div style="display:flex;flex-wrap:wrap;gap:40px;max-width:1100px;margin:0 auto;padding-bottom:32px"><div style="flex:1 1 260px"><img src="/media/shared/cupmanager_light.svg" alt="Cup Manager" style="max-height:48px;max-width:220px"/></div><div style="flex:1 1 180px"><h3 style="font-family:var(--font-heading, Montserrat, sans-serif);font-weight:700;font-size:17px;color:#1a1a1a;margin:0 0 18px">Navigation</h3><a href="/sv/support/" class="cm-footer-link" style="color:var(--brand);text-decoration:none;font-size:14px;display:block;margin-bottom:8px">Support</a><a href="/sv/priser/" class="cm-footer-link" style="color:var(--brand);text-decoration:none;font-size:14px;display:block;margin-bottom:8px">Priser</a><a href="/sv/om-cupmanager/" class="cm-footer-link" style="color:var(--brand);text-decoration:none;font-size:14px;display:block;margin-bottom:8px">Om oss</a><a href="/sv/jobba-hos-oss/" class="cm-footer-link" style="color:var(--brand);text-decoration:none;font-size:14px;display:block;margin-bottom:8px">Jobba hos oss</a></div><div style="flex:1 1 220px"><h3 style="font-family:var(--font-heading, Montserrat, sans-serif);font-weight:700;font-size:17px;color:#1a1a1a;margin:0 0 18px">Kontakt</h3><p style="color:#555;font-size:14px;line-height:1.8;margin:0">Telefon<!-- -->: <!-- -->046-52580<br/>Epost<!-- -->: <a class="cm-footer-mail" href="mailto:support@cupmanager.net">support@cupmanager.net</a></p></div></div><div style="border-top:1px solid rgba(0,0,0,0.08);padding:20px 0 24px;max-width:1100px;margin:0 auto;display:flex;flex-direction:column;gap:10px;align-items:center"><span style="display:flex;gap:18px"><a href="https://www.facebook.com/CupManager/" aria-label="Facebook"><svg width="22" height="22" viewBox="0 0 24 24" fill="var(--brand)"><path d="M22 12a10 10 0 1 0-11.56 9.88v-6.99H7.9V12h2.54V9.8c0-2.5 1.49-3.89 3.77-3.89 1.09 0 2.23.2 2.23.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56V12h2.78l-.45 2.89h-2.33v6.99A10 10 0 0 0 22 12z"></path></svg></a><a href="https://www.instagram.com/cupmanager/" aria-label="Instagram"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"></rect><circle cx="12" cy="12" r="4"></circle><circle cx="17.5" cy="6.5" r="1" fill="var(--brand)" stroke="none"></circle></svg></a></span><span style="color:#888;font-size:13px">Copyright 2026 Cup Manager</span></div></section> </footer> <a id="preview-btn" href="" data-fs-db="plinto-fs" class="fixed bottom-20 right-6 bg-amber-500 hover:bg-amber-600 text-black px-4 py-2 rounded-lg shadow-lg flex items-center gap-2 transition-colors z-40 font-medium" style="display:none"> <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"> <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path> <circle cx="12" cy="12" r="3"></circle> </svg>
+Preview Changes
+</a> <script type="module" src="/_astro/PreviewButton.astro_astro_type_script_index_0_lang.d8INO1zV.js"></script> <div id="lang-switcher" class="fixed bottom-6 right-6 z-50 group"><div class="flex flex-col gap-1 items-end max-h-0 overflow-hidden opacity-0 pointer-events-none group-hover:max-h-96 group-hover:mb-2 group-hover:opacity-100 group-hover:pointer-events-auto transition-all duration-150"><a href="/no/lottning-schema/" class="flex items-center gap-2 bg-white border border-gray-200 shadow-md px-3 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors whitespace-nowrap"><svg width="20" height="14" viewBox="0 0 20 14" xmlns="http://www.w3.org/2000/svg"><rect width="20" height="14" fill="#EF2B2D"/><rect x="5" width="3" height="14" fill="#fff"/><rect y="5.5" width="20" height="3" fill="#fff"/><rect x="5.5" width="2" height="14" fill="#002868"/><rect y="6" width="20" height="2" fill="#002868"/></svg><span>Norsk</span></a><a href="/en/lottning-schema/" class="flex items-center gap-2 bg-white border border-gray-200 shadow-md px-3 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors whitespace-nowrap"><svg width="20" height="14" viewBox="0 0 60 42" xmlns="http://www.w3.org/2000/svg"><rect width="60" height="42" fill="#012169"/><path d="M0,0 L60,42 M60,0 L0,42" stroke="#fff" stroke-width="8"/><path d="M0,0 L60,42 M60,0 L0,42" stroke="#C8102E" stroke-width="4"/><path d="M30,0 V42 M0,21 H60" stroke="#fff" stroke-width="12"/><path d="M30,0 V42 M0,21 H60" stroke="#C8102E" stroke-width="7"/></svg><span>English</span></a></div><button class="flex items-center gap-2 bg-white border border-gray-200 shadow-lg px-3 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors" aria-label="Switch language"><svg width="20" height="14" viewBox="0 0 20 14" xmlns="http://www.w3.org/2000/svg"><rect width="20" height="14" fill="#006AA7"/><rect x="5" width="3" height="14" fill="#FECC02"/><rect y="5.5" width="20" height="3" fill="#FECC02"/></svg><span>Svenska</span><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="group-hover:rotate-180 transition-transform duration-150"><polyline points="18 15 12 9 6 15"></polyline></svg></button></div> </body></html>

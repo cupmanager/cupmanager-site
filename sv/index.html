@@ -1,0 +1,821 @@
+<!DOCTYPE html><html lang="sv"> <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Startsidan - Cup Manager</title><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400..800&family=Roboto:wght@300..700&display=swap"><link rel="icon" href="/media/shared/favicon.png" sizes="32x32"><link rel="icon" href="/media/shared/favicon.png" sizes="192x192"><link rel="apple-touch-icon" href="/media/shared/favicon.png"><meta name="msapplication-TileImage" content="/media/shared/favicon.png"><link rel="alternate" hreflang="sv" href="https://cupmanager.net/sv/"><link rel="alternate" hreflang="no" href="https://cupmanager.net/no/"><link rel="alternate" hreflang="en" href="https://cupmanager.net/en/"><link rel="alternate" hreflang="x-default" href="https://cupmanager.net/sv/"><link rel="stylesheet" href="/_astro/registry.4cHICgBS.css"></head> <body> <header class="plinto-header"> <a href="/sv" style="display:inline-flex;align-items:center"><img src="/media/shared/cupmanager_light.svg" alt="Cup Manager" style="height:48px;width:auto;display:block"/></a>
+<nav class="cm-nav"><style>
+  .plinto-header {
+    --plinto-header-max-width: 1300px;
+    --plinto-header-padding-inline: 30px;
+    --plinto-header-padding-block: 0px;
+    --plinto-header-min-height: 100px;
+    --plinto-header-border-width: 0px;
+    --plinto-header-shadow: 0 0 20px rgba(0,0,0,0.1);
+  }
+</style><style>
+        .cm-nav { display: flex; align-items: center; gap: 30px; font-family: var(--font-body, Roboto, sans-serif); }
+        .cm-nav-toggle { display: none; }
+        .cm-nav-hamburger { display: none; cursor: pointer; padding: 8px; background: none; border: none; color: #333; }
+        .cm-nav-hamburger svg { display: block; }
+        .cm-nav-links { display: contents; }
+        .cm-nav a.cm-nav-link, .cm-nav span.cm-nav-link { color: #5C6B79; font-weight: 400; font-size: 17px; text-decoration: none; transition: color 0.15s; }
+        /* Chevron inherits the link colour, so it greens on hover too */
+        .cm-nav .cm-caret { margin-left: 5px; flex: none; }
+        @media (min-width: 1024px) {
+          /* Nav items span the full header height (as on cupmanager.net), for
+             two reasons: the mega panel is positioned at top:100% of its item,
+             so anything shorter drops it *inside* the header; and it gives the
+             hover target the whole bar rather than just the text. Going
+             inline-flex also stops the chevron inflating the trigger's line
+             box, which would knock it off the centre line of its neighbours. */
+          /* The nav must fill the header before its items can; otherwise
+             stretching them only reaches the nav's own content height. */
+          .cm-nav { align-self: stretch; }
+          .cm-nav > .cm-nav-links > a.cm-nav-link,
+          .cm-nav > .cm-nav-links > .cm-mi-wrap { align-self: stretch; display: inline-flex; align-items: center; }
+          .cm-nav .cm-mi-wrap > a.cm-nav-link,
+          .cm-nav .cm-mi-wrap > span.cm-nav-link { display: inline-flex; align-items: center; height: 100%; }
+        }
+        .cm-nav a.cm-nav-link:hover, .cm-nav .cm-mi-wrap:hover > a.cm-nav-link, .cm-nav .cm-mi-wrap:hover > span.cm-nav-link { color: var(--brand); }
+        .cm-nav span.cm-nav-link { cursor: default; }
+        @media (max-width: 1024px) {
+          .cm-nav .cm-caret { display: none; }
+          .cm-nav-hamburger { display: block; }
+          .cm-nav-links { display: none; flex-direction: column; width: 100%; position: absolute; top: 100%; left: 0; right: 0; background: #fff; border-bottom: 1px solid #eee; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); z-index: 50; padding: 0 24px 12px; }
+          .cm-nav-links > a, .cm-nav-links .cm-mi-wrap { display: block; padding: 12px 0; border-top: 1px solid #f0f0f0; }
+          .cm-nav-toggle:checked ~ .cm-nav-links { display: flex; }
+        }
+      </style><input type="checkbox" id="cm-nav-toggle" class="cm-nav-toggle" hidden=""/><label for="cm-nav-toggle" class="cm-nav-hamburger" aria-label="Menu"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg></label><div class="cm-nav-links"><a href="/sv" class="cm-nav-link">Hem</a><div class="cm-mi-wrap"><style>
+          /* Deliberately NOT positioned: the panel spans the viewport, so its
+             containing block has to be the header (.plinto-header is relative,
+             from the library's globals) rather than the item. Items stretch to
+             the full header height, so top:100% lands in the same place either
+             way. */
+          .cm-mi-panel { display: none; position: absolute; top: 100%; left: 0; right: 0; background: #fff; border-top: 1px solid var(--brand); border-bottom: 1px solid var(--brand); z-index: 60; }
+          .cm-mi-wrap:hover > .cm-mi-panel, .cm-mi-wrap:focus-within > .cm-mi-panel { display: block; }
+          /* The two halves meet at the centre of the viewport. Contained keeps
+             them inside the header's content width (cupmanager.net); full lets
+             the colour bleed to the edges (superinvite.com). */
+          .cm-mi-panel-inner { display: flex; max-width: var(--cm-panel-max-width, 1300px); margin: 0 auto; }
+          .cm-mi-panel-highlights { background: var(--brand); flex: 0 0 50%; min-width: 0; box-sizing: border-box; display: flex; flex-direction: column; gap: 20px; justify-content: center; padding: 44px 20px 44px 27%; }
+          .cm-nav .cm-mi-panel-highlights a.cm-nav-link { color: #fff; font-weight: 400; font-size: 18px; display: inline-flex; align-items: center; gap: 14px; }
+          .cm-mi-panel-highlights svg { width: 20px; height: 20px; flex: none; }
+          .cm-nav .cm-mi-panel-highlights a.cm-nav-link:hover { color: rgba(255,255,255,0.8); }
+          .cm-mi-panel-main { background: #f5f5f5; flex: 0 0 50%; min-width: 0; box-sizing: border-box; padding: 44px 6% 44px 5%; }
+          .cm-mi-panel-heading { font-family: var(--font-heading, Montserrat, sans-serif); font-weight: 600; font-size: 22px; color: #162B40; margin: 0 0 6px; padding-bottom: 14px; border-bottom: 2px solid var(--brand); }
+          /* Multi-column, not grid: the live panels fill the first column
+             before starting the second, and column-count does that for any
+             number of links without the markup naming a row count. */
+          .cm-mi-panel-links { columns: 2; column-gap: 32px; margin-top: 20px; }
+          .cm-nav .cm-mi-panel-links a.cm-nav-link { display: block; break-inside: avoid; margin-bottom: 18px; color: #5C6B79; font-weight: 400; font-size: 15px; }
+          .cm-nav .cm-mi-panel-links a.cm-nav-link:hover { color: var(--brand); }
+          @media (max-width: 1024px) {
+            .cm-mi-panel { display: block; position: static; border: 0; background: transparent; }
+            .cm-mi-panel-inner { display: block; max-width: none; }
+            .cm-mi-panel-highlights { display: none; }
+            .cm-mi-panel-main { background: transparent; padding: 8px 0 0 12px; }
+            .cm-mi-panel-heading { display: none; }
+            .cm-mi-panel-links { columns: 1; margin-top: 4px; }
+            .cm-nav .cm-mi-panel-links a.cm-nav-link { margin-bottom: 10px; }
+          }
+        </style><span class="cm-nav-link" tabindex="0" role="button" aria-haspopup="true">Om Cup Manager<svg class="cm-caret" aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg></span><div class="cm-mi-panel"><div class="cm-mi-panel-inner"><div class="cm-mi-panel-highlights"><a href="/sv/kort-och-klarna" class="cm-nav-link"><svg width="16" height="16" viewBox="0 0 512 512" fill="currentColor" aria-hidden="true"><path d="M448 96c17.7 0 32 14.3 32 32l0 64-448 0 0-64c0-17.7 14.3-32 32-32l384 0zm32 128l0 160c0 17.7-14.3 32-32 32L64 416c-17.7 0-32-14.3-32-32l0-160 448 0zM64 64C28.7 64 0 92.7 0 128L0 384c0 35.3 28.7 64 64 64l384 0c35.3 0 64-28.7 64-64l0-256c0-35.3-28.7-64-64-64L64 64zM96 336c0 8.8 7.2 16 16 16l32 0c8.8 0 16-7.2 16-16s-7.2-16-16-16l-32 0c-8.8 0-16 7.2-16 16zm96 0c0 8.8 7.2 16 16 16l32 0c8.8 0 16-7.2 16-16s-7.2-16-16-16l-32 0c-8.8 0-16 7.2-16 16z"></path></svg>Kort och Klarna</a><a href="/sv/app" class="cm-nav-link"><svg width="16" height="16" viewBox="0 0 384 512" fill="currentColor" aria-hidden="true"><path d="M48 448c0 17.7 14.3 32 32 32l224 0c17.7 0 32-14.3 32-32l0-96-288 0 0 96zm0-128l288 0 0-256c0-17.7-14.3-32-32-32L80 32C62.3 32 48 46.3 48 64l0 256zM16 64C16 28.7 44.7 0 80 0L304 0c35.3 0 64 28.7 64 64l0 384c0 35.3-28.7 64-64 64L80 512c-35.3 0-64-28.7-64-64L16 64zM160 400l64 0c8.8 0 16 7.2 16 16s-7.2 16-16 16l-64 0c-8.8 0-16-7.2-16-16s7.2-16 16-16z"></path></svg>Egen turneringsapp</a><a href="/sv/hemsida" class="cm-nav-link"><svg width="16" height="16" viewBox="0 0 512 512" fill="currentColor" aria-hidden="true"><path d="M288 64l0 64-64 0 0-64 64 0zm-64 96l16 0 0 64-128 0c-35.3 0-64 28.7-64 64l0 64-16 0c-17.7 0-32 14.3-32 32l0 64c0 17.7 14.3 32 32 32l64 0c17.7 0 32-14.3 32-32l0-64c0-17.7-14.3-32-32-32l-16 0 0-64c0-17.7 14.3-32 32-32l128 0 0 96-16 0c-17.7 0-32 14.3-32 32l0 64c0 17.7 14.3 32 32 32l64 0c17.7 0 32-14.3 32-32l0-64c0-17.7-14.3-32-32-32l-16 0 0-96 128 0c17.7 0 32 14.3 32 32l0 64-16 0c-17.7 0-32 14.3-32 32l0 64c0 17.7 14.3 32 32 32l64 0c17.7 0 32-14.3 32-32l0-64c0-17.7-14.3-32-32-32l-16 0 0-64c0-35.3-28.7-64-64-64l-128 0 0-64 16 0c17.7 0 32-14.3 32-32l0-64c0-17.7-14.3-32-32-32l-64 0c-17.7 0-32 14.3-32 32l0 64c0 17.7 14.3 32 32 32zM32 384l64 0 0 64-64 0 0-64zm192 0l64 0 0 64-64 0 0-64zm192 0l64 0 0 64-64 0 0-64z"></path></svg>Hemsida ingår</a><a href="/sv/streaming" class="cm-nav-link"><svg width="16" height="16" viewBox="0 0 512 512" fill="currentColor" aria-hidden="true"><path d="M256 32a224 224 0 1 1 0 448 224 224 0 1 1 0-448zm0 480a256 256 0 1 0 0-512 256 256 0 1 0 0 512zm72.7-256L208 329.7 208 182.3 328.7 256zM188.3 147.1c-7.6 4.2-12.3 12.3-12.3 20.9l0 176c0 8.7 4.7 16.7 12.3 20.9s16.8 4.1 24.3-.5l144-88c7.1-4.4 11.5-12.1 11.5-20.5s-4.4-16.1-11.5-20.5l-144-88c-7.4-4.5-16.7-4.7-24.3-.5z"></path></svg>Livestreaming</a><a href="/sv/priser" class="cm-nav-link"><svg width="16" height="16" viewBox="0 0 512 512" fill="currentColor" aria-hidden="true"><path d="M64.1 96c0-17.7 14.3-32 32-32l156.1 0c8.5 0 16.6 3.4 22.6 9.4l192 192c12.5 12.5 12.5 32.8 0 45.2L310.7 466.7c-12.5 12.5-32.8 12.5-45.3 0l-192-192c-6-6-9.4-14.1-9.4-22.6L64.1 96zm32-64c-35.3 0-64 28.7-64 64l0 156.1c0 17 6.7 33.2 18.7 45.3l192 192c25 25 65.5 25 90.5 0L489.5 333.3c25-25 25-65.5 0-90.5l-192-192c-12-12-28.3-18.7-45.3-18.7L96.1 32zm48 136a24 24 0 1 0 0-48 24 24 0 1 0 0 48z"></path></svg>Priser</a></div><div class="cm-mi-panel-main"><p class="cm-mi-panel-heading">Läs mer om våra funktioner</p><div class="cm-mi-panel-links"><a href="/sv/hemsida" class="cm-nav-link">Egen hemsida för turneringen</a><a href="/sv/anmalningar" class="cm-nav-link">Anmälningssystem för lag &amp; domare</a><a href="/sv/kort-och-klarna" class="cm-nav-link">Integrerade betalningslösningar</a><a href="/sv/lagkonto-boende" class="cm-nav-link">Lagkonto och boendehantering</a><a href="/sv/lottning-schema" class="cm-nav-link">Lottning och schemaläggning</a><a href="/sv/resultat" class="cm-nav-link">Resultat och annat under turneringen</a></div></div></div></div></div><a href="/sv/support" class="cm-nav-link">Support</a><a href="/sv/laddaner" class="cm-nav-link">Ladda ner</a><a href="/sv/om-cupmanager" class="cm-nav-link">Om oss</a><a href="https://calendly.com/superinvite-cupmanager-en/demo" style="display:inline-flex;align-items:center;gap:8px;background-color:var(--brand);color:#fff;border-radius:3px;font-family:var(--font-body, Roboto, sans-serif);font-weight:300;text-decoration:none;white-space:nowrap;font-size:16px;padding:10px 30px">Boka demo</a></div><script>(function(){
+        var path = location.pathname.replace(/\/$/, '');
+        var links = document.querySelectorAll('.cm-nav > .cm-nav-links > a.cm-nav-link, .cm-nav > .cm-nav-links > .cm-mi-wrap > a.cm-nav-link');
+        links.forEach(function(a){
+          var href = a.getAttribute('href');
+          if (!href) return;
+          var norm = href.replace(/\/$/, '');
+          if (norm === path || (norm !== '/sv' && path.indexOf(norm + '/') === 0)) a.style.color = 'var(--brand)';
+        });
+      })();</script></nav> </header> <main> <section style="position:relative;min-height:min(85vh, 780px);display:flex;align-items:center;justify-content:center;background-color:#1a1a1a;overflow:hidden"><video src="/media/start-video-002-optimized.mp4" poster="/media/home/hero-poster.jpg" autoPlay="" muted="" loop="" playsInline="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover"></video><div style="position:absolute;inset:0;background-color:rgba(0,0,0,0.45)"></div><div style="position:relative;z-index:1;text-align:center;color:#fff;padding:0 24px;max-width:800px"><h1 style="font-size:clamp(2rem, 5vw, 3.5rem);font-weight:700;margin-bottom:20px;font-family:var(--font-heading, Montserrat, sans-serif)">Cup Manager</h1><p style="font-size:clamp(1rem, 2.5vw, 1.3rem);font-weight:400;margin-bottom:36px;line-height:1.5">Cup Manager är världens bästa turneringssystem för världens bästa turneringar</p><a href="/sv/missa-inte/" style="display:inline-flex;align-items:center;gap:8px;background-color:var(--brand);color:#fff;border-radius:3px;font-family:var(--font-body, Roboto, sans-serif);font-weight:300;text-decoration:none;font-size:16px;padding:8px 20px">Läs mer om Cup Manager</a></div></section>
+<section style="padding:60px 10%;text-align:left"><style>.cm-sec-heading:has(> [data-puck-overlay-portal]:empty) { display: none; }</style><div style="max-width:1000px;margin:0 auto"><h2 class="cm-sec-heading" style="color:var(--brand);font-size:clamp(1.4rem, 3vw, 2.1rem);font-weight:700;margin-bottom:14px;font-family:var(--font-heading, Montserrat, sans-serif)">Vad är Cup Manager?</h2><div style="width:52px;height:3px;background-color:var(--brand);margin:0 0 24px"></div><div style="color:#333;font-size:16px;line-height:1.7;font-family:var(--font-body, Roboto, sans-serif)"><style>
+.cm-rich > *:first-child { margin-top: 0; }
+.cm-rich > *:last-child { margin-bottom: 0; }
+.cm-rich p { margin: 0 0 0.9em; }
+.cm-rich ul { list-style: disc; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich ol { list-style: decimal; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich li { margin: 0.3em 0; }
+.cm-rich a { color: var(--brand); text-decoration: none; }
+.cm-rich a:hover { text-decoration: underline; }
+.cm-rich strong { font-weight: 700; }
+.cm-rich blockquote { border-left: 3px solid var(--brand); padding-left: 1em; margin: 1em 0; font-style: italic; opacity: 0.85; }
+.cm-rich h3, .cm-rich h4 { font-weight: 700; margin: 1.2em 0 0.5em; font-family: var(--font-heading, Montserrat, sans-serif); }
+.cm-rich h3 { font-size: 1.25em; }
+.cm-rich h4 { font-size: 1.1em; }
+.cm-rich table { border-collapse: collapse; margin: 1em 0; }
+.cm-rich th, .cm-rich td { border: 1px solid #d5d5d5; padding: 5px 10px; text-align: center; }
+.cm-rich th { background: rgba(0,0,0,0.045); font-weight: 700; }
+.cm-rich img { max-width: 100%; height: auto; }
+.cm-rich hr { border: none; border-top: 1px solid rgba(0,0,0,0.12); margin: 1.4em 0; }
+</style><div class="cm-rich"><p>Cup Manager hjälper dig som arrangerar turneringar att enkelt och smidigt ge en fantastisk helhetsupplevelse till dina deltagare. Från anmälning, betallösning, lottning och spelschema till liverapportering av mål och slutresultat till webb, mobilappar eller sms.</p>
+<p>Vi har gjort det enkelt för stora, små, enkla och komplexa turneringar.</p></div></div></div></section>
+<section style="background-color:#fff;padding:0"><style>
+        /* Side by side only while the copy still fits the fixed-ratio row.
+           Measured on the longest row of the start page: against the 460px box
+           the roomy padding leaves just 3px of slack from 1441px to 1560px and
+           overflows below that, so the tighter padding covers everything up to
+           1599px and buys back the ~60px that makes the copy fit down to 960px.
+           From 1600px up the roomy padding has 28px to spare on its own. */
+        @media (min-width: 961px) and (max-width: 1599px) {
+          .cm-frow:not(.cm-frow-contained):not(.cm-frow-split) > div:last-child > div {
+            padding: 40px 5% !important;
+          }
+        }
+        @media (max-width: 960px) {
+          /* Stacked: the row is content-height, and the image keeps a fixed
+             ratio of its own so every stacked row still matches the others. */
+          .cm-frow { flex-direction: column !important; min-height: 0 !important; }
+          /* flex-basis becomes HEIGHT in column direction — reset it */
+          .cm-frow > div { flex-basis: auto !important; }
+          .cm-frow:not(.cm-frow-contained) > div:first-child {
+            aspect-ratio: 16 / 9;
+            min-height: 0 !important;
+          }
+        }
+      </style><div class="cm-frow" style="display:flex;flex-direction:row;min-height:460px;max-width:100%;gap:0;align-items:stretch"><div style="flex:1;min-width:0;position:relative;overflow:hidden;min-height:300px"><img src="/media/home/ai-image-copy-1.webp" alt="AI-schemaläggning i Cup Manager" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;display:block"/></div><div style="flex:1;min-width:0;display:flex;align-items:center;background-color:#fff"><div style="padding:60px 7%;max-width:1000px"><div><p style="font-size:12px;font-weight:500;letter-spacing:0.12em;color:#aaa;text-transform:uppercase;margin-bottom:10px;font-family:var(--font-body, Roboto, sans-serif)">Smartare schemaläggning med AI</p><h2 style="font-size:clamp(1.4rem, 2.5vw, 2rem);font-weight:700;color:#1a1a1a;margin-bottom:16px;line-height:1.2;font-family:var(--font-heading, Montserrat, sans-serif)">Så fungerar det i Cup Manager</h2><div style="width:60px;height:2px;background-color:#1a1a1a;margin-bottom:20px"></div><div style="color:#555;font-size:15px;line-height:1.7;margin-bottom:28px;font-family:var(--font-body, Roboto, sans-serif)"><style>
+.cm-rich > *:first-child { margin-top: 0; }
+.cm-rich > *:last-child { margin-bottom: 0; }
+.cm-rich p { margin: 0 0 0.9em; }
+.cm-rich ul { list-style: disc; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich ol { list-style: decimal; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich li { margin: 0.3em 0; }
+.cm-rich a { color: var(--brand); text-decoration: none; }
+.cm-rich a:hover { text-decoration: underline; }
+.cm-rich strong { font-weight: 700; }
+.cm-rich blockquote { border-left: 3px solid var(--brand); padding-left: 1em; margin: 1em 0; font-style: italic; opacity: 0.85; }
+.cm-rich h3, .cm-rich h4 { font-weight: 700; margin: 1.2em 0 0.5em; font-family: var(--font-heading, Montserrat, sans-serif); }
+.cm-rich h3 { font-size: 1.25em; }
+.cm-rich h4 { font-size: 1.1em; }
+.cm-rich table { border-collapse: collapse; margin: 1em 0; }
+.cm-rich th, .cm-rich td { border: 1px solid #d5d5d5; padding: 5px 10px; text-align: center; }
+.cm-rich th { background: rgba(0,0,0,0.045); font-weight: 700; }
+.cm-rich img { max-width: 100%; height: auto; }
+.cm-rich hr { border: none; border-top: 1px solid rgba(0,0,0,0.12); margin: 1.4em 0; }
+</style><div class="cm-rich"><p>Att lägga ett fungerande spelschema är ett komplext pussel – särskilt när det handlar om hundratals eller tusentals matcher, flera spelplatser, vilotider och specialönskemål.</p></div></div><a href="/sv/vara-ai-losningar/" style="display:inline-flex;align-items:center;gap:8px;background-color:var(--brand);color:#fff;border-radius:3px;font-family:var(--font-body, Roboto, sans-serif);font-weight:300;text-decoration:none;font-size:15px;padding:8px 20px">Läs mer om AI i Cup Manager här<!-- --> <span style="font-size:18px;line-height:1">→</span></a></div></div></div></div></section>
+<section style="background-color:#f5f5f5;padding:0"><style>
+        /* Side by side only while the copy still fits the fixed-ratio row.
+           Measured on the longest row of the start page: against the 460px box
+           the roomy padding leaves just 3px of slack from 1441px to 1560px and
+           overflows below that, so the tighter padding covers everything up to
+           1599px and buys back the ~60px that makes the copy fit down to 960px.
+           From 1600px up the roomy padding has 28px to spare on its own. */
+        @media (min-width: 961px) and (max-width: 1599px) {
+          .cm-frow:not(.cm-frow-contained):not(.cm-frow-split) > div:last-child > div {
+            padding: 40px 5% !important;
+          }
+        }
+        @media (max-width: 960px) {
+          /* Stacked: the row is content-height, and the image keeps a fixed
+             ratio of its own so every stacked row still matches the others. */
+          .cm-frow { flex-direction: column !important; min-height: 0 !important; }
+          /* flex-basis becomes HEIGHT in column direction — reset it */
+          .cm-frow > div { flex-basis: auto !important; }
+          .cm-frow:not(.cm-frow-contained) > div:first-child {
+            aspect-ratio: 16 / 9;
+            min-height: 0 !important;
+          }
+        }
+      </style><div class="cm-frow" style="display:flex;flex-direction:row-reverse;min-height:460px;max-width:100%;gap:0;align-items:stretch"><div style="flex:1;min-width:0;position:relative;overflow:hidden;min-height:300px"><img src="/media/home/Toppbilde-Kunde-case-scaled-2.png" alt="Bergen Basket Festival" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;display:block"/></div><div style="flex:1;min-width:0;display:flex;align-items:center;background-color:#f5f5f5"><div style="padding:60px 7%;max-width:1000px"><div><p style="font-size:12px;font-weight:500;letter-spacing:0.12em;color:#aaa;text-transform:uppercase;margin-bottom:10px;font-family:var(--font-body, Roboto, sans-serif)">CASE STUDIE: BERGEN BASKET FESTIVAL</p><h2 style="font-size:clamp(1.4rem, 2.5vw, 2rem);font-weight:700;color:#1a1a1a;margin-bottom:16px;line-height:1.2;font-family:var(--font-heading, Montserrat, sans-serif)">En av våra kunder berättar</h2><div style="width:60px;height:2px;background-color:#1a1a1a;margin-bottom:20px"></div><div style="color:#555;font-size:15px;line-height:1.7;margin-bottom:28px;font-family:var(--font-body, Roboto, sans-serif)"><style>
+.cm-rich > *:first-child { margin-top: 0; }
+.cm-rich > *:last-child { margin-bottom: 0; }
+.cm-rich p { margin: 0 0 0.9em; }
+.cm-rich ul { list-style: disc; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich ol { list-style: decimal; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich li { margin: 0.3em 0; }
+.cm-rich a { color: var(--brand); text-decoration: none; }
+.cm-rich a:hover { text-decoration: underline; }
+.cm-rich strong { font-weight: 700; }
+.cm-rich blockquote { border-left: 3px solid var(--brand); padding-left: 1em; margin: 1em 0; font-style: italic; opacity: 0.85; }
+.cm-rich h3, .cm-rich h4 { font-weight: 700; margin: 1.2em 0 0.5em; font-family: var(--font-heading, Montserrat, sans-serif); }
+.cm-rich h3 { font-size: 1.25em; }
+.cm-rich h4 { font-size: 1.1em; }
+.cm-rich table { border-collapse: collapse; margin: 1em 0; }
+.cm-rich th, .cm-rich td { border: 1px solid #d5d5d5; padding: 5px 10px; text-align: center; }
+.cm-rich th { background: rgba(0,0,0,0.045); font-weight: 700; }
+.cm-rich img { max-width: 100%; height: auto; }
+.cm-rich hr { border: none; border-top: 1px solid rgba(0,0,0,0.12); margin: 1.4em 0; }
+</style><div class="cm-rich"><p>Läs vårt reportage om en lyckad resa för basket och Bergen i Norge. Geir Eikenes berättar lite om deras resa, hur de avancerat, lyckats och fortsätter att sätta upp nya mål i framtiden med sin turnering.</p></div></div><a href="/sv/bergen-basket-festival/" style="display:inline-flex;align-items:center;gap:8px;background-color:var(--brand);color:#fff;border-radius:3px;font-family:var(--font-body, Roboto, sans-serif);font-weight:300;text-decoration:none;font-size:15px;padding:8px 20px">Läs om Bergen Basket Festival här<!-- --> <span style="font-size:18px;line-height:1">→</span></a></div></div></div></div></section>
+<section style="background-color:#fff;padding:0"><style>
+        /* Side by side only while the copy still fits the fixed-ratio row.
+           Measured on the longest row of the start page: against the 460px box
+           the roomy padding leaves just 3px of slack from 1441px to 1560px and
+           overflows below that, so the tighter padding covers everything up to
+           1599px and buys back the ~60px that makes the copy fit down to 960px.
+           From 1600px up the roomy padding has 28px to spare on its own. */
+        @media (min-width: 961px) and (max-width: 1599px) {
+          .cm-frow:not(.cm-frow-contained):not(.cm-frow-split) > div:last-child > div {
+            padding: 40px 5% !important;
+          }
+        }
+        @media (max-width: 960px) {
+          /* Stacked: the row is content-height, and the image keeps a fixed
+             ratio of its own so every stacked row still matches the others. */
+          .cm-frow { flex-direction: column !important; min-height: 0 !important; }
+          /* flex-basis becomes HEIGHT in column direction — reset it */
+          .cm-frow > div { flex-basis: auto !important; }
+          .cm-frow:not(.cm-frow-contained) > div:first-child {
+            aspect-ratio: 16 / 9;
+            min-height: 0 !important;
+          }
+        }
+      </style><div class="cm-frow" style="display:flex;flex-direction:row;min-height:460px;max-width:100%;gap:0;align-items:stretch"><div style="flex:1;min-width:0;position:relative;overflow:hidden;min-height:300px"><img src="/media/home/support.webp" alt="Cup Manager-supporten" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;display:block"/></div><div style="flex:1;min-width:0;display:flex;align-items:center;background-color:#fff"><div style="padding:60px 7%;max-width:1000px"><div><p style="font-size:12px;font-weight:500;letter-spacing:0.12em;color:#aaa;text-transform:uppercase;margin-bottom:10px;font-family:var(--font-body, Roboto, sans-serif)">VI ÄR STOLTA ÖVER VÅR SUPPORT</p><h2 style="font-size:clamp(1.4rem, 2.5vw, 2rem);font-weight:700;color:#1a1a1a;margin-bottom:16px;line-height:1.2;font-family:var(--font-heading, Montserrat, sans-serif)">Support i världsklass</h2><div style="width:60px;height:2px;background-color:#1a1a1a;margin-bottom:20px"></div><div style="color:#555;font-size:15px;line-height:1.7;margin-bottom:28px;font-family:var(--font-body, Roboto, sans-serif)"><style>
+.cm-rich > *:first-child { margin-top: 0; }
+.cm-rich > *:last-child { margin-bottom: 0; }
+.cm-rich p { margin: 0 0 0.9em; }
+.cm-rich ul { list-style: disc; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich ol { list-style: decimal; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich li { margin: 0.3em 0; }
+.cm-rich a { color: var(--brand); text-decoration: none; }
+.cm-rich a:hover { text-decoration: underline; }
+.cm-rich strong { font-weight: 700; }
+.cm-rich blockquote { border-left: 3px solid var(--brand); padding-left: 1em; margin: 1em 0; font-style: italic; opacity: 0.85; }
+.cm-rich h3, .cm-rich h4 { font-weight: 700; margin: 1.2em 0 0.5em; font-family: var(--font-heading, Montserrat, sans-serif); }
+.cm-rich h3 { font-size: 1.25em; }
+.cm-rich h4 { font-size: 1.1em; }
+.cm-rich table { border-collapse: collapse; margin: 1em 0; }
+.cm-rich th, .cm-rich td { border: 1px solid #d5d5d5; padding: 5px 10px; text-align: center; }
+.cm-rich th { background: rgba(0,0,0,0.045); font-weight: 700; }
+.cm-rich img { max-width: 100%; height: auto; }
+.cm-rich hr { border: none; border-top: 1px solid rgba(0,0,0,0.12); margin: 1.4em 0; }
+</style><div class="cm-rich"><p>Den kanske mest definierande delen av Cup Manager är vår support. Vi arbetar hårt för att alla i företaget har som yttersta mål att hjälpa våra kunder. Vi finns tillgängliga varje dag för att hjälpa er med allt från enskilda frågor till att assistera med spelschema och rådgivning.</p></div></div><a href="/sv/support/" style="display:inline-flex;align-items:center;gap:8px;background-color:var(--brand);color:#fff;border-radius:3px;font-family:var(--font-body, Roboto, sans-serif);font-weight:300;text-decoration:none;font-size:15px;padding:8px 20px">Läs mer om vår support här<!-- --> <span style="font-size:18px;line-height:1">→</span></a></div></div></div></div></section>
+<section style="background-color:#f5f5f5;padding:0"><style>
+        /* Side by side only while the copy still fits the fixed-ratio row.
+           Measured on the longest row of the start page: against the 460px box
+           the roomy padding leaves just 3px of slack from 1441px to 1560px and
+           overflows below that, so the tighter padding covers everything up to
+           1599px and buys back the ~60px that makes the copy fit down to 960px.
+           From 1600px up the roomy padding has 28px to spare on its own. */
+        @media (min-width: 961px) and (max-width: 1599px) {
+          .cm-frow:not(.cm-frow-contained):not(.cm-frow-split) > div:last-child > div {
+            padding: 40px 5% !important;
+          }
+        }
+        @media (max-width: 960px) {
+          /* Stacked: the row is content-height, and the image keeps a fixed
+             ratio of its own so every stacked row still matches the others. */
+          .cm-frow { flex-direction: column !important; min-height: 0 !important; }
+          /* flex-basis becomes HEIGHT in column direction — reset it */
+          .cm-frow > div { flex-basis: auto !important; }
+          .cm-frow:not(.cm-frow-contained) > div:first-child {
+            aspect-ratio: 16 / 9;
+            min-height: 0 !important;
+          }
+        }
+      </style><div class="cm-frow" style="display:flex;flex-direction:row-reverse;min-height:460px;max-width:100%;gap:0;align-items:stretch"><div style="flex:1;min-width:0;position:relative;overflow:hidden;min-height:300px"><img src="/media/home/klarna_cupmanager-3.webp" alt="Betalning med Klarna i Cup Manager" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:left center;display:block"/></div><div style="flex:1;min-width:0;display:flex;align-items:center;background-color:#f5f5f5"><div style="padding:60px 7%;max-width:1000px"><div><p style="font-size:12px;font-weight:500;letter-spacing:0.12em;color:#aaa;text-transform:uppercase;margin-bottom:10px;font-family:var(--font-body, Roboto, sans-serif)">ENKLA BETALLÖSNINGAR</p><h2 style="font-size:clamp(1.4rem, 2.5vw, 2rem);font-weight:700;color:#1a1a1a;margin-bottom:16px;line-height:1.2;font-family:var(--font-heading, Montserrat, sans-serif)">Ta enkelt betalt med kort, Klarna eller Swish</h2><div style="width:60px;height:2px;background-color:#1a1a1a;margin-bottom:20px"></div><div style="color:#555;font-size:15px;line-height:1.7;margin-bottom:28px;font-family:var(--font-body, Roboto, sans-serif)"><style>
+.cm-rich > *:first-child { margin-top: 0; }
+.cm-rich > *:last-child { margin-bottom: 0; }
+.cm-rich p { margin: 0 0 0.9em; }
+.cm-rich ul { list-style: disc; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich ol { list-style: decimal; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich li { margin: 0.3em 0; }
+.cm-rich a { color: var(--brand); text-decoration: none; }
+.cm-rich a:hover { text-decoration: underline; }
+.cm-rich strong { font-weight: 700; }
+.cm-rich blockquote { border-left: 3px solid var(--brand); padding-left: 1em; margin: 1em 0; font-style: italic; opacity: 0.85; }
+.cm-rich h3, .cm-rich h4 { font-weight: 700; margin: 1.2em 0 0.5em; font-family: var(--font-heading, Montserrat, sans-serif); }
+.cm-rich h3 { font-size: 1.25em; }
+.cm-rich h4 { font-size: 1.1em; }
+.cm-rich table { border-collapse: collapse; margin: 1em 0; }
+.cm-rich th, .cm-rich td { border: 1px solid #d5d5d5; padding: 5px 10px; text-align: center; }
+.cm-rich th { background: rgba(0,0,0,0.045); font-weight: 700; }
+.cm-rich img { max-width: 100%; height: auto; }
+.cm-rich hr { border: none; border-top: 1px solid rgba(0,0,0,0.12); margin: 1.4em 0; }
+</style><div class="cm-rich"><p>Med vår moderna betallösning kan ni slippa alla bankbetalningar. Låt lagen betala med kort eller Klarna vilket gör att betalningarna registreras automatiskt i systemet och ni får era pengar direkt.</p></div></div><a href="/sv/kort-och-klarna/" style="display:inline-flex;align-items:center;gap:8px;background-color:var(--brand);color:#fff;border-radius:3px;font-family:var(--font-body, Roboto, sans-serif);font-weight:300;text-decoration:none;font-size:15px;padding:8px 20px">Läs mer om vår betallösning<!-- --> <span style="font-size:18px;line-height:1">→</span></a></div></div></div></div></section>
+<section style="background-color:#fff;padding:0"><style>
+        /* Side by side only while the copy still fits the fixed-ratio row.
+           Measured on the longest row of the start page: against the 460px box
+           the roomy padding leaves just 3px of slack from 1441px to 1560px and
+           overflows below that, so the tighter padding covers everything up to
+           1599px and buys back the ~60px that makes the copy fit down to 960px.
+           From 1600px up the roomy padding has 28px to spare on its own. */
+        @media (min-width: 961px) and (max-width: 1599px) {
+          .cm-frow:not(.cm-frow-contained):not(.cm-frow-split) > div:last-child > div {
+            padding: 40px 5% !important;
+          }
+        }
+        @media (max-width: 960px) {
+          /* Stacked: the row is content-height, and the image keeps a fixed
+             ratio of its own so every stacked row still matches the others. */
+          .cm-frow { flex-direction: column !important; min-height: 0 !important; }
+          /* flex-basis becomes HEIGHT in column direction — reset it */
+          .cm-frow > div { flex-basis: auto !important; }
+          .cm-frow:not(.cm-frow-contained) > div:first-child {
+            aspect-ratio: 16 / 9;
+            min-height: 0 !important;
+          }
+        }
+      </style><div class="cm-frow" style="display:flex;flex-direction:row;min-height:460px;max-width:100%;gap:0;align-items:stretch"><div style="flex:1;min-width:0;position:relative;overflow:hidden;min-height:300px"><img src="/media/home/usp-mobile-app.jpg" alt="Egen mobilapp för turneringen" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;display:block"/></div><div style="flex:1;min-width:0;display:flex;align-items:center;background-color:#fff"><div style="padding:60px 7%;max-width:1000px"><div><p style="font-size:12px;font-weight:500;letter-spacing:0.12em;color:#aaa;text-transform:uppercase;margin-bottom:10px;font-family:var(--font-body, Roboto, sans-serif)">ENGAGERA ERA BESÖKARE</p><h2 style="font-size:clamp(1.4rem, 2.5vw, 2rem);font-weight:700;color:#1a1a1a;margin-bottom:16px;line-height:1.2;font-family:var(--font-heading, Montserrat, sans-serif)">Er egen mobilapp för Android och iPhone</h2><div style="width:60px;height:2px;background-color:#1a1a1a;margin-bottom:20px"></div><div style="color:#555;font-size:15px;line-height:1.7;margin-bottom:28px;font-family:var(--font-body, Roboto, sans-serif)"><style>
+.cm-rich > *:first-child { margin-top: 0; }
+.cm-rich > *:last-child { margin-bottom: 0; }
+.cm-rich p { margin: 0 0 0.9em; }
+.cm-rich ul { list-style: disc; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich ol { list-style: decimal; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich li { margin: 0.3em 0; }
+.cm-rich a { color: var(--brand); text-decoration: none; }
+.cm-rich a:hover { text-decoration: underline; }
+.cm-rich strong { font-weight: 700; }
+.cm-rich blockquote { border-left: 3px solid var(--brand); padding-left: 1em; margin: 1em 0; font-style: italic; opacity: 0.85; }
+.cm-rich h3, .cm-rich h4 { font-weight: 700; margin: 1.2em 0 0.5em; font-family: var(--font-heading, Montserrat, sans-serif); }
+.cm-rich h3 { font-size: 1.25em; }
+.cm-rich h4 { font-size: 1.1em; }
+.cm-rich table { border-collapse: collapse; margin: 1em 0; }
+.cm-rich th, .cm-rich td { border: 1px solid #d5d5d5; padding: 5px 10px; text-align: center; }
+.cm-rich th { background: rgba(0,0,0,0.045); font-weight: 700; }
+.cm-rich img { max-width: 100%; height: auto; }
+.cm-rich hr { border: none; border-top: 1px solid rgba(0,0,0,0.12); margin: 1.4em 0; }
+</style><div class="cm-rich"><p>Vi kan hjälpa er att få er egen mobilapp för turneringen. Vi gör allt arbete med att utveckla appen och den blir sedan kopplad till turneringen i Cup Manager vilket gör att ni kan administrera allt från ett och samma ställe.</p></div></div><a href="/sv/app/" style="display:inline-flex;align-items:center;gap:8px;background-color:var(--brand);color:#fff;border-radius:3px;font-family:var(--font-body, Roboto, sans-serif);font-weight:300;text-decoration:none;font-size:15px;padding:8px 20px">Skaffa en app för er turnering<!-- --> <span style="font-size:18px;line-height:1">→</span></a></div></div></div></div></section>
+<section style="padding:20px 7%"><div style="max-width:1140px;margin:0 auto;background-color:transparent;padding:20px 28px;text-align:left;border-radius:3px"><h2 style="font-family:var(--font-heading, Montserrat, sans-serif);font-weight:700;font-size:clamp(1.3rem, 2.2vw, 1.8rem);color:var(--brand);margin:0;line-height:1.3">Mer information för den intresserade</h2></div></section>
+<section style="padding:40px 7%;background-color:transparent"><style>
+        .cm-cols-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 48px; max-width: 1140px; margin: 0 auto; text-align: left; }
+        /* In the editor Puck wraps the columns in a DropZone. display:contents
+           would make them cells of the grid above, but it also discards the
+           DropZone's own box — 0x0 while empty, so Puck's own min-height cannot
+           apply and a freshly dropped CmColumns cannot be filled at all: the
+           dragged block just relocates elsewhere on the page. The DropZone is
+           the grid instead, spanning the outer tracks and repeating them
+           inside. The rendered page has no DropZone, so there the rule above
+           does the work. */
+        .cm-cols-2 > [class*="DropZone"] {
+          grid-column: 1 / -1;
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
+          gap: 48px;
+        }
+        @media (max-width: 640px) {
+          .cm-cols-2 { grid-template-columns: 1fr; max-width: 100%; }
+          .cm-cols-2 > [class*="DropZone"] { grid-template-columns: 1fr; }
+        }
+      </style><div class="cm-cols-2"><div><style>.cm-col-heading:has(> [data-puck-overlay-portal]:empty) { display: none; }</style><h2 class="cm-col-heading" style="color:#1a1a1a;font-size:1.5rem;font-weight:700;margin-bottom:24px;font-family:var(--font-heading, Montserrat, sans-serif)">Viktiga funktioner</h2><div class="py-4 max-w-2xl mx-auto text-left"><div class="text-gray-700 leading-relaxed"><style>
+.cm-rich > *:first-child { margin-top: 0; }
+.cm-rich > *:last-child { margin-bottom: 0; }
+.cm-rich p { margin: 0 0 0.9em; }
+.cm-rich ul { list-style: disc; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich ol { list-style: decimal; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich li { margin: 0.3em 0; }
+.cm-rich a { color: var(--brand); text-decoration: none; }
+.cm-rich a:hover { text-decoration: underline; }
+.cm-rich strong { font-weight: 700; }
+.cm-rich blockquote { border-left: 3px solid var(--brand); padding-left: 1em; margin: 1em 0; font-style: italic; opacity: 0.85; }
+.cm-rich h3, .cm-rich h4 { font-weight: 700; margin: 1.2em 0 0.5em; font-family: var(--font-heading, Montserrat, sans-serif); }
+.cm-rich h3 { font-size: 1.25em; }
+.cm-rich h4 { font-size: 1.1em; }
+.cm-rich table { border-collapse: collapse; margin: 1em 0; }
+.cm-rich th, .cm-rich td { border: 1px solid #d5d5d5; padding: 5px 10px; text-align: center; }
+.cm-rich th { background: rgba(0,0,0,0.045); font-weight: 700; }
+.cm-rich img { max-width: 100%; height: auto; }
+.cm-rich hr { border: none; border-top: 1px solid rgba(0,0,0,0.12); margin: 1.4em 0; }
+</style><div class="cm-rich"><p>Missa inte att vi också har häftiga funktioner som liveresultat, livestreaming, egen hemsida för turneringen, boende &amp; mat, domare, SMS-utskick och incheckning.</p></div></div></div><style>.cm-btn-green:hover{background-color:#369929!important}</style><a href="/sv/missa-inte/" class="cm-btn-green" style="display:inline-flex;align-items:center;gap:8px;background-color:var(--brand);color:#fff;border-radius:3px;font-family:var(--font-body, Roboto, sans-serif);font-weight:300;text-decoration:none;font-size:15px;padding:8px 20px;margin:4px">Läs mer om våra funktioner</a></div><div><style>.cm-col-heading:has(> [data-puck-overlay-portal]:empty) { display: none; }</style><h2 class="cm-col-heading" style="color:#1a1a1a;font-size:1.5rem;font-weight:700;margin-bottom:24px;font-family:var(--font-heading, Montserrat, sans-serif)">För turneringsnörden</h2><div class="py-4 max-w-2xl mx-auto text-left"><div class="text-gray-700 leading-relaxed"><style>
+.cm-rich > *:first-child { margin-top: 0; }
+.cm-rich > *:last-child { margin-bottom: 0; }
+.cm-rich p { margin: 0 0 0.9em; }
+.cm-rich ul { list-style: disc; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich ol { list-style: decimal; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich li { margin: 0.3em 0; }
+.cm-rich a { color: var(--brand); text-decoration: none; }
+.cm-rich a:hover { text-decoration: underline; }
+.cm-rich strong { font-weight: 700; }
+.cm-rich blockquote { border-left: 3px solid var(--brand); padding-left: 1em; margin: 1em 0; font-style: italic; opacity: 0.85; }
+.cm-rich h3, .cm-rich h4 { font-weight: 700; margin: 1.2em 0 0.5em; font-family: var(--font-heading, Montserrat, sans-serif); }
+.cm-rich h3 { font-size: 1.25em; }
+.cm-rich h4 { font-size: 1.1em; }
+.cm-rich table { border-collapse: collapse; margin: 1em 0; }
+.cm-rich th, .cm-rich td { border: 1px solid #d5d5d5; padding: 5px 10px; text-align: center; }
+.cm-rich th { background: rgba(0,0,0,0.045); font-weight: 700; }
+.cm-rich img { max-width: 100%; height: auto; }
+.cm-rich hr { border: none; border-top: 1px solid rgba(0,0,0,0.12); margin: 1.4em 0; }
+</style><div class="cm-rich"><p>I bakgrunden kör vi en del smarta algoritmer för att skapa så bra förutsättningar för administratören som möjligt. Visste du till exempel att vi automatiskt delar in lag i grupper efter geografiska avstånd så det blir så intressanta matcher som möjligt?</p></div></div></div><style>.cm-btn-green:hover{background-color:#369929!important}</style><a href="/sv/for-norden/" class="cm-btn-green" style="display:inline-flex;align-items:center;gap:8px;background-color:var(--brand);color:#fff;border-radius:3px;font-family:var(--font-body, Roboto, sans-serif);font-weight:300;text-decoration:none;font-size:15px;padding:8px 20px;margin:4px">Läs fördjupad fakta</a></div><div><style>.cm-col-heading:has(> [data-puck-overlay-portal]:empty) { display: none; }</style><h2 class="cm-col-heading" style="color:#1a1a1a;font-size:1.5rem;font-weight:700;margin-bottom:24px;font-family:var(--font-heading, Montserrat, sans-serif)">Fler smarta funktioner</h2><div class="py-4 max-w-2xl mx-auto text-left"><div class="text-gray-700 leading-relaxed"><style>
+.cm-rich > *:first-child { margin-top: 0; }
+.cm-rich > *:last-child { margin-bottom: 0; }
+.cm-rich p { margin: 0 0 0.9em; }
+.cm-rich ul { list-style: disc; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich ol { list-style: decimal; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich li { margin: 0.3em 0; }
+.cm-rich a { color: var(--brand); text-decoration: none; }
+.cm-rich a:hover { text-decoration: underline; }
+.cm-rich strong { font-weight: 700; }
+.cm-rich blockquote { border-left: 3px solid var(--brand); padding-left: 1em; margin: 1em 0; font-style: italic; opacity: 0.85; }
+.cm-rich h3, .cm-rich h4 { font-weight: 700; margin: 1.2em 0 0.5em; font-family: var(--font-heading, Montserrat, sans-serif); }
+.cm-rich h3 { font-size: 1.25em; }
+.cm-rich h4 { font-size: 1.1em; }
+.cm-rich table { border-collapse: collapse; margin: 1em 0; }
+.cm-rich th, .cm-rich td { border: 1px solid #d5d5d5; padding: 5px 10px; text-align: center; }
+.cm-rich th { background: rgba(0,0,0,0.045); font-weight: 700; }
+.cm-rich img { max-width: 100%; height: auto; }
+.cm-rich hr { border: none; border-top: 1px solid rgba(0,0,0,0.12); margin: 1.4em 0; }
+</style><div class="cm-rich"><p>Vi försöker alltid tänka igenom våra funktioner så de får det där lilla extra. Några är vi extra stolta över, som att om man slår ihop två klasser finns de ursprungliga klasserna i bakgrunden, utifall att man skulle ångra sig. Smart va?</p></div></div></div><style>.cm-btn-green:hover{background-color:#369929!important}</style><a href="/sv/smarta-funktioner/" class="cm-btn-green" style="display:inline-flex;align-items:center;gap:8px;background-color:var(--brand);color:#fff;border-radius:3px;font-family:var(--font-body, Roboto, sans-serif);font-weight:300;text-decoration:none;font-size:15px;padding:8px 20px;margin:4px">Läs mer smarta extrafunktioner</a></div><div><style>.cm-col-heading:has(> [data-puck-overlay-portal]:empty) { display: none; }</style><h2 class="cm-col-heading" style="color:#1a1a1a;font-size:1.5rem;font-weight:700;margin-bottom:24px;font-family:var(--font-heading, Montserrat, sans-serif)">Prissättning</h2><div class="py-4 max-w-2xl mx-auto text-left"><div class="text-gray-700 leading-relaxed"><style>
+.cm-rich > *:first-child { margin-top: 0; }
+.cm-rich > *:last-child { margin-bottom: 0; }
+.cm-rich p { margin: 0 0 0.9em; }
+.cm-rich ul { list-style: disc; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich ol { list-style: decimal; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich li { margin: 0.3em 0; }
+.cm-rich a { color: var(--brand); text-decoration: none; }
+.cm-rich a:hover { text-decoration: underline; }
+.cm-rich strong { font-weight: 700; }
+.cm-rich blockquote { border-left: 3px solid var(--brand); padding-left: 1em; margin: 1em 0; font-style: italic; opacity: 0.85; }
+.cm-rich h3, .cm-rich h4 { font-weight: 700; margin: 1.2em 0 0.5em; font-family: var(--font-heading, Montserrat, sans-serif); }
+.cm-rich h3 { font-size: 1.25em; }
+.cm-rich h4 { font-size: 1.1em; }
+.cm-rich table { border-collapse: collapse; margin: 1em 0; }
+.cm-rich th, .cm-rich td { border: 1px solid #d5d5d5; padding: 5px 10px; text-align: center; }
+.cm-rich th { background: rgba(0,0,0,0.045); font-weight: 700; }
+.cm-rich img { max-width: 100%; height: auto; }
+.cm-rich hr { border: none; border-top: 1px solid rgba(0,0,0,0.12); margin: 1.4em 0; }
+</style><div class="cm-rich"><p>Vi har en enkel prissättning som passar både små och stora turneringar i olika sporter. Förutom en lagbaserad licens finns det många extratjänster att välja till!</p></div></div></div><style>.cm-btn-green:hover{background-color:#369929!important}</style><a href="/sv/priser/" class="cm-btn-green" style="display:inline-flex;align-items:center;gap:8px;background-color:var(--brand);color:#fff;border-radius:3px;font-family:var(--font-body, Roboto, sans-serif);font-weight:300;text-decoration:none;font-size:15px;padding:8px 20px;margin:4px">Läs mer om våra priser</a></div></div></section>
+<section style="background-color:#f5f5f5;padding:0"><style>
+        /* Side by side only while the copy still fits the fixed-ratio row.
+           Measured on the longest row of the start page: against the 460px box
+           the roomy padding leaves just 3px of slack from 1441px to 1560px and
+           overflows below that, so the tighter padding covers everything up to
+           1599px and buys back the ~60px that makes the copy fit down to 960px.
+           From 1600px up the roomy padding has 28px to spare on its own. */
+        @media (min-width: 961px) and (max-width: 1599px) {
+          .cm-frow:not(.cm-frow-contained):not(.cm-frow-split) > div:last-child > div {
+            padding: 40px 5% !important;
+          }
+        }
+        @media (max-width: 960px) {
+          /* Stacked: the row is content-height, and the image keeps a fixed
+             ratio of its own so every stacked row still matches the others. */
+          .cm-frow { flex-direction: column !important; min-height: 0 !important; }
+          /* flex-basis becomes HEIGHT in column direction — reset it */
+          .cm-frow > div { flex-basis: auto !important; }
+          .cm-frow:not(.cm-frow-contained) > div:first-child {
+            aspect-ratio: 16 / 9;
+            min-height: 0 !important;
+          }
+        }
+      </style><div class="cm-frow" style="display:flex;flex-direction:row;min-height:460px;max-width:100%;gap:0;align-items:stretch"><div style="flex:1;min-width:0;position:relative;overflow:hidden;min-height:300px"><img src="/media/home/cupinsight-3.webp" alt="CupInsight – rapport och konferens" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;display:block"/></div><div style="flex:1;min-width:0;display:flex;align-items:center;background-color:#f5f5f5"><div style="padding:60px 7%;max-width:1000px"><div><p style="font-size:12px;font-weight:500;letter-spacing:0.12em;color:#aaa;text-transform:uppercase;margin-bottom:10px;font-family:var(--font-body, Roboto, sans-serif)">UTVECKLA DIN TURNERING</p><h2 style="font-size:clamp(1.4rem, 2.5vw, 2rem);font-weight:700;color:#1a1a1a;margin-bottom:16px;line-height:1.2;font-family:var(--font-heading, Montserrat, sans-serif)">CupInsight - Årlig rapport och konferens</h2><div style="width:60px;height:2px;background-color:#1a1a1a;margin-bottom:20px"></div><div style="color:#555;font-size:15px;line-height:1.7;margin-bottom:28px;font-family:var(--font-body, Roboto, sans-serif)"><style>
+.cm-rich > *:first-child { margin-top: 0; }
+.cm-rich > *:last-child { margin-bottom: 0; }
+.cm-rich p { margin: 0 0 0.9em; }
+.cm-rich ul { list-style: disc; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich ol { list-style: decimal; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich li { margin: 0.3em 0; }
+.cm-rich a { color: var(--brand); text-decoration: none; }
+.cm-rich a:hover { text-decoration: underline; }
+.cm-rich strong { font-weight: 700; }
+.cm-rich blockquote { border-left: 3px solid var(--brand); padding-left: 1em; margin: 1em 0; font-style: italic; opacity: 0.85; }
+.cm-rich h3, .cm-rich h4 { font-weight: 700; margin: 1.2em 0 0.5em; font-family: var(--font-heading, Montserrat, sans-serif); }
+.cm-rich h3 { font-size: 1.25em; }
+.cm-rich h4 { font-size: 1.1em; }
+.cm-rich table { border-collapse: collapse; margin: 1em 0; }
+.cm-rich th, .cm-rich td { border: 1px solid #d5d5d5; padding: 5px 10px; text-align: center; }
+.cm-rich th { background: rgba(0,0,0,0.045); font-weight: 700; }
+.cm-rich img { max-width: 100%; height: auto; }
+.cm-rich hr { border: none; border-top: 1px solid rgba(0,0,0,0.12); margin: 1.4em 0; }
+</style><div class="cm-rich"><p>Vårt mål med CupInsight är att ge våra arrangörer värdefulla insikter och verktyg för att ta turneringarna till nya höjder. Oavsett om det handlar om att förbättra kvaliteten eller öka omfattningen, hjälper CupInsight till att uppnå dessa mål. CupInsight består av två årliga delar: en rapport och en konferens. Dessa delar kommer att ge våra arrangörer de verktyg och den kunskap som tar deras turneringar till nästa nivå.</p></div></div><a href="https://cupinsight.cups.nu/" style="display:inline-flex;align-items:center;gap:8px;background-color:var(--brand);color:#fff;border-radius:3px;font-family:var(--font-body, Roboto, sans-serif);font-weight:300;text-decoration:none;font-size:15px;padding:8px 20px">Gå till CupInsight<!-- --> <span style="font-size:18px;line-height:1">→</span></a></div></div></div></div></section>
+<section style="background-color:#f5f5f5;padding:0"><style>
+        /* Side by side only while the copy still fits the fixed-ratio row.
+           Measured on the longest row of the start page: against the 460px box
+           the roomy padding leaves just 3px of slack from 1441px to 1560px and
+           overflows below that, so the tighter padding covers everything up to
+           1599px and buys back the ~60px that makes the copy fit down to 960px.
+           From 1600px up the roomy padding has 28px to spare on its own. */
+        @media (min-width: 961px) and (max-width: 1599px) {
+          .cm-frow:not(.cm-frow-contained):not(.cm-frow-split) > div:last-child > div {
+            padding: 40px 5% !important;
+          }
+        }
+        @media (max-width: 960px) {
+          /* Stacked: the row is content-height, and the image keeps a fixed
+             ratio of its own so every stacked row still matches the others. */
+          .cm-frow { flex-direction: column !important; min-height: 0 !important; }
+          /* flex-basis becomes HEIGHT in column direction — reset it */
+          .cm-frow > div { flex-basis: auto !important; }
+          .cm-frow:not(.cm-frow-contained) > div:first-child {
+            aspect-ratio: 16 / 9;
+            min-height: 0 !important;
+          }
+        }
+      </style><div class="cm-frow" style="display:flex;flex-direction:row-reverse;min-height:460px;max-width:100%;gap:0;align-items:stretch"><div style="flex:1;min-width:0;position:relative;overflow:hidden;min-height:300px"><img src="/media/home/si.jpg" alt="Superinvite" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;display:block"/></div><div style="flex:1;min-width:0;display:flex;align-items:center;background-color:#f5f5f5"><div style="padding:60px 7%;max-width:1000px"><div><p style="font-size:12px;font-weight:500;letter-spacing:0.12em;color:#aaa;text-transform:uppercase;margin-bottom:10px;font-family:var(--font-body, Roboto, sans-serif)">TA BETALT FÖR FÖRENINGEN</p><h2 style="font-size:clamp(1.4rem, 2.5vw, 2rem);font-weight:700;color:#1a1a1a;margin-bottom:16px;line-height:1.2;font-family:var(--font-heading, Montserrat, sans-serif)">Superinvite</h2><div style="width:60px;height:2px;background-color:#1a1a1a;margin-bottom:20px"></div><div style="color:#555;font-size:15px;line-height:1.7;margin-bottom:28px;font-family:var(--font-body, Roboto, sans-serif)"><style>
+.cm-rich > *:first-child { margin-top: 0; }
+.cm-rich > *:last-child { margin-bottom: 0; }
+.cm-rich p { margin: 0 0 0.9em; }
+.cm-rich ul { list-style: disc; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich ol { list-style: decimal; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich li { margin: 0.3em 0; }
+.cm-rich a { color: var(--brand); text-decoration: none; }
+.cm-rich a:hover { text-decoration: underline; }
+.cm-rich strong { font-weight: 700; }
+.cm-rich blockquote { border-left: 3px solid var(--brand); padding-left: 1em; margin: 1em 0; font-style: italic; opacity: 0.85; }
+.cm-rich h3, .cm-rich h4 { font-weight: 700; margin: 1.2em 0 0.5em; font-family: var(--font-heading, Montserrat, sans-serif); }
+.cm-rich h3 { font-size: 1.25em; }
+.cm-rich h4 { font-size: 1.1em; }
+.cm-rich table { border-collapse: collapse; margin: 1em 0; }
+.cm-rich th, .cm-rich td { border: 1px solid #d5d5d5; padding: 5px 10px; text-align: center; }
+.cm-rich th { background: rgba(0,0,0,0.045); font-weight: 700; }
+.cm-rich img { max-width: 100%; height: auto; }
+.cm-rich hr { border: none; border-top: 1px solid rgba(0,0,0,0.12); margin: 1.4em 0; }
+</style><div class="cm-rich"><p>Vår systerprodukt Superinvite används av uppemot 1000 klubbar för att samla in träningsavgifter och medlemsavgifter, i både Norge och Sverige. Systemet låter dig anpassa er insamling samtidigt som det är väldigt lättanvänt.</p><p>Har du ett fotbollscamp, träningsläger eller annat evenemang som du enkelt vill samla in pengar till? Kolla in Superinvite!</p></div></div><a href="https://www.superinvite.com/" style="display:inline-flex;align-items:center;gap:8px;background-color:var(--brand);color:#fff;border-radius:3px;font-family:var(--font-body, Roboto, sans-serif);font-weight:300;text-decoration:none;font-size:15px;padding:8px 20px">Läs mer om Superinvite<!-- --> <span style="font-size:18px;line-height:1">→</span></a></div></div></div></div></section>
+<section style="background-color:#f5f5f5;padding:0"><style>
+        /* Side by side only while the copy still fits the fixed-ratio row.
+           Measured on the longest row of the start page: against the 460px box
+           the roomy padding leaves just 3px of slack from 1441px to 1560px and
+           overflows below that, so the tighter padding covers everything up to
+           1599px and buys back the ~60px that makes the copy fit down to 960px.
+           From 1600px up the roomy padding has 28px to spare on its own. */
+        @media (min-width: 961px) and (max-width: 1599px) {
+          .cm-frow:not(.cm-frow-contained):not(.cm-frow-split) > div:last-child > div {
+            padding: 40px 5% !important;
+          }
+        }
+        @media (max-width: 960px) {
+          /* Stacked: the row is content-height, and the image keeps a fixed
+             ratio of its own so every stacked row still matches the others. */
+          .cm-frow { flex-direction: column !important; min-height: 0 !important; }
+          /* flex-basis becomes HEIGHT in column direction — reset it */
+          .cm-frow > div { flex-basis: auto !important; }
+          .cm-frow:not(.cm-frow-contained) > div:first-child {
+            aspect-ratio: 16 / 9;
+            min-height: 0 !important;
+          }
+        }
+      </style><div class="cm-frow" style="display:flex;flex-direction:row;min-height:460px;max-width:100%;gap:0;align-items:stretch"><div style="flex:1;min-width:0;position:relative;overflow:hidden;min-height:300px"><img src="/media/home/EastAfricaCup_v2.webp" alt="East Africa Cup" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;display:block"/></div><div style="flex:1;min-width:0;display:flex;align-items:center;background-color:#f5f5f5"><div style="padding:60px 7%;max-width:1000px"><div><p style="font-size:12px;font-weight:500;letter-spacing:0.12em;color:#aaa;text-transform:uppercase;margin-bottom:10px;font-family:var(--font-body, Roboto, sans-serif)">IDROTT ÄR VIKTIGT I EN GLOBAL VÄRLD</p><h2 style="font-size:clamp(1.4rem, 2.5vw, 2rem);font-weight:700;color:#1a1a1a;margin-bottom:16px;line-height:1.2;font-family:var(--font-heading, Montserrat, sans-serif)">Gemenskap, hopp och utveckling – både här hemma och i Östafrika.</h2><div style="width:60px;height:2px;background-color:#1a1a1a;margin-bottom:20px"></div><div style="color:#555;font-size:15px;line-height:1.7;margin-bottom:28px;font-family:var(--font-body, Roboto, sans-serif)"><style>
+.cm-rich > *:first-child { margin-top: 0; }
+.cm-rich > *:last-child { margin-bottom: 0; }
+.cm-rich p { margin: 0 0 0.9em; }
+.cm-rich ul { list-style: disc; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich ol { list-style: decimal; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich li { margin: 0.3em 0; }
+.cm-rich a { color: var(--brand); text-decoration: none; }
+.cm-rich a:hover { text-decoration: underline; }
+.cm-rich strong { font-weight: 700; }
+.cm-rich blockquote { border-left: 3px solid var(--brand); padding-left: 1em; margin: 1em 0; font-style: italic; opacity: 0.85; }
+.cm-rich h3, .cm-rich h4 { font-weight: 700; margin: 1.2em 0 0.5em; font-family: var(--font-heading, Montserrat, sans-serif); }
+.cm-rich h3 { font-size: 1.25em; }
+.cm-rich h4 { font-size: 1.1em; }
+.cm-rich table { border-collapse: collapse; margin: 1em 0; }
+.cm-rich th, .cm-rich td { border: 1px solid #d5d5d5; padding: 5px 10px; text-align: center; }
+.cm-rich th { background: rgba(0,0,0,0.045); font-weight: 700; }
+.cm-rich img { max-width: 100%; height: auto; }
+.cm-rich hr { border: none; border-top: 1px solid rgba(0,0,0,0.12); margin: 1.4em 0; }
+</style><div class="cm-rich"><p>Vi samarbetar med East Africa Cup (EAC), en årlig ungdomsfestival i Tanzania som stärker unga genom idrott, utbildning och samhällsengagemang.</p></div></div><a href="/sv/east-africa-cup/" style="display:inline-flex;align-items:center;gap:8px;background-color:var(--brand);color:#fff;border-radius:3px;font-family:var(--font-body, Roboto, sans-serif);font-weight:300;text-decoration:none;font-size:15px;padding:8px 20px">Läs mer om samarbetet<!-- --> <span style="font-size:18px;line-height:1">→</span></a></div></div></div></div></section>
+<header style="padding:51px 40px 20px"><h2 style="margin:0;font-size:28px;font-weight:700;font-family:var(--font-heading, Montserrat, sans-serif);color:#1a1a1a;text-align:center">Några av våra härliga kunder</h2></header>
+<section style="padding:40px 40px;background-color:#fff;overflow:hidden"><div style="display:flex;flex-wrap:wrap;gap:40px 40px;align-items:center;justify-content:center"><div style="display:flex;align-items:center;justify-content:center;height:100px;width:130px"><img src="/media/x1000w-gothiacup-main-pos-rgb.png" alt="Gothia Cup" style="max-height:100px;max-width:130px;object-fit:contain;filter:grayscale(0.3)"/></div><div style="display:flex;align-items:center;justify-content:center;height:100px;width:130px"><img src="/media/lun-logo-c-rgb.png" alt="Lundaspelen" style="max-height:100px;max-width:130px;object-fit:contain;filter:grayscale(0.3)"/></div><div style="display:flex;align-items:center;justify-content:center;height:100px;width:130px"><img src="/media/home/logos/NorwayCup.png" alt="Norway Cup" style="max-height:100px;max-width:130px;object-fit:contain;filter:grayscale(0.3)"/></div><div style="display:flex;align-items:center;justify-content:center;height:100px;width:130px"><img src="/media/ahus-beach-ab-logo.jpg" alt="Åhus Beach" style="max-height:100px;max-width:130px;object-fit:contain;filter:grayscale(0.3)"/></div><div style="display:flex;align-items:center;justify-content:center;height:100px;width:130px"><img src="/media/images-2.jpg" alt="Storsjöcupen" style="max-height:100px;max-width:130px;object-fit:contain;filter:grayscale(0.3)"/></div><div style="display:flex;align-items:center;justify-content:center;height:100px;width:130px"><img src="/media/49689245-904a-4044-b75d-49c1ae57c67b.jpg" alt="Göteborg Cup" style="max-height:100px;max-width:130px;object-fit:contain;filter:grayscale(0.3)"/></div><div style="display:flex;align-items:center;justify-content:center;height:100px;width:130px"><img src="/media/home/logos/skadevi.png" alt="Skadevi handbollscup" style="max-height:100px;max-width:130px;object-fit:contain;filter:grayscale(0.3)"/></div><div style="display:flex;align-items:center;justify-content:center;height:100px;width:130px"><img src="/media/images-1.jpg" alt="Eskilscupen" style="max-height:100px;max-width:130px;object-fit:contain;filter:grayscale(0.3)"/></div><div style="display:flex;align-items:center;justify-content:center;height:100px;width:130px"><img src="/media/1d8a290c-7168-48eb-99dc-9d8f79e462fe.png" alt="Bohus Cup" style="max-height:100px;max-width:130px;object-fit:contain;filter:grayscale(0.3)"/></div><div style="display:flex;align-items:center;justify-content:center;height:100px;width:130px"><img src="/media/psg-clean-color-crop0x0x1000x1000.png" alt="Piteå Summer Games" style="max-height:100px;max-width:130px;object-fit:contain;filter:grayscale(0.3)"/></div><div style="display:flex;align-items:center;justify-content:center;height:100px;width:130px"><img src="/media/weblogo-nyttformat-1-crop23x36x960x949.png" alt="Future Cup" style="max-height:100px;max-width:130px;object-fit:contain;filter:grayscale(0.3)"/></div><div style="display:flex;align-items:center;justify-content:center;height:100px;width:130px"><img src="/media/storvretacupen.jpg" alt="Storvretacuppen" style="max-height:100px;max-width:130px;object-fit:contain;filter:grayscale(0.3)"/></div><div style="display:flex;align-items:center;justify-content:center;height:100px;width:130px"><img src="/media/f669edd2-edc1-4652-a2e9-7c6fb179cc42.jpg" alt="Partille World Cup" style="max-height:100px;max-width:130px;object-fit:contain;filter:grayscale(0.3)"/></div><div style="display:flex;align-items:center;justify-content:center;height:100px;width:130px"><img src="/media/logo-large-crop0x0x1000x1000-1000--.png" alt="Göteborg Basket Festival" style="max-height:100px;max-width:130px;object-fit:contain;filter:grayscale(0.3)"/></div><div style="display:flex;align-items:center;justify-content:center;height:100px;width:130px"><img src="/media/orebrocupen-logo.png" alt="Örebrocupen" style="max-height:100px;max-width:130px;object-fit:contain;filter:grayscale(0.3)"/></div><div style="display:flex;align-items:center;justify-content:center;height:100px;width:130px"><img src="/media/eken.jpg" alt="Eken Cup" style="max-height:100px;max-width:130px;object-fit:contain;filter:grayscale(0.3)"/></div><div style="display:flex;align-items:center;justify-content:center;height:100px;width:130px"><img src="/media/7e6f90d7-4693-468e-adbe-341c3b5cac01.png" alt="Hallbybollen" style="max-height:100px;max-width:130px;object-fit:contain;filter:grayscale(0.3)"/></div><div style="display:flex;align-items:center;justify-content:center;height:100px;width:130px"><img src="/media/unnamed-1.webp" alt="Umeå Fotbollsfestival" style="max-height:100px;max-width:130px;object-fit:contain;filter:grayscale(0.3)"/></div><div style="display:flex;align-items:center;justify-content:center;height:100px;width:130px"><img src="/media/irstablixten-liggande-crop0x0x1000x1000.png" alt="IrstaBlixten" style="max-height:100px;max-width:130px;object-fit:contain;filter:grayscale(0.3)"/></div><div style="display:flex;align-items:center;justify-content:center;height:100px;width:130px"><img src="/media/1-500-crop0x200x1000x646.jpg" alt="Mid Nordic Cup" style="max-height:100px;max-width:130px;object-fit:contain;filter:grayscale(0.3)"/></div><div style="display:flex;align-items:center;justify-content:center;height:100px;width:130px"><img src="/media/aovb1200-300x124-crop0x48x1000x891.png" alt="Ängelholm Outdoor" style="max-height:100px;max-width:130px;object-fit:contain;filter:grayscale(0.3)"/></div><div style="display:flex;align-items:center;justify-content:center;height:100px;width:130px"><img src="/media/42d899e3-d769-4242-96da-25c6801b3b5d.jpg" alt="Floorball Games" style="max-height:100px;max-width:130px;object-fit:contain;filter:grayscale(0.3)"/></div><div style="display:flex;align-items:center;justify-content:center;height:100px;width:130px"><img src="/media/dc-edc-v-crop0x0x1000x1000.png" alt="Dalecarlia" style="max-height:100px;max-width:130px;object-fit:contain;filter:grayscale(0.3)"/></div><div style="display:flex;align-items:center;justify-content:center;height:100px;width:130px"><img src="/media/namnlas-9-crop100x100x812x801.png" alt="Mälarenergi Cup" style="max-height:100px;max-width:130px;object-fit:contain;filter:grayscale(0.3)"/></div><div style="display:flex;align-items:center;justify-content:center;height:100px;width:130px"><img src="/media/hudik.jpg" alt="Hudik Cup" style="max-height:100px;max-width:130px;object-fit:contain;filter:grayscale(0.3)"/></div><div style="display:flex;align-items:center;justify-content:center;height:100px;width:130px"><img src="/media/warberg.jpg" alt="Warbergsspelen" style="max-height:100px;max-width:130px;object-fit:contain;filter:grayscale(0.3)"/></div><div style="display:flex;align-items:center;justify-content:center;height:100px;width:130px"><img src="/media/select.png" alt="Select Cup" style="max-height:100px;max-width:130px;object-fit:contain;filter:grayscale(0.3)"/></div><div style="display:flex;align-items:center;justify-content:center;height:100px;width:130px"><img src="/media/home/logos/logga_Etuna.png" alt="Etuna Basket Cup" style="max-height:100px;max-width:130px;object-fit:contain;filter:grayscale(0.3)"/></div><div style="display:flex;align-items:center;justify-content:center;height:100px;width:130px"><img src="/media/sfc-logo-sma-format-rgb-guld-hemsidan2-crop0x12x981x981.png" alt="STockholm Football Cup" style="max-height:100px;max-width:130px;object-fit:contain;filter:grayscale(0.3)"/></div><div style="display:flex;align-items:center;justify-content:center;height:100px;width:130px"><img src="/media/laxacupen2020-crop217x183x591x678.jpg" alt="Laxacupen" style="max-height:100px;max-width:130px;object-fit:contain;filter:grayscale(0.3)"/></div><div style="display:flex;align-items:center;justify-content:center;height:100px;width:130px"><img src="/media/logga-crop128x133x762x728.png" alt="Nordic Youth Trophy" style="max-height:100px;max-width:130px;object-fit:contain;filter:grayscale(0.3)"/></div><div style="display:flex;align-items:center;justify-content:center;height:100px;width:130px"><img src="/media/sibben.png" alt="Sibben Cup" style="max-height:100px;max-width:130px;object-fit:contain;filter:grayscale(0.3)"/></div><div style="display:flex;align-items:center;justify-content:center;height:100px;width:130px"><img src="/media/potatis.jpg" alt="Potatiscupen" style="max-height:100px;max-width:130px;object-fit:contain;filter:grayscale(0.3)"/></div><div style="display:flex;align-items:center;justify-content:center;height:100px;width:130px"><img src="/media/arvikacup-crop0x47x1000x806.jpg" alt="Arvika Cup" style="max-height:100px;max-width:130px;object-fit:contain;filter:grayscale(0.3)"/></div><div style="display:flex;align-items:center;justify-content:center;height:100px;width:130px"><img src="/media/fredag2411-23-crop0x133x1000x744.jpg" alt="Helltop cup" style="max-height:100px;max-width:130px;object-fit:contain;filter:grayscale(0.3)"/></div><div style="display:flex;align-items:center;justify-content:center;height:100px;width:130px"><img src="/media/headerbild-1000-.png" alt="Hovet Cup" style="max-height:100px;max-width:130px;object-fit:contain;filter:grayscale(0.3)"/></div><div style="display:flex;align-items:center;justify-content:center;height:100px;width:130px"><img src="/media/jc-utanbakgrund-crop0x13x1000x935-1000-.png" alt="Junicupen" style="max-height:100px;max-width:130px;object-fit:contain;filter:grayscale(0.3)"/></div><div style="display:flex;align-items:center;justify-content:center;height:100px;width:130px"><img src="/media/scorpions-cup-logo-black-cupmanager-crop0x0x1000x1000.png" alt="Scorpions Cup" style="max-height:100px;max-width:130px;object-fit:contain;filter:grayscale(0.3)"/></div><div style="display:flex;align-items:center;justify-content:center;height:100px;width:130px"><img src="/media/home/logos/lampe-challenge.jpg" alt="Lampe Challenge" style="max-height:100px;max-width:130px;object-fit:contain;filter:grayscale(0.3)"/></div><div style="display:flex;align-items:center;justify-content:center;height:100px;width:130px"><img src="/media/alvsjocupenlogga.png" alt="Älvsjöcupen" style="max-height:100px;max-width:130px;object-fit:contain;filter:grayscale(0.3)"/></div><div style="display:flex;align-items:center;justify-content:center;height:100px;width:130px"><img src="/media/goiranssoncup-pos.png" alt="Göransson Cup" style="max-height:100px;max-width:130px;object-fit:contain;filter:grayscale(0.3)"/></div><div style="display:flex;align-items:center;justify-content:center;height:100px;width:130px"><img src="/media/katrineholmsinnebandy-logo-crop0x0x1000x1000.png" alt="Katrineholmscupen" style="max-height:100px;max-width:130px;object-fit:contain;filter:grayscale(0.3)"/></div><div style="display:flex;align-items:center;justify-content:center;height:100px;width:130px"><img src="/media/logo-staende-color-ucff-2024-01.jpg" alt="Umeå Coop Floorball Festival" style="max-height:100px;max-width:130px;object-fit:contain;filter:grayscale(0.3)"/></div></div></section>
+<section style="background-color:#434649;padding:28px 7%;text-align:center"><h2 style="font-family:var(--font-heading, Montserrat, sans-serif);font-weight:700;font-size:clamp(1.3rem, 2.2vw, 1.8rem);color:#fff;margin:0;line-height:1.3">Vad säger kunderna om oss?</h2></section>
+<section style="background-color:#434649;padding:120px 0 90px"><style>
+        /* Scroll-snap rather than a carousel library, deliberately: no block in
+           this package hydrates, and the one existing client-side script
+           (CmStats) is a plain inline string. A library would need an island,
+           and a client: directive written into the MDX would not survive the
+           next save — the generator only emits Puck props. Snap also keeps the
+           Puck canvas usable, where a JS carousel fights drag-and-drop, and
+           gives swipe on touch for free. */
+        .cm-slider {
+          display: flex;
+          gap: 50px;
+          overflow-x: auto;
+          scroll-snap-type: x mandatory;
+          /* Room for the snap to breathe at the ends, so the first and last
+             slide can still centre instead of jamming against the edge. */
+          scroll-padding-inline: 0;
+          scrollbar-width: none;
+          -ms-overflow-style: none;
+        }
+        .cm-slider::-webkit-scrollbar { display: none; }
+        .cm-slider > * {
+          flex: 0 0 calc((100% - 0px) / 1);
+          scroll-snap-align: center;
+        }
+        /* In the editor Puck wraps the slides in a DropZone, which is the drop
+           target. display:contents would make the slides flex items of the row
+           above, but it also discards the DropZone's own box — measured at 0x0
+           while empty, so Puck's own min-height cannot apply and a new slider
+           could not be filled at all. Make the DropZone the flex row instead:
+           it always has a box, and lays the slides out identically. The
+           rendered page has no DropZone, so there the rule above does the
+           work. */
+        .cm-slider > [class*="DropZone"] {
+          flex: 1 1 auto;
+          display: flex;
+          gap: 50px;
+          scroll-snap-align: none;
+        }
+        .cm-slider > [class*="DropZone"] > * {
+          flex: 0 0 calc((100% - 0px) / 1);
+          scroll-snap-align: center;
+        }
+        /* The rail is the scrolling box, so the arrows cannot live inside it —
+           they would scroll away with the slides. The wrap is their frame. */
+        .cm-slider-wrap { position: relative; }
+        .cm-slider-nav {
+          position: absolute;
+          top: 50%;
+          transform: translateY(-50%);
+          z-index: 2;
+          width: 44px;
+          height: 44px;
+          border: 0;
+          border-radius: 50%;
+          background: rgba(255, 255, 255, 0.9);
+          color: #1a1a1a;
+          font-size: 22px;
+          line-height: 1;
+          cursor: pointer;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+        }
+        .cm-slider-nav:hover { background: #fff; }
+        .cm-slider-nav[hidden] { display: none; }
+        /* Just inside the edges, not hanging off them: the rail is full bleed,
+           so there is no outside left to hang in. */
+        .cm-slider-prev { left: 12px; }
+        .cm-slider-next { right: 12px; }
+      </style><div class="cm-slider-wrap"><div class="cm-slider" data-autoplay="3000" data-loop="1"><section style="background-color:#434649;padding:32px 40px"><div style="max-width:800px;margin:0 auto;background-color:#fff;border-radius:8px;padding:36px 40px;box-shadow:0 2px 10px rgba(0,0,0,0.15)"><blockquote style="font-size:clamp(1.1rem, 2.5vw, 1.6rem);font-weight:400;color:#333;line-height:1.6;font-family:var(--font-body, Roboto, sans-serif);margin:0 0 32px;font-style:italic">“<!-- -->Jag vill uttrycka min djupaste tacksamhet för ert enastående stöd och hårda arbete som bidrog till att göra årets cup till en sådan magisk upplevelse. Som ansvarig för evenemanget har jag fått motta oräkneliga positiva kommentarer från deltagare, föräldrar och funktionärer. Särskilt vill jag lyfta fram: Spelschemat, hemsidan och ert engagemang. Ni har satt en ny standard för hur en välarrangerad cup ska se ut.<!-- -->”</blockquote><div style="display:flex;align-items:center;gap:20px"><img src="/media/home/skarmbild-2024-07-03-100132.png" alt="Anwer Al-Nakash" style="height:48px;width:48px;object-fit:contain;border-radius:50%;background-color:#fff"/><div><p style="font-weight:700;color:#1a1a1a;font-size:15px;margin-bottom:2px;font-family:var(--font-body, Roboto, sans-serif)">Anwer Al-Nakash</p><p style="color:#777;font-size:13px;font-family:var(--font-body, Roboto, sans-serif)">Min Tiger Cup, Cupansvarig</p></div></div></div></section><section style="background-color:#434649;padding:32px 40px"><div style="max-width:800px;margin:0 auto;background-color:#fff;border-radius:8px;padding:36px 40px;box-shadow:0 2px 10px rgba(0,0,0,0.15)"><blockquote style="font-size:clamp(1.1rem, 2.5vw, 1.6rem);font-weight:400;color:#333;line-height:1.6;font-family:var(--font-body, Roboto, sans-serif);margin:0 0 32px;font-style:italic">“<!-- -->Hei. ville bare takke dere for fantastisk hjelp, fra start til slutt, vi hadde aldri klart dette uten deres hjelp.<!-- -->”</blockquote><div style="display:flex;align-items:center;gap:20px"><img src="/media/home/holmlia.jpeg" alt="Holmlias klubblogotyp" style="height:48px;width:48px;object-fit:contain;border-radius:50%;background-color:#fff"/><div><p style="font-weight:700;color:#1a1a1a;font-size:15px;margin-bottom:2px;font-family:var(--font-body, Roboto, sans-serif)">Holmlia Sportsklubb</p></div></div></div></section><section style="background-color:#434649;padding:32px 40px"><div style="max-width:800px;margin:0 auto;background-color:#fff;border-radius:8px;padding:36px 40px;box-shadow:0 2px 10px rgba(0,0,0,0.15)"><blockquote style="font-size:clamp(1.1rem, 2.5vw, 1.6rem);font-weight:400;color:#333;line-height:1.6;font-family:var(--font-body, Roboto, sans-serif);margin:0 0 32px;font-style:italic">“<!-- -->SUPERTACK till er alla som bistått oss med Kolmården Cup. Allt har funkat klockrent. [...] på det stora hela har det funkat perfekt med hemsida och app. Det är en dröm att arbeta med verktyget live också. SÅ HIMLA BRA!<!-- -->”</blockquote><div style="display:flex;align-items:center;gap:20px"><img src="/media/home/kolmarden.png" alt="Kolmårdens klubblogotyp" style="height:48px;width:48px;object-fit:contain;border-radius:50%;background-color:#fff"/><div><p style="font-weight:700;color:#1a1a1a;font-size:15px;margin-bottom:2px;font-family:var(--font-body, Roboto, sans-serif)">Johan Kryger</p><p style="color:#777;font-size:13px;font-family:var(--font-body, Roboto, sans-serif)">Kolmården Cup</p></div></div></div></section><section style="background-color:#434649;padding:32px 40px"><div style="max-width:800px;margin:0 auto;background-color:#fff;border-radius:8px;padding:36px 40px;box-shadow:0 2px 10px rgba(0,0,0,0.15)"><blockquote style="font-size:clamp(1.1rem, 2.5vw, 1.6rem);font-weight:400;color:#333;line-height:1.6;font-family:var(--font-body, Roboto, sans-serif);margin:0 0 32px;font-style:italic">“<!-- -->Vi är med på EEM-cup i Eskilstuna. Redan förra året blev jag mycket imponerad av webbplattformen. [] Cup Manager är f.ö. bland det bästa jag sett på webben även inräknat det som finns utanför idrottens värld. Snyggt, enkelt och med massor av fiffiga funktioner utan att de för den skull tar över upplevelsen på sidan.<!-- -->”</blockquote><div style="display:flex;align-items:center;gap:20px"><img src="/media/home/logga_Etuna.png" alt="Etunas klubblogotyp" style="height:48px;width:48px;object-fit:contain;border-radius:50%;background-color:#fff"/><div><p style="font-weight:700;color:#1a1a1a;font-size:15px;margin-bottom:2px;font-family:var(--font-body, Roboto, sans-serif)">Mottagen e-post precis innan</p><p style="color:#777;font-size:13px;font-family:var(--font-body, Roboto, sans-serif)">Eskilstuna Basket Cup</p></div></div></div></section></div><button type="button" class="cm-slider-nav cm-slider-prev" aria-label="Previous" hidden="">‹</button><button type="button" class="cm-slider-nav cm-slider-next" aria-label="Next" hidden="">›</button></div><script>(function(){
+  var wraps = document.querySelectorAll('.cm-slider-wrap:not([data-slider-wired])');
+  if (!wraps.length) return;
+  var inEditor = window.parent !== window;
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  Array.prototype.forEach.call(wraps, function(wrap) {
+    wrap.setAttribute('data-slider-wired', '1');
+    var rail = wrap.querySelector('.cm-slider');
+    if (!rail) return;
+    var prev = wrap.querySelector('.cm-slider-prev');
+    var next = wrap.querySelector('.cm-slider-next');
+    var timer = null, stopped = false;
+    var ms = parseInt(rail.getAttribute('data-autoplay') || '0', 10);
+
+    function pause() { if (timer) { clearInterval(timer); timer = null; } }
+    function stop() { stopped = true; pause(); }
+    function start() { if (stopped || timer || !ms || inEditor || reduce) return; timer = setInterval(advance, ms); }
+    function page(dir) { rail.scrollBy({ left: dir * rail.clientWidth, behavior: 'smooth' }); }
+    function atEnd() { return rail.scrollLeft + rail.clientWidth >= rail.scrollWidth - 2; }
+
+    // Endless in both directions by cloning the whole set either side, so the
+    // rail always has more of the same beyond both edges. Once a clone set is
+    // fully scrolled into view the position jumps back by one set width — the
+    // content there is identical, so there is nothing to see. Snap is switched
+    // off across the jump, or it fights the instant move and lands askew.
+    //
+    // Never in the editor: cloning nodes inside Puck's DropZone would leave it
+    // holding elements its data knows nothing about.
+    var setW = 0;
+    var loop = rail.getAttribute('data-loop') === '1' && !inEditor;
+    if (loop) {
+      var reals = Array.prototype.slice.call(rail.children);
+      if (reals.length > 1) {
+        reals.forEach(function(n) { rail.appendChild(mark(n.cloneNode(true))); });
+        reals.slice().reverse().forEach(function(n) { rail.insertBefore(mark(n.cloneNode(true)), rail.firstChild); });
+        measure();
+        rail.scrollLeft = setW;
+      } else {
+        loop = false;
+      }
+    }
+    function mark(node) {
+      // Out of the accessibility tree and out of the tab order: a clone is the
+      // same quote said once, and a screen reader should not hear it three
+      // times or tab through duplicated links.
+      node.setAttribute('aria-hidden', 'true');
+      node.setAttribute('data-clone', '1');
+      if ('inert' in HTMLElement.prototype) node.inert = true;
+      return node;
+    }
+    function measure() { setW = rail.scrollWidth / 3; }
+
+    function normalise() {
+      if (!loop || !setW) return;
+      var x = rail.scrollLeft;
+      if (x < setW * 0.5) jump(x + setW);
+      else if (x > setW * 1.5) jump(x - setW);
+    }
+    function jump(to) {
+      var snap = rail.style.scrollSnapType;
+      rail.style.scrollSnapType = 'none';
+      rail.scrollLeft = to;
+      rail.style.scrollSnapType = snap;
+    }
+
+    // scrollend fires once the momentum has settled, which is exactly when the
+    // jump is invisible. Where it is missing, a short idle timer stands in.
+    if ('onscrollend' in window) {
+      rail.addEventListener('scrollend', normalise);
+    } else {
+      var idle = null;
+      rail.addEventListener('scroll', function() {
+        if (idle) clearTimeout(idle);
+        idle = setTimeout(normalise, 140);
+      }, { passive: true });
+    }
+
+    function advance() { if (loop) page(1); else if (atEnd()) rail.scrollTo({ left: 0, behavior: 'smooth' }); else page(1); }
+
+    function sync() {
+      var scrollable = rail.scrollWidth > rail.clientWidth + 2;
+      if (prev) prev.hidden = !scrollable;
+      if (next) next.hidden = !scrollable;
+      if (loop) { measure(); }
+    }
+    sync();
+    window.addEventListener('resize', sync);
+
+    if (prev) prev.addEventListener('click', function() { stop(); page(-1); });
+    if (next) next.addEventListener('click', function() { stop(); page(1); });
+    ['pointerdown', 'wheel', 'keydown', 'touchstart'].forEach(function(t) {
+      rail.addEventListener(t, stop, { passive: true });
+    });
+
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(function(entries) {
+        entries.forEach(function(e) { if (e.isIntersecting) start(); else pause(); });
+      }, { threshold: 0.3 }).observe(wrap);
+    } else {
+      start();
+    }
+  });
+})();</script></section> </main> <footer> <section style="background-color:var(--brand);padding:56px 7%;font-family:var(--font-body, Roboto, sans-serif)"><div style="display:flex;flex-wrap:wrap;gap:48px;max-width:1100px;margin:0 auto"><div style="flex:1 1 420px"><h3 style="font-family:var(--font-heading, Montserrat, sans-serif);font-weight:700;font-size:22px;color:#fff;margin:0 0 18px">Vanliga frågor</h3><style>.cm-faq-dark .cm-rich a { color: #fff; text-decoration: underline; } .cm-faq-dark .cm-rich a:hover { color: rgba(255,255,255,0.85); }</style><details class="cm-faq-dark" style="border-bottom:1px solid rgba(255,255,255,0.15);padding:12px 0"><summary style="font-family:var(--font-body, Roboto, sans-serif);font-weight:700;font-size:16px;cursor:pointer;color:#fff;list-style:none;display:flex;justify-content:space-between;align-items:center">Vem kan använda Cup Manager?<svg class="cm-faq-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-left:16px;flex-shrink:0;transition:transform 0.15s"><path d="M6 9l6 6 6-6"></path></svg><style>details[open] > summary > .cm-faq-chevron { transform: rotate(180deg); }</style></summary><div style="font-family:var(--font-body, Roboto, sans-serif);font-size:14px;line-height:1.7;color:rgba(255,255,255,0.75);margin-top:12px;padding-right:32px"><style>
+.cm-rich > *:first-child { margin-top: 0; }
+.cm-rich > *:last-child { margin-bottom: 0; }
+.cm-rich p { margin: 0 0 0.9em; }
+.cm-rich ul { list-style: disc; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich ol { list-style: decimal; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich li { margin: 0.3em 0; }
+.cm-rich a { color: var(--brand); text-decoration: none; }
+.cm-rich a:hover { text-decoration: underline; }
+.cm-rich strong { font-weight: 700; }
+.cm-rich blockquote { border-left: 3px solid var(--brand); padding-left: 1em; margin: 1em 0; font-style: italic; opacity: 0.85; }
+.cm-rich h3, .cm-rich h4 { font-weight: 700; margin: 1.2em 0 0.5em; font-family: var(--font-heading, Montserrat, sans-serif); }
+.cm-rich h3 { font-size: 1.25em; }
+.cm-rich h4 { font-size: 1.1em; }
+.cm-rich table { border-collapse: collapse; margin: 1em 0; }
+.cm-rich th, .cm-rich td { border: 1px solid #d5d5d5; padding: 5px 10px; text-align: center; }
+.cm-rich th { background: rgba(0,0,0,0.045); font-weight: 700; }
+.cm-rich img { max-width: 100%; height: auto; }
+.cm-rich hr { border: none; border-top: 1px solid rgba(0,0,0,0.12); margin: 1.4em 0; }
+</style><div class="cm-rich"><p>Cup Manager används av allt från världens största turneringar till lokala turneringar med 30 lag. Det går att nyttja olika många fördelar beroende på er storlek. Även en enkel turnering kan spara tid och huvudbry genom att hantera spelschemat och sköta kommunikationen på ett och samma ställe.</p></div></div></details><style>.cm-faq-dark .cm-rich a { color: #fff; text-decoration: underline; } .cm-faq-dark .cm-rich a:hover { color: rgba(255,255,255,0.85); }</style><details class="cm-faq-dark" style="border-bottom:1px solid rgba(255,255,255,0.15);padding:12px 0"><summary style="font-family:var(--font-body, Roboto, sans-serif);font-weight:700;font-size:16px;cursor:pointer;color:#fff;list-style:none;display:flex;justify-content:space-between;align-items:center">Hur kommer jag igång?<svg class="cm-faq-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-left:16px;flex-shrink:0;transition:transform 0.15s"><path d="M6 9l6 6 6-6"></path></svg><style>details[open] > summary > .cm-faq-chevron { transform: rotate(180deg); }</style></summary><div style="font-family:var(--font-body, Roboto, sans-serif);font-size:14px;line-height:1.7;color:rgba(255,255,255,0.75);margin-top:12px;padding-right:32px"><style>
+.cm-rich > *:first-child { margin-top: 0; }
+.cm-rich > *:last-child { margin-bottom: 0; }
+.cm-rich p { margin: 0 0 0.9em; }
+.cm-rich ul { list-style: disc; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich ol { list-style: decimal; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich li { margin: 0.3em 0; }
+.cm-rich a { color: var(--brand); text-decoration: none; }
+.cm-rich a:hover { text-decoration: underline; }
+.cm-rich strong { font-weight: 700; }
+.cm-rich blockquote { border-left: 3px solid var(--brand); padding-left: 1em; margin: 1em 0; font-style: italic; opacity: 0.85; }
+.cm-rich h3, .cm-rich h4 { font-weight: 700; margin: 1.2em 0 0.5em; font-family: var(--font-heading, Montserrat, sans-serif); }
+.cm-rich h3 { font-size: 1.25em; }
+.cm-rich h4 { font-size: 1.1em; }
+.cm-rich table { border-collapse: collapse; margin: 1em 0; }
+.cm-rich th, .cm-rich td { border: 1px solid #d5d5d5; padding: 5px 10px; text-align: center; }
+.cm-rich th { background: rgba(0,0,0,0.045); font-weight: 700; }
+.cm-rich img { max-width: 100%; height: auto; }
+.cm-rich hr { border: none; border-top: 1px solid rgba(0,0,0,0.12); margin: 1.4em 0; }
+</style><div class="cm-rich"><p>Det är enkelt att komma igång med Cup Manager. <a href="https://calendly.com/superinvite-cupmanager-en/demo">Boka ett demo</a>, eller <a href="/sv/support/">kontakta oss direkt per mail eller telefon</a> så hjälper vi dig igång!</p></div></div></details><style>.cm-faq-dark .cm-rich a { color: #fff; text-decoration: underline; } .cm-faq-dark .cm-rich a:hover { color: rgba(255,255,255,0.85); }</style><details class="cm-faq-dark" style="border-bottom:1px solid rgba(255,255,255,0.15);padding:12px 0"><summary style="font-family:var(--font-body, Roboto, sans-serif);font-weight:700;font-size:16px;cursor:pointer;color:#fff;list-style:none;display:flex;justify-content:space-between;align-items:center">Vad kostar det?<svg class="cm-faq-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-left:16px;flex-shrink:0;transition:transform 0.15s"><path d="M6 9l6 6 6-6"></path></svg><style>details[open] > summary > .cm-faq-chevron { transform: rotate(180deg); }</style></summary><div style="font-family:var(--font-body, Roboto, sans-serif);font-size:14px;line-height:1.7;color:rgba(255,255,255,0.75);margin-top:12px;padding-right:32px"><style>
+.cm-rich > *:first-child { margin-top: 0; }
+.cm-rich > *:last-child { margin-bottom: 0; }
+.cm-rich p { margin: 0 0 0.9em; }
+.cm-rich ul { list-style: disc; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich ol { list-style: decimal; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich li { margin: 0.3em 0; }
+.cm-rich a { color: var(--brand); text-decoration: none; }
+.cm-rich a:hover { text-decoration: underline; }
+.cm-rich strong { font-weight: 700; }
+.cm-rich blockquote { border-left: 3px solid var(--brand); padding-left: 1em; margin: 1em 0; font-style: italic; opacity: 0.85; }
+.cm-rich h3, .cm-rich h4 { font-weight: 700; margin: 1.2em 0 0.5em; font-family: var(--font-heading, Montserrat, sans-serif); }
+.cm-rich h3 { font-size: 1.25em; }
+.cm-rich h4 { font-size: 1.1em; }
+.cm-rich table { border-collapse: collapse; margin: 1em 0; }
+.cm-rich th, .cm-rich td { border: 1px solid #d5d5d5; padding: 5px 10px; text-align: center; }
+.cm-rich th { background: rgba(0,0,0,0.045); font-weight: 700; }
+.cm-rich img { max-width: 100%; height: auto; }
+.cm-rich hr { border: none; border-top: 1px solid rgba(0,0,0,0.12); margin: 1.4em 0; }
+</style><div class="cm-rich"><p>Vi har en enkel modell med ett pris per lag som deltar, en transaktionsavgift för onlinebetalning och möjlighet för extratjänster. Läs mer om <a href="/sv/priser/">våra priser här</a>.</p></div></div></details><style>.cm-faq-dark .cm-rich a { color: #fff; text-decoration: underline; } .cm-faq-dark .cm-rich a:hover { color: rgba(255,255,255,0.85); }</style><details class="cm-faq-dark" style="border-bottom:1px solid rgba(255,255,255,0.15);padding:12px 0"><summary style="font-family:var(--font-body, Roboto, sans-serif);font-weight:700;font-size:16px;cursor:pointer;color:#fff;list-style:none;display:flex;justify-content:space-between;align-items:center">Hur mycket support ingår i licensavgiften?<svg class="cm-faq-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-left:16px;flex-shrink:0;transition:transform 0.15s"><path d="M6 9l6 6 6-6"></path></svg><style>details[open] > summary > .cm-faq-chevron { transform: rotate(180deg); }</style></summary><div style="font-family:var(--font-body, Roboto, sans-serif);font-size:14px;line-height:1.7;color:rgba(255,255,255,0.75);margin-top:12px;padding-right:32px"><style>
+.cm-rich > *:first-child { margin-top: 0; }
+.cm-rich > *:last-child { margin-bottom: 0; }
+.cm-rich p { margin: 0 0 0.9em; }
+.cm-rich ul { list-style: disc; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich ol { list-style: decimal; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich li { margin: 0.3em 0; }
+.cm-rich a { color: var(--brand); text-decoration: none; }
+.cm-rich a:hover { text-decoration: underline; }
+.cm-rich strong { font-weight: 700; }
+.cm-rich blockquote { border-left: 3px solid var(--brand); padding-left: 1em; margin: 1em 0; font-style: italic; opacity: 0.85; }
+.cm-rich h3, .cm-rich h4 { font-weight: 700; margin: 1.2em 0 0.5em; font-family: var(--font-heading, Montserrat, sans-serif); }
+.cm-rich h3 { font-size: 1.25em; }
+.cm-rich h4 { font-size: 1.1em; }
+.cm-rich table { border-collapse: collapse; margin: 1em 0; }
+.cm-rich th, .cm-rich td { border: 1px solid #d5d5d5; padding: 5px 10px; text-align: center; }
+.cm-rich th { background: rgba(0,0,0,0.045); font-weight: 700; }
+.cm-rich img { max-width: 100%; height: auto; }
+.cm-rich hr { border: none; border-top: 1px solid rgba(0,0,0,0.12); margin: 1.4em 0; }
+</style><div class="cm-rich"><p>Det finns ingen gräns på hur mycket support som ingår. All support, hjälp och upplärning ingår. Av erfarenhet vet vi att det blir bäst om ni försöker göra så mycket som möjligt själva och därför är vårt huvudsakliga mål med supporten att förklara hur man gör, men vi lämnar er självklart aldrig i sticket.</p>
+<p>För att komma i kontakt med oss kan ni ringa eller maila oss, eller klicka på chatikonen nere till höger på denna sidan. Har ni längre ärenden så rekommenderar vi att ni <a href="/sv/boka/">bokar ett möte</a>.</p></div></div></details><style>.cm-faq-dark .cm-rich a { color: #fff; text-decoration: underline; } .cm-faq-dark .cm-rich a:hover { color: rgba(255,255,255,0.85); }</style><details class="cm-faq-dark" style="border-bottom:1px solid rgba(255,255,255,0.15);padding:12px 0"><summary style="font-family:var(--font-body, Roboto, sans-serif);font-weight:700;font-size:16px;cursor:pointer;color:#fff;list-style:none;display:flex;justify-content:space-between;align-items:center">Kan man få joursupport under cupen?<svg class="cm-faq-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-left:16px;flex-shrink:0;transition:transform 0.15s"><path d="M6 9l6 6 6-6"></path></svg><style>details[open] > summary > .cm-faq-chevron { transform: rotate(180deg); }</style></summary><div style="font-family:var(--font-body, Roboto, sans-serif);font-size:14px;line-height:1.7;color:rgba(255,255,255,0.75);margin-top:12px;padding-right:32px"><style>
+.cm-rich > *:first-child { margin-top: 0; }
+.cm-rich > *:last-child { margin-bottom: 0; }
+.cm-rich p { margin: 0 0 0.9em; }
+.cm-rich ul { list-style: disc; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich ol { list-style: decimal; padding-left: 1.4em; margin: 0 0 0.9em; }
+.cm-rich li { margin: 0.3em 0; }
+.cm-rich a { color: var(--brand); text-decoration: none; }
+.cm-rich a:hover { text-decoration: underline; }
+.cm-rich strong { font-weight: 700; }
+.cm-rich blockquote { border-left: 3px solid var(--brand); padding-left: 1em; margin: 1em 0; font-style: italic; opacity: 0.85; }
+.cm-rich h3, .cm-rich h4 { font-weight: 700; margin: 1.2em 0 0.5em; font-family: var(--font-heading, Montserrat, sans-serif); }
+.cm-rich h3 { font-size: 1.25em; }
+.cm-rich h4 { font-size: 1.1em; }
+.cm-rich table { border-collapse: collapse; margin: 1em 0; }
+.cm-rich th, .cm-rich td { border: 1px solid #d5d5d5; padding: 5px 10px; text-align: center; }
+.cm-rich th { background: rgba(0,0,0,0.045); font-weight: 700; }
+.cm-rich img { max-width: 100%; height: auto; }
+.cm-rich hr { border: none; border-top: 1px solid rgba(0,0,0,0.12); margin: 1.4em 0; }
+</style><div class="cm-rich"><p>Joursupport ingår för alla turneringar. Det innebär att ni under turneringsdagarna kan ringa oss och få hjälp. Kontaktuppgifter finns <a href="/sv/support/">här</a>.</p></div></div></details></div><div style="flex:1 1 320px"><h3 style="font-family:var(--font-heading, Montserrat, sans-serif);font-weight:700;font-size:22px;color:#fff;margin:0 0 18px">Vill du veta mer?</h3><p style="color:rgba(255,255,255,0.9);font-size:15px;line-height:1.7;margin:0 0 20px">På vår hjälpsida för systemet Cup Manager finns manualer och dokumentation för hur man använder de olika funktionerna.</p><div style="display:flex;flex-direction:column;gap:12px;align-items:flex-start"><a href="https://help.cupmanager.net/" style="display:inline-flex;align-items:center;gap:8px;background-color:#fff;color:#1a1a1a;padding:12px 24px;border-radius:3px;font-weight:600;font-size:15px;text-decoration:none;box-shadow:0 1px 4px rgba(0,0,0,0.15)">Gå till Cup Managers hjälpsidor<!-- --> <span aria-hidden="true">›</span></a><a href="/sv/rakna-pa-kapacitet/" style="display:inline-flex;align-items:center;gap:8px;background-color:#fff;color:#1a1a1a;padding:12px 24px;border-radius:3px;font-weight:600;font-size:15px;text-decoration:none;box-shadow:0 1px 4px rgba(0,0,0,0.15)">Nytt verktyg! Räkna på kapacitet i din turnering<!-- --> <span aria-hidden="true">›</span></a></div></div></div></section>
+<section style="background-color:#f4f4f4;padding:48px 7% 0;font-family:var(--font-body, Roboto, sans-serif)"><style>.cm-footer-mail { color: var(--brand); text-decoration: none; } .cm-footer-mail:hover, .cm-footer-link:hover { text-decoration: underline; }</style><div style="display:flex;flex-wrap:wrap;gap:40px;max-width:1100px;margin:0 auto;padding-bottom:32px"><div style="flex:1 1 260px"><img src="/media/shared/cupmanager_light.svg" alt="Cup Manager" style="max-height:48px;max-width:220px"/></div><div style="flex:1 1 180px"><h3 style="font-family:var(--font-heading, Montserrat, sans-serif);font-weight:700;font-size:17px;color:#1a1a1a;margin:0 0 18px">Navigation</h3><a href="/sv/support/" class="cm-footer-link" style="color:var(--brand);text-decoration:none;font-size:14px;display:block;margin-bottom:8px">Support</a><a href="/sv/priser/" class="cm-footer-link" style="color:var(--brand);text-decoration:none;font-size:14px;display:block;margin-bottom:8px">Priser</a><a href="/sv/om-cupmanager/" class="cm-footer-link" style="color:var(--brand);text-decoration:none;font-size:14px;display:block;margin-bottom:8px">Om oss</a><a href="/sv/jobba-hos-oss/" class="cm-footer-link" style="color:var(--brand);text-decoration:none;font-size:14px;display:block;margin-bottom:8px">Jobba hos oss</a></div><div style="flex:1 1 220px"><h3 style="font-family:var(--font-heading, Montserrat, sans-serif);font-weight:700;font-size:17px;color:#1a1a1a;margin:0 0 18px">Kontakt</h3><p style="color:#555;font-size:14px;line-height:1.8;margin:0">Telefon<!-- -->: <!-- -->046-52580<br/>Epost<!-- -->: <a class="cm-footer-mail" href="mailto:support@cupmanager.net">support@cupmanager.net</a></p></div></div><div style="border-top:1px solid rgba(0,0,0,0.08);padding:20px 0 24px;max-width:1100px;margin:0 auto;display:flex;flex-direction:column;gap:10px;align-items:center"><span style="display:flex;gap:18px"><a href="https://www.facebook.com/CupManager/" aria-label="Facebook"><svg width="22" height="22" viewBox="0 0 24 24" fill="var(--brand)"><path d="M22 12a10 10 0 1 0-11.56 9.88v-6.99H7.9V12h2.54V9.8c0-2.5 1.49-3.89 3.77-3.89 1.09 0 2.23.2 2.23.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56V12h2.78l-.45 2.89h-2.33v6.99A10 10 0 0 0 22 12z"></path></svg></a><a href="https://www.instagram.com/cupmanager/" aria-label="Instagram"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"></rect><circle cx="12" cy="12" r="4"></circle><circle cx="17.5" cy="6.5" r="1" fill="var(--brand)" stroke="none"></circle></svg></a></span><span style="color:#888;font-size:13px">Copyright 2026 Cup Manager</span></div></section> </footer> <a id="preview-btn" href="" data-fs-db="plinto-fs" class="fixed bottom-20 right-6 bg-amber-500 hover:bg-amber-600 text-black px-4 py-2 rounded-lg shadow-lg flex items-center gap-2 transition-colors z-40 font-medium" style="display:none"> <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"> <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path> <circle cx="12" cy="12" r="3"></circle> </svg>
+Preview Changes
+</a> <script type="module" src="/_astro/PreviewButton.astro_astro_type_script_index_0_lang.d8INO1zV.js"></script> <div id="lang-switcher" class="fixed bottom-6 right-6 z-50 group"><div class="flex flex-col gap-1 items-end max-h-0 overflow-hidden opacity-0 pointer-events-none group-hover:max-h-96 group-hover:mb-2 group-hover:opacity-100 group-hover:pointer-events-auto transition-all duration-150"><a href="/no/" class="flex items-center gap-2 bg-white border border-gray-200 shadow-md px-3 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors whitespace-nowrap"><svg width="20" height="14" viewBox="0 0 20 14" xmlns="http://www.w3.org/2000/svg"><rect width="20" height="14" fill="#EF2B2D"/><rect x="5" width="3" height="14" fill="#fff"/><rect y="5.5" width="20" height="3" fill="#fff"/><rect x="5.5" width="2" height="14" fill="#002868"/><rect y="6" width="20" height="2" fill="#002868"/></svg><span>Norsk</span></a><a href="/en/" class="flex items-center gap-2 bg-white border border-gray-200 shadow-md px-3 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors whitespace-nowrap"><svg width="20" height="14" viewBox="0 0 60 42" xmlns="http://www.w3.org/2000/svg"><rect width="60" height="42" fill="#012169"/><path d="M0,0 L60,42 M60,0 L0,42" stroke="#fff" stroke-width="8"/><path d="M0,0 L60,42 M60,0 L0,42" stroke="#C8102E" stroke-width="4"/><path d="M30,0 V42 M0,21 H60" stroke="#fff" stroke-width="12"/><path d="M30,0 V42 M0,21 H60" stroke="#C8102E" stroke-width="7"/></svg><span>English</span></a></div><button class="flex items-center gap-2 bg-white border border-gray-200 shadow-lg px-3 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors" aria-label="Switch language"><svg width="20" height="14" viewBox="0 0 20 14" xmlns="http://www.w3.org/2000/svg"><rect width="20" height="14" fill="#006AA7"/><rect x="5" width="3" height="14" fill="#FECC02"/><rect y="5.5" width="20" height="3" fill="#FECC02"/></svg><span>Svenska</span><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="group-hover:rotate-180 transition-transform duration-150"><polyline points="18 15 12 9 6 15"></polyline></svg></button></div> </body></html>

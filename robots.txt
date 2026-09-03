@@ -1,0 +1,5 @@
+User-agent: *
+Disallow: /plinto/
+Allow: /
+
+Sitemap: https://cupmanager.net/sitemap-index.xml
