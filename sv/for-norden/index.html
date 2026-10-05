@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="sv"> <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>För den nördiga - Cup Manager</title><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400..800&family=Roboto:wght@300..700&display=swap"><link rel="icon" href="/media/shared/favicon.png" sizes="32x32"><link rel="icon" href="/media/shared/favicon.png" sizes="192x192"><link rel="apple-touch-icon" href="/media/shared/favicon.png"><meta name="msapplication-TileImage" content="/media/shared/favicon.png"><link rel="alternate" hreflang="sv" href="https://cupmanager.net/sv/for-norden/"><link rel="alternate" hreflang="no" href="https://cupmanager.net/no/for-norden/"><link rel="alternate" hreflang="en" href="https://cupmanager.net/en/for-norden/"><link rel="alternate" hreflang="x-default" href="https://cupmanager.net/sv/for-norden/"><link rel="stylesheet" href="/_astro/registry.DEDUUh7L.css"></head> <body> <header class="plinto-header"> <a href="/sv" style="display:inline-flex;align-items:center"><img src="/media/shared/cupmanager_light.svg" alt="Cup Manager" style="height:48px;width:auto;display:block"/></a>
+<!DOCTYPE html><html lang="sv"> <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Så fungerar schemaläggning och lottning i Cup Manager - Cup Manager</title><meta name="description" content="Tekniken bakom Cup Manager: automatisk schemaläggning med constraint programming, gruppindelning som minimerar elva typer av konflikter, och algoritmen för slutspelsträd."><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400..800&family=Roboto:wght@300..700&display=swap"><link rel="icon" href="/media/shared/favicon.png" sizes="32x32"><link rel="icon" href="/media/shared/favicon.png" sizes="192x192"><link rel="apple-touch-icon" href="/media/shared/favicon.png"><meta name="msapplication-TileImage" content="/media/shared/favicon.png"><link rel="alternate" hreflang="sv" href="https://cupmanager.net/sv/for-norden/"><link rel="alternate" hreflang="no" href="https://cupmanager.net/no/for-norden/"><link rel="alternate" hreflang="en" href="https://cupmanager.net/en/for-norden/"><link rel="alternate" hreflang="x-default" href="https://cupmanager.net/sv/for-norden/"><script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"Organization","@id":"https://cupmanager.net/#organization","name":"Cup Manager","url":"https://cupmanager.net","logo":"https://cupmanager.net/media/shared/favicon.png","sameAs":["https://www.facebook.com/CupManager/","https://www.instagram.com/cupmanager/"]},{"@type":"SoftwareApplication","name":"Cup Manager","applicationCategory":"BusinessApplication","operatingSystem":"Windows, macOS, iOS, Android","description":"Turneringssystem för arrangörer av cuper och idrottsturneringar: anmälan, betalning, lottning, automatisk schemaläggning, domare, boende, resultat, hemsida och app.","url":"https://cupmanager.net/sv/","publisher":{"@id":"https://cupmanager.net/#organization"}}]}</script><link rel="stylesheet" href="/_astro/registry.DEDUUh7L.css"></head> <body> <header class="plinto-header"> <a href="/sv" style="display:inline-flex;align-items:center"><img src="/media/shared/cupmanager_light.svg" alt="Cup Manager" style="height:48px;width:auto;display:block"/></a>
 <nav class="cm-nav"><style>
   .plinto-header {
     --plinto-header-max-width: 1300px;
@@ -261,15 +261,84 @@
 .cm-rich th { background: rgba(0,0,0,0.045); font-weight: 700; }
 .cm-rich img { max-width: 100%; height: auto; }
 .cm-rich hr { border: none; border-top: 1px solid rgba(0,0,0,0.12); margin: 1.4em 0; }
-</style><div class="cm-rich"><p>För en 7-lagsgrupp ser svaret ut så här när man varierar antalet lag från samma klubb (rader) och antalet matcher per lag (kolumner):</p><p>|  | 1 | 2 | 3 | 4 | 5 | 6 |
-| --- | --- | --- | --- | --- | --- | --- |
-| <strong>1</strong> | 0 | 0 | 0 | 0 | 0 | 0 |
-| <strong>2</strong> | 0 | 0 | 0 | 0 | 0 | 1 |
-| <strong>3</strong> | 0 | 0 | 0 | 0 | 2 | 3 |
-| <strong>4</strong> | 0 | 1 | 1 | 2 | 4 | 6 |
-| <strong>5</strong> | 1 | 3 | 4 | 6 | 8 | 10 |
-| <strong>6</strong> | 2 | 5 | 7 | 10 | 12 | 15 |
-| <strong>7</strong> | 4 | 7 | 11 | 14 | 18 | 21 |</p><p>Det finns tydliga mönster i tabellen ovan, men sambandet är så komplicerat att vi varit tvungna att simulera fram resultaten för olika gruppstorlekar i förväg i Cup Manager. Det hjälper sedan systemet att avgöra om det hittat en optimal matchindelning.</p><p>Eftersom det inte finns något enkelt sätt att hitta de bästa matcherna testar sig sedan Cup Manager fram precis som en människa också hade gjort. Fördelen för Cup Manager är att det går väldigt snabbt och att Cup Manager hela tiden kan hålla reda på att alla lag fått rätt antal matcher. Cup Manager hanterar också alla 11 konflikterna från listan med konflikter. Det är inte helt lätt att själv hålla dem i huvudet! Det är det här testandet som trots allt kan ta några minuter om du lottar en kämpande klass i Cup Manager.</p></div></div></div></div></div></section>
+</style><div class="cm-rich"><p>För en 7-lagsgrupp ser svaret ut så här när man varierar antalet lag från samma klubb (rader) och antalet matcher per lag (kolumner):</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th></th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th></tr></thead><tbody><tr><td><strong>1</strong></td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td></tr><tr><td><strong>2</strong></td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>1</td></tr><tr><td><strong>3</strong></td><td>0</td><td>0</td><td>0</td><td>0</td><td>2</td><td>3</td></tr><tr><td><strong>4</strong></td><td>0</td><td>1</td><td>1</td><td>2</td><td>4</td><td>6</td></tr><tr><td><strong>5</strong></td><td>1</td><td>3</td><td>4</td><td>6</td><td>8</td><td>10</td></tr><tr><td><strong>6</strong></td><td>2</td><td>5</td><td>7</td><td>10</td><td>12</td><td>15</td></tr><tr><td><strong>7</strong></td><td>4</td><td>7</td><td>11</td><td>14</td><td>18</td><td>21</td></tr></tbody></table><p>Det finns tydliga mönster i tabellen ovan, men sambandet är så komplicerat att vi varit tvungna att simulera fram resultaten för olika gruppstorlekar i förväg i Cup Manager. Det hjälper sedan systemet att avgöra om det hittat en optimal matchindelning.</p><p>Eftersom det inte finns något enkelt sätt att hitta de bästa matcherna testar sig sedan Cup Manager fram precis som en människa också hade gjort. Fördelen för Cup Manager är att det går väldigt snabbt och att Cup Manager hela tiden kan hålla reda på att alla lag fått rätt antal matcher. Cup Manager hanterar också alla 11 konflikterna från listan med konflikter. Det är inte helt lätt att själv hålla dem i huvudet! Det är det här testandet som trots allt kan ta några minuter om du lottar en kämpande klass i Cup Manager.</p></div></div></div></div></div></section>
 <section style="padding:40px 7%;background-color:transparent"><style>
         .cm-cols-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 48px; max-width: 1140px; margin: 0 auto; text-align: left; }
         /* In the editor Puck wraps the columns in a DropZone. display:contents

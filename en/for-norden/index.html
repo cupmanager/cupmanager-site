@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"> <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>For the nerds - Cup Manager</title><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400..800&family=Roboto:wght@300..700&display=swap"><link rel="icon" href="/media/shared/favicon.png" sizes="32x32"><link rel="icon" href="/media/shared/favicon.png" sizes="192x192"><link rel="apple-touch-icon" href="/media/shared/favicon.png"><meta name="msapplication-TileImage" content="/media/shared/favicon.png"><link rel="alternate" hreflang="sv" href="https://cupmanager.net/sv/for-norden/"><link rel="alternate" hreflang="no" href="https://cupmanager.net/no/for-norden/"><link rel="alternate" hreflang="en" href="https://cupmanager.net/en/for-norden/"><link rel="alternate" hreflang="x-default" href="https://cupmanager.net/sv/for-norden/"><link rel="stylesheet" href="/_astro/registry.DEDUUh7L.css"></head> <body> <header class="plinto-header"> <a href="/en" style="display:inline-flex;align-items:center"><img src="/media/shared/cupmanager_light.svg" alt="Cup Manager" style="height:48px;width:auto;display:block"/></a>
+<!DOCTYPE html><html lang="en"> <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>How scheduling and draws work in Cup Manager - Cup Manager</title><meta name="description" content="The technology behind Cup Manager: automatic scheduling with constraint programming, group allocation that minimises eleven types of conflict, and the algorithm for knockout brackets."><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400..800&family=Roboto:wght@300..700&display=swap"><link rel="icon" href="/media/shared/favicon.png" sizes="32x32"><link rel="icon" href="/media/shared/favicon.png" sizes="192x192"><link rel="apple-touch-icon" href="/media/shared/favicon.png"><meta name="msapplication-TileImage" content="/media/shared/favicon.png"><link rel="alternate" hreflang="sv" href="https://cupmanager.net/sv/for-norden/"><link rel="alternate" hreflang="no" href="https://cupmanager.net/no/for-norden/"><link rel="alternate" hreflang="en" href="https://cupmanager.net/en/for-norden/"><link rel="alternate" hreflang="x-default" href="https://cupmanager.net/sv/for-norden/"><script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"Organization","@id":"https://cupmanager.net/#organization","name":"Cup Manager","url":"https://cupmanager.net","logo":"https://cupmanager.net/media/shared/favicon.png","sameAs":["https://www.facebook.com/CupManager/","https://www.instagram.com/cupmanager/"]},{"@type":"SoftwareApplication","name":"Cup Manager","applicationCategory":"BusinessApplication","operatingSystem":"Windows, macOS, iOS, Android","description":"Tournament management system for organisers of cups and sports tournaments: registration, payment, draws, automatic scheduling, referees, accommodation, results, website and app.","url":"https://cupmanager.net/en/","publisher":{"@id":"https://cupmanager.net/#organization"}}]}</script><link rel="stylesheet" href="/_astro/registry.DEDUUh7L.css"></head> <body> <header class="plinto-header"> <a href="/en" style="display:inline-flex;align-items:center"><img src="/media/shared/cupmanager_light.svg" alt="Cup Manager" style="height:48px;width:auto;display:block"/></a>
 <nav class="cm-nav"><style>
   .plinto-header {
     --plinto-header-max-width: 1300px;
@@ -261,15 +261,84 @@
 .cm-rich th { background: rgba(0,0,0,0.045); font-weight: 700; }
 .cm-rich img { max-width: 100%; height: auto; }
 .cm-rich hr { border: none; border-top: 1px solid rgba(0,0,0,0.12); margin: 1.4em 0; }
-</style><div class="cm-rich"><p>For a 7-team group, here&#39;s what the answer looks like as you vary the number of teams from the same club (rows) and the number of matches per team (columns):</p><p>|  | 1 | 2 | 3 | 4 | 5 | 6 |
-| --- | --- | --- | --- | --- | --- | --- |
-| <strong>1</strong> | 0 | 0 | 0 | 0 | 0 | 0 |
-| <strong>2</strong> | 0 | 0 | 0 | 0 | 0 | 1 |
-| <strong>3</strong> | 0 | 0 | 0 | 0 | 2 | 3 |
-| <strong>4</strong> | 0 | 1 | 1 | 2 | 4 | 6 |
-| <strong>5</strong> | 1 | 3 | 4 | 6 | 8 | 10 |
-| <strong>6</strong> | 2 | 5 | 7 | 10 | 12 | 15 |
-| <strong>7</strong> | 4 | 7 | 11 | 14 | 18 | 21 |</p><p>There are clear patterns in the table above, but the relationship is complicated enough that we&#39;ve had to simulate the results for different group sizes in advance inside Cup Manager. That precomputed data then helps the system determine whether it has found an optimal match assignment.</p><p>Since there&#39;s no simple way to find the best matches, Cup Manager tries its way forward — much like a human would. The advantage Cup Manager has is speed, and the ability to constantly keep track of whether every team has the right number of matches. Cup Manager also handles all 11 conflicts from the list above, which isn&#39;t easy to keep in your head on your own! This trial-and-error process is what can take a few minutes when you draw a non-ranked class in Cup Manager.</p></div></div></div></div></div></section>
+</style><div class="cm-rich"><p>For a 7-team group, here&#39;s what the answer looks like as you vary the number of teams from the same club (rows) and the number of matches per team (columns):</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th></th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th></tr></thead><tbody><tr><td><strong>1</strong></td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td></tr><tr><td><strong>2</strong></td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>1</td></tr><tr><td><strong>3</strong></td><td>0</td><td>0</td><td>0</td><td>0</td><td>2</td><td>3</td></tr><tr><td><strong>4</strong></td><td>0</td><td>1</td><td>1</td><td>2</td><td>4</td><td>6</td></tr><tr><td><strong>5</strong></td><td>1</td><td>3</td><td>4</td><td>6</td><td>8</td><td>10</td></tr><tr><td><strong>6</strong></td><td>2</td><td>5</td><td>7</td><td>10</td><td>12</td><td>15</td></tr><tr><td><strong>7</strong></td><td>4</td><td>7</td><td>11</td><td>14</td><td>18</td><td>21</td></tr></tbody></table><p>There are clear patterns in the table above, but the relationship is complicated enough that we&#39;ve had to simulate the results for different group sizes in advance inside Cup Manager. That precomputed data then helps the system determine whether it has found an optimal match assignment.</p><p>Since there&#39;s no simple way to find the best matches, Cup Manager tries its way forward — much like a human would. The advantage Cup Manager has is speed, and the ability to constantly keep track of whether every team has the right number of matches. Cup Manager also handles all 11 conflicts from the list above, which isn&#39;t easy to keep in your head on your own! This trial-and-error process is what can take a few minutes when you draw a non-ranked class in Cup Manager.</p></div></div></div></div></div></section>
 <section style="padding:40px 7%;background-color:transparent"><style>
         .cm-cols-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 48px; max-width: 1140px; margin: 0 auto; text-align: left; }
         /* In the editor Puck wraps the columns in a DropZone. display:contents
